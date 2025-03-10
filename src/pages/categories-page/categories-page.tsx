@@ -40,10 +40,10 @@ export const CategoriesPage = () => {
         />
       </div>
       <Button
-        onClick={() => navigation("/registration")}
+        onClick={() => navigation("/links")}
         text="Продолжить"
         variant="primary"
-        className="mt-8"
+        className="mt-[120px]"
         isLamp
       />
     </Layout>

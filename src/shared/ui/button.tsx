@@ -5,8 +5,8 @@ import { cn } from "../lib/utils";
 
 export const buttonVariants = {
   primary:
-    "bg-main text-white rounded-full w-full py-3 flex  items-center justify-center  gap-2 font-bold",
-  secondary: "bg-secondary text-white rounded-full",
+    "bg-main text-white rounded-full w-full py-4 flex  items-center justify-center  gap-2 font-bold",
+  secondary: "bg-secondary text-white py-4 font-bold rounded-full",
 } as const;
 
 export type ButtonVariant = keyof typeof buttonVariants;
