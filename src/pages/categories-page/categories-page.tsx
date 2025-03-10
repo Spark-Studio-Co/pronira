@@ -43,7 +43,7 @@ export const CategoriesPage = () => {
         onClick={() => navigation("/links")}
         text="Продолжить"
         variant="primary"
-        className="mt-[120px]"
+        className="mt-[120px] mb-8"
         isLamp
       />
     </Layout>

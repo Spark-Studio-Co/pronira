@@ -24,7 +24,7 @@ export const RegistrationPage = () => {
         onClick={() => navigation("/categories")}
         text="Продолжить"
         variant="primary"
-        className="mt-8"
+        className="mt-8 mb-8"
         isLamp
       />
     </Layout>

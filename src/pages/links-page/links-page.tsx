@@ -31,7 +31,7 @@ export const LinksPage = () => {
         onClick={() => navigation("/personal")}
         text="Продолжить"
         variant="primary"
-        className="mt-[286px]"
+        className="mt-[286px] mb-8"
         isLamp
       />
     </Layout>
