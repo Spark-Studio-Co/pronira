@@ -1,8 +1,8 @@
 "use client";
 
-import { ChevronDown } from "lucide";
 import { forwardRef, useEffect, useRef, useState } from "react";
 import { cn } from "../lib/utils";
+import { ChevronDown } from "lucide-react";
 
 export interface DropdownOption {
   value: string;

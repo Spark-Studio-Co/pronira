@@ -1,4 +1,4 @@
-import { CheckCircle } from "lucide";
+import { CheckCircle } from "lucide-react";
 
 interface ISelector {
   name: string;

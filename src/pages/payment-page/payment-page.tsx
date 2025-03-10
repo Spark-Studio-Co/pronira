@@ -1,5 +1,4 @@
 import { Layout } from "@/shared/ui/layout";
-import React from "react";
 
 export const PaymentPage = () => {
   return (
