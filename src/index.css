@@ -1,0 +1,10 @@
+@import "tailwindcss";
+@layer theme, base, components, utilities;
+@import url("https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,200..1000;1,200..1000&display=swap");
+
+@theme {
+  --color-main: #6798de;
+  --color-gray-light: #f4f4f4;
+  --color-secondary: #00a859;
+  --color-main-light: #e1eaf8;
+}
