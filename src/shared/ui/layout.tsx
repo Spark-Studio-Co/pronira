@@ -18,9 +18,9 @@ export const Layout: React.FC<ILayout> = ({
 }) => {
   return (
     <div className="w-full min-h-full">
-      <div className="px-4 lg:px-0 pt-[90px] lg:pt-[161px] flex flex-col items-center lg:items-start lg:max-w-[1300px] mx-auto relative">
+      <div className={`px-4 lg:px-0 pt-[90px] ${isWelcome && ' lg:pt-[161px]'} flex flex-col items-center lg:items-start lg:max-w-[1300px] mx-auto relative`}>
         {isHeading && (
-          <div className={`w-full flex ${isCenter ? 'items-center justify-center' : 'items-start'} mb-4`}>
+          <div className={`w-full flex ${isCenter ? 'lg:items-center lg:justify-center' : 'items-start'} mb-4`}>
             <h1 className={`text-[28px] lg:text-[48px] text-black text-left ${isCenter ? 'text-center' : 'text-left'} font-bold`}>
               {heading}
             </h1>

@@ -10,8 +10,8 @@ export const SuccessPyamentPage = () => {
 
     return (
         // <Layout isWelcome={false} isHeading>
-        <div className="flex flex-col items-center relative max-w-[90%] mx-auto mb-20">
-            <img src={background} className='absolute' />
+        <div className="flex flex-col items-center relative max-w-[90%] lg:w-[408px] mx-auto mb-20">
+            <img src={background} className='absolute lg:hidden' />
             <div className='z-50 flex flex-col items-center'>
                 <span className='text-main text-[48px] font-bold mt-20'>Отлично!</span>
                 <span className='text-black text-[32px] font-bold -mt-2'>Платеж принят</span>
