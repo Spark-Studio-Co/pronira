@@ -2,7 +2,7 @@ import { PromocodeInput } from "@/shared/ui/promocode-input";
 
 export const Promocode = () => {
   return (
-    <div className="w-full bg-main-light border-[1px] border-main rounded-[16px] px-[28px]  flex flex-col items-center justify-center pt-4 pb-[41px]">
+    <div className="w-full lg:max-w-[408px] bg-main-light border-[1px] border-main rounded-[16px] px-[28px]  flex flex-col items-center justify-center pt-4 pb-[41px]">
       <span className="text-main text-[18px] font-bold">
         Промокод если есть
       </span>

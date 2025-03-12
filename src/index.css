@@ -8,4 +8,7 @@
   --color-gray-light: #f4f4f4;
   --color-secondary: #00a859;
   --color-main-light: #e1eaf8;
+
+    --breakpoint-3xl: 1700px;
+    --breakpoint-4xl: 1900px;
 }

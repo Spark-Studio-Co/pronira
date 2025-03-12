@@ -9,8 +9,8 @@ export const PaymentPage = () => {
   const navigate = useNavigate()
 
   return (
-    <Layout isWelcome={false} isHeading heading="Отправить платеж">
-      <div className="w-full flex items-start flex-col">
+    <Layout isWelcome={false} isHeading heading="Отправить платеж" isCenter>
+      <div className="w-full flex items-start flex-col lg:items-center lg:w-[408px] lg:justify-center">
         <span className="font-[400] text-black">Выбери одну или несколько категорий</span>
         <div className="w-full  mt-8 flex flex-col gap-3">
           <Input placeholder="Квартиры" />
