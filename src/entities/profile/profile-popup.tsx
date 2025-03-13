@@ -52,7 +52,6 @@ export function ProfileInstructionsPopup({
                   Выберите формат инструкции для скачивания в зависимости от
                   вашего устройства
                 </p>
-
                 <div className="space-y-4">
                   <Button
                     variant="primary"
