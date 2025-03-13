@@ -4,7 +4,7 @@ import { Layout } from "@/shared/ui/layout";
 
 export const PersonalDataPage = () => {
   return (
-    <Layout isWelcome={false} isHeading heading="Личный кабинет">
+    <Layout isWelcome={false} isHeading heading="Смена личных данных">
       <div className="w-full mt-8 flex flex-col gap-3 lg:grid lg:grid-cols-3 lg:gap-x-6 lg:gap-y-4">
         <div className="lg:col-span-1">
           <Input placeholder="Как тебя зовут?" />

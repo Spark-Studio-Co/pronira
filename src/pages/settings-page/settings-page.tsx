@@ -41,6 +41,7 @@ export const SettingsPage = () => {
           variant="secondary"
           className="w-full"
         />
+        <Button text="Телеграмм канал" variant="secondary" className="w-full" />
       </div>
       <PromoCodePopup isOpen={isOpen} onClose={handleClose} />
     </Layout>
