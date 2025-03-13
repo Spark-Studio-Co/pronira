@@ -28,7 +28,7 @@ export const BottomTab = () => {
       style={{
         boxShadow: "0px -4px 10px rgba(0, 0, 0, 0.1)",
       }}
-      className="w-full absolute flex items-center justify-between px-[78px] h-[85px] py-[27px]  bottom-0 bg-white rounded-t-[32px] shadow-2xl"
+      className="w-full fixed flex items-center justify-between px-[78px] h-[85px] py-[27px]  bottom-0 bg-white rounded-t-[32px] shadow-2xl"
     >
       <House
         color={getColor("personal")}
