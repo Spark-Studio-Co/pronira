@@ -6,7 +6,7 @@ interface ProfilePopupState {
   close: () => void;
 }
 
-export const useProfilePopupStore = create<ProfilePopupState>((set) => ({
+export const useInstructionPopupStore = create<ProfilePopupState>((set) => ({
   isOpen: false,
   open: () => set({ isOpen: true }),
   close: () => set({ isOpen: false }),

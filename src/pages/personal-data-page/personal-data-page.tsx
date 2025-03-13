@@ -1,4 +1,3 @@
-import { Promocode } from "@/entities/promocode/promocode";
 import { Input } from "@/shared/ui/input";
 import { Layout } from "@/shared/ui/layout";
 
@@ -26,9 +25,6 @@ export const PersonalDataPage = () => {
         </div>
         <div className="lg:col-span-1 lg:col-start-2">
           <Input placeholder="Придумай пароль для входа" />
-        </div>
-        <div className="lg:col-span-3 lg:flex lg:justify-center">
-          <Promocode />
         </div>
       </div>
     </Layout>

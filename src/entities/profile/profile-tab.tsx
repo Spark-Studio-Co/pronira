@@ -1,7 +1,7 @@
 import { Avatar } from "@/shared/ui/avatar";
 import { Button } from "@/shared/ui/button";
 import { InfoIcon } from "lucide-react";
-import { useProfilePopupStore } from "./store/profile-popup-store";
+import { useProfilePopupStore } from "./store/use-instruction-popup-store";
 
 export const ProfileTab = () => {
   const { open } = useProfilePopupStore();

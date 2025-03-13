@@ -1,3 +1,5 @@
+import { ProfileInstructionsPopup } from "@/entities/profile/profile-popup";
+import { useInstructionPopupStore } from "@/entities/profile/store/use-instruction-popup-store";
 import { PromoCodePopup } from "@/entities/promocode/promocode-popup";
 import { Button } from "@/shared/ui/button";
 import { Layout } from "@/shared/ui/layout";
@@ -7,12 +9,17 @@ import { useNavigate } from "react-router-dom";
 export const SettingsPage = () => {
   const navigate = useNavigate();
   const [isOpen, setIsOpen] = useState<boolean>(false);
+  const {
+    isOpen: isInstructionPopupOpen,
+    close,
+    open,
+  } = useInstructionPopupStore();
 
-  const handleOpen = () => {
+  const handleCodePopupOpen = () => {
     setIsOpen(true);
   };
 
-  const handleClose = () => {
+  const handleCodePopupClose = () => {
     setIsOpen(false);
   };
 
@@ -27,23 +34,38 @@ export const SettingsPage = () => {
         <Button
           text="Получить промокод для друга"
           className="w-full"
-          onClick={handleOpen}
+          onClick={handleCodePopupOpen}
         />
         <Button
           text="Принять платеж за поисковой артефакт"
           className="w-full"
           onClick={() => navigate("/payment")}
         />
-        <Button text="Изменить персональные данные" className="w-full" />
-        <Button text="Инструкция по установке" className="w-full" />
+        <Button
+          text="Изменить персональные данные"
+          onClick={() => navigate("/settings/personal-data")}
+          className="w-full"
+        />
+        <Button
+          text="Инструкция по установке"
+          className="w-full"
+          onClick={() => open()}
+        />
         <Button
           text="Связаться с создателем"
           variant="secondary"
+          onClick={() => (
+            (window.location.href = "https://wa.me/+79785054554"), "_blank"
+          )}
           className="w-full"
         />
         <Button text="Телеграмм канал" variant="secondary" className="w-full" />
       </div>
-      <PromoCodePopup isOpen={isOpen} onClose={handleClose} />
+      <ProfileInstructionsPopup
+        isOpen={isInstructionPopupOpen}
+        onClose={close}
+      />
+      <PromoCodePopup isOpen={isOpen} onClose={handleCodePopupClose} />
     </Layout>
   );
 };

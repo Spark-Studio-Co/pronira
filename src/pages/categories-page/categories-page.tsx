@@ -30,7 +30,7 @@ export const CategoriesPage = () => {
             </span>
           </h1>
         </div>
-        <div className="w-full flex flex-col items-center gap-4 lg:gap-x-9 mt-8 lg:mt-16 lg:grid lg:grid-cols-3">
+        <div className="w-full flex flex-col items-center gap-4 lg:gap-x-9 mt-8 lg:mt-16 lg:grid lg:grid-cols-4">
           {categories.slice(0, 3).map((category) => (
             <Selector
               key={category}
@@ -39,7 +39,7 @@ export const CategoriesPage = () => {
               isChecked={checkedCategories.includes(category)}
             />
           ))}
-          <div className="lg:col-span-1 lg:col-start-2 lg:mt-10">
+          <div className="w-full lg:col-span-1 lg:col-start-2 lg:mt-10">
             <Selector
               name={categories[3]}
               onClick={() => toggleCategory(categories[3])}

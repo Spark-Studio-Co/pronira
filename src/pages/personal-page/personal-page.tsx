@@ -1,11 +1,11 @@
 import { ProfileInstructionsPopup } from "@/entities/profile/profile-popup";
 import { ProfileTab } from "@/entities/profile/profile-tab";
-import { useProfilePopupStore } from "@/entities/profile/store/profile-popup-store";
+import { useInstructionPopupStore } from "@/entities/profile/store/use-instruction-popup-store";
 import { Layout } from "@/shared/ui/layout";
 import { AnnouncementsWidget } from "@/widgets/announcements-widget/announcements-widget";
 
 export const PersonalPage = () => {
-  const { isOpen, close } = useProfilePopupStore();
+  const { isOpen, close } = useInstructionPopupStore();
 
   return (
     <Layout isWelcome={false} isHeading heading="Личный кабинет">
