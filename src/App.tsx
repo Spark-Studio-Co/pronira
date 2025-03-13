@@ -10,6 +10,7 @@ import { SettingsPage } from "./pages/settings-page/settings-page";
 import { PaymentPage } from "./pages/payment-page/payment-page";
 import { SuccessPyamentPage } from "./pages/success-payment-page/success-payment-page";
 import { DeniedPyamentPage } from "./pages/payment-denied-page/payment-denied-page";
+import { PersonalDataPage } from "./pages/personal-data-page/personal-data-page";
 
 function App() {
   return (
@@ -23,6 +24,10 @@ function App() {
             <Route path="/links" element={<LinksPage />} />
             <Route path="/personal" element={<PersonalPage />} />
             <Route path="/settings" element={<SettingsPage />} />
+            <Route
+              path="/settings/personal-data"
+              element={<PersonalDataPage />}
+            />
             <Route path="/payment" element={<PaymentPage />} />
             <Route path="/payment-success" element={<SuccessPyamentPage />} />
             <Route path="/payment-denied" element={<DeniedPyamentPage />} />

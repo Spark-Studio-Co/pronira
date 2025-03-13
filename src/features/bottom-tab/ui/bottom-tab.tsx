@@ -1,8 +1,27 @@
 import { House, MapIcon, Settings, Wallet } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { create } from "zustand";
+
+interface NavStore {
+  activeTab: string;
+  setActiveTab: (tab: string) => void;
+}
+
+const useNavStore = create<NavStore>((set) => ({
+  activeTab: "personal",
+  setActiveTab: (tab) => set({ activeTab: tab }),
+}));
 
 export const BottomTab = () => {
   const navigate = useNavigate();
+  const { activeTab, setActiveTab } = useNavStore();
+
+  const handleNavigation = (path: string, tab: string) => {
+    setActiveTab(tab);
+    navigate(path);
+  };
+
+  const getColor = (tab: string) => (activeTab === tab ? "#4A90E2" : "#C2D6F2");
 
   return (
     <div
@@ -11,13 +30,25 @@ export const BottomTab = () => {
       }}
       className="w-full absolute flex items-center justify-between px-[78px] h-[85px] py-[27px]  bottom-0 bg-white rounded-t-[32px] shadow-2xl"
     >
-      <House color="#6798de" size={32} onClick={() => navigate("/personal")} />
-      <MapIcon color="#6798de" size={32} onClick={() => navigate("/search")} />
-      <Wallet color="#6798de" size={32} onClick={() => navigate("/payment")} />
-      <Settings
-        color="#6798de"
+      <House
+        color={getColor("personal")}
         size={32}
-        onClick={() => navigate("/settings")}
+        onClick={() => handleNavigation("/personal", "personal")}
+      />
+      <MapIcon
+        color={getColor("search")}
+        size={32}
+        onClick={() => handleNavigation("/search", "search")}
+      />
+      <Wallet
+        color={getColor("payment")}
+        size={32}
+        onClick={() => handleNavigation("/payment", "payment")}
+      />
+      <Settings
+        color={getColor("settings")}
+        size={32}
+        onClick={() => handleNavigation("/settings", "settings")}
       />
     </div>
   );

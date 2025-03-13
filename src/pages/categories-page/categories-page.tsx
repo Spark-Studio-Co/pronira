@@ -6,16 +6,24 @@ import { useNavigate } from "react-router-dom";
 
 export const CategoriesPage = () => {
   const navigation = useNavigate();
-  const [isChecked, setIsChecked] = useState(false);
+  const [checkedCategories, setCheckedCategories] = useState<string[]>([]);
+
+  const categories = ["Квартиры", "Дома", "Земельные участки", "Аренда"];
+
+  const toggleCategory = (category: string) => {
+    setCheckedCategories((prev) =>
+      prev.includes(category)
+        ? prev.filter((item) => item !== category)
+        : [...prev, category]
+    );
+  };
 
   return (
     <Layout isWelcome>
       <div className="lg:items-center lg:justify-center w-full flex flex-col">
         <div className="flex flex-col items-start w-full">
           <h1 className="text-[24px] text-center lg:text-left font-bold">
-            <span className="lg:text-[48px]">
-              Теперь самое интересное!
-            </span>
+            <span className="lg:text-[48px]">Теперь самое интересное!</span>
             <br />
             <span className="lg:text-[24px]">
               Выбери одну или несколько моих сокровищниц
@@ -23,26 +31,19 @@ export const CategoriesPage = () => {
           </h1>
         </div>
         <div className="w-full flex flex-col items-center gap-4 lg:gap-x-9 mt-8 lg:mt-16 lg:grid lg:grid-cols-3">
-          <Selector
-            name="Квартиры"
-            onClick={() => setIsChecked(true)}
-            isChecked={isChecked}
-          />
-          <Selector
-            name="Дома"
-            onClick={() => setIsChecked(true)}
-            isChecked={isChecked}
-          />
-          <Selector
-            name="Земельные участки"
-            onClick={() => setIsChecked(true)}
-            isChecked={isChecked}
-          />
+          {categories.slice(0, 3).map((category) => (
+            <Selector
+              key={category}
+              name={category}
+              onClick={() => toggleCategory(category)}
+              isChecked={checkedCategories.includes(category)}
+            />
+          ))}
           <div className="lg:col-span-1 lg:col-start-2 lg:mt-10">
             <Selector
-              name="Аренда"
-              onClick={() => setIsChecked(true)}
-              isChecked={isChecked}
+              name={categories[3]}
+              onClick={() => toggleCategory(categories[3])}
+              isChecked={checkedCategories.includes(categories[3])}
             />
           </div>
         </div>

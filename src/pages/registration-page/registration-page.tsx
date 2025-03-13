@@ -10,7 +10,9 @@ export const RegistrationPage = () => {
   return (
     <Layout isWelcome>
       <div className="flex items-center justify-center flex-col w-full">
-        <h1 className="text-[24px] font-bold lg:text-[48px] lg:w-full">Давай знакомиться!</h1>
+        <h1 className="text-[24px] font-bold lg:text-[48px] lg:w-full">
+          Давай знакомиться!
+        </h1>
         <div className="w-full mt-8 flex flex-col gap-3 lg:grid lg:grid-cols-3 lg:gap-x-6 lg:gap-y-4">
           <div className="lg:col-span-1">
             <Input placeholder="Как тебя зовут?" />
