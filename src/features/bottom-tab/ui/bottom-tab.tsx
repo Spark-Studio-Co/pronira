@@ -1,4 +1,4 @@
-import { House, MapIcon, Settings, Wallet } from "lucide-react";
+import { House, Settings, Wallet } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { create } from "zustand";
 
@@ -34,11 +34,6 @@ export const BottomTab = () => {
         color={getColor("personal")}
         size={32}
         onClick={() => handleNavigation("/personal", "personal")}
-      />
-      <MapIcon
-        color={getColor("search")}
-        size={32}
-        onClick={() => handleNavigation("/search", "search")}
       />
       <Wallet
         color={getColor("payment")}
