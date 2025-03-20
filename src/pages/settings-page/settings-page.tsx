@@ -66,7 +66,7 @@ export const SettingsPage = () => {
         onClose={close}
       />
       <PromoCodePopup isOpen={isOpen} onClose={handleCodePopupClose} />
-      <span className="flex flex-col items-center text-center gap-2 mt-8">
+      <span className="flex flex-col justify-center w-full items-center text-center gap-2 mt-8">
         ИП Тымченко Ярослав Викторович <br /> <br /> ИНН: 920001086086
       </span>
     </Layout>

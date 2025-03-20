@@ -27,7 +27,11 @@ export const RegistrationPage = () => {
             <Input placeholder="Поделись электронной почтой" />
           </div>
           <div className="lg:col-span-1">
-            <Input placeholder="Ты агент или частное лицо" />
+            <Input
+              placeholder="Ты агент или частное лицо"
+              isSelector
+              options={["Агент", "Частное лицо"]}
+            />
           </div>
           <div className="lg:col-span-1">
             <Input placeholder="Название агенства в котором работаешь" />

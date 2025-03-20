@@ -30,7 +30,7 @@ export const CategoriesPage = () => {
             </span>
           </h1>
         </div>
-        <div className="w-full flex flex-col items-center gap-4 lg:gap-x-9 mt-8 lg:mt-16 lg:grid lg:grid-cols-4">
+        <div className="w-full flex flex-col items-center gap-4 lg:gap-x-9 mt-8 lg:mt-16 lg:grid lg:grid-cols-3">
           {categories.slice(0, 3).map((category) => (
             <Selector
               key={category}

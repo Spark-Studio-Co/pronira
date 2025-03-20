@@ -9,7 +9,7 @@ export const LinksPage = () => {
   const [links, setLinks] = useState<{ [key: string]: string }>({});
   const [activeInputs, setActiveInputs] = useState<string[]>([]);
 
-  const categories = ["Квартиры", "Дома", "Участки"];
+  const categories = ["Квартиры", "Дома", "Участки", "Аренда"];
 
   const handleInputToggle = (category: string) => {
     setActiveInputs((prev) =>
@@ -53,12 +53,14 @@ export const LinksPage = () => {
           </div>
         ))}
       </div>
-      <img src={treasure} className="w-[400px] h-[400px]" alt="Money" />
+      <div className="w-full flex items-center justify-center mt-8">
+        <img src={treasure} className="w-[400px]" alt="Money" />
+      </div>
       <Button
         onClick={() => navigation("/personal")}
         text="Продолжить"
         variant="primary"
-        className="mt-[286px] mb-8"
+        className="mt-[128px] mb-8"
         isLamp
       />
     </Layout>
