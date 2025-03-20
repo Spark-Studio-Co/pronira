@@ -1,5 +1,4 @@
 import background from "@/assets/success_payment_bg.png";
-import jin from "@/assets/main.png";
 import { Button } from "@/shared/ui/button";
 import { useNavigate } from "react-router-dom";
 import denied from "@/assets/payment_denied.png";
