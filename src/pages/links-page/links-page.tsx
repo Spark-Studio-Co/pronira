@@ -2,6 +2,7 @@ import { Button } from "@/shared/ui/button";
 import { Layout } from "@/shared/ui/layout";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
+import treasure from "@/assets/treasure.png";
 
 export const LinksPage = () => {
   const navigation = useNavigate();
@@ -52,6 +53,7 @@ export const LinksPage = () => {
           </div>
         ))}
       </div>
+      <img src={treasure} className="w-[400px] h-[400px]" alt="Money" />
       <Button
         onClick={() => navigation("/personal")}
         text="Продолжить"

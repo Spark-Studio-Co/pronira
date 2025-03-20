@@ -29,7 +29,7 @@ export const SettingsPage = () => {
         <Button
           text="Задать параметры поиска"
           className="w-full"
-          onClick={() => navigate("")}
+          onClick={() => navigate("/links")}
         />
         <Button
           text="Получить промокод для друга"
