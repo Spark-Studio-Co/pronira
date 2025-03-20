@@ -1,6 +1,5 @@
 import { QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Route, Routes, useLocation } from "react-router-dom";
-import { AnimatePresence, motion } from "framer-motion";
 import reactQueryClient from "./shared/api/query-client";
 
 // Import pages
