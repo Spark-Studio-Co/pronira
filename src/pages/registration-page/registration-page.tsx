@@ -9,7 +9,7 @@ import { useUpdateUser } from "@/entities/auth/hooks/mutation/use-update-user.mu
 
 export const RegistrationPage = () => {
   const navigation = useNavigate();
-  const { mutate: updateUser } = useUpdateUser();
+  const { mutate: updateUser, isPending } = useUpdateUser();
 
   const [formData, setFormData] = useState({
     id: "",
@@ -111,7 +111,7 @@ export const RegistrationPage = () => {
         </div>
         <Button
           onClick={handleSubmit}
-          text="Продолжить"
+          text={isPending ? "Отправляем..." : "Продолжить"}
           variant="primary"
           className="mt-8 mb-8 lg:max-w-[382px] lg:mt-16"
           isLamp
