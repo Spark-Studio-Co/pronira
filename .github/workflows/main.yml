@@ -17,4 +17,4 @@ jobs:
           username: ${{ secrets.VPS_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
-            ~/var/www/dist/deploy-frontend.sh
+            /var/www/dist/deploy-frontend.sh
