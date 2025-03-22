@@ -1,11 +1,11 @@
 #!/bin/bash
 echo "Deploying frontend..."
 
-cd ~/var/www/dist
+cd /var/www/pronira
 git pull origin main
 
 echo "Installing dependencies..."
-npm install
+yarn install
 
 echo "Building frontend..."
 npx vite build
