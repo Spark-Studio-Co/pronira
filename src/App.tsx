@@ -73,7 +73,7 @@ function AnimatedRoutes() {
     </Routes>
   );
 }
-
+// r
 function App() {
   return (
     <QueryClientProvider client={reactQueryClient}>
