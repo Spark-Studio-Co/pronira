@@ -218,36 +218,35 @@ export default function SubscriptionsPage() {
             ) : (
               <TableRow>
                 <TableCell colSpan={5} className="h-24 text-center">
-                  No plans found.
+                  Тариффы не найдены.
                 </TableCell>
               </TableRow>
             )}
           </TableBody>
         </Table>
       </div>
-
       {selectedPlan && (
         <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
           <DialogContent className="sm:max-w-[425px]">
             <DialogHeader>
-              <DialogTitle>Edit Price</DialogTitle>
+              <DialogTitle>Изменить цену</DialogTitle>
               <DialogDescription>
-                Update the price for {selectedPlan.name}.
+                Обновить цену для {selectedPlan.name}.
               </DialogDescription>
             </DialogHeader>
             <div className="grid gap-4 py-4">
               <div className="grid grid-cols-4 items-center gap-4">
-                <FormLabel className="text-right">Current Price:</FormLabel>
+                <FormLabel className="text-right">Текущая цена:</FormLabel>
                 <div className="col-span-3 font-medium">
                   {selectedPlan.price}
                 </div>
               </div>
               <div className="grid grid-cols-4 items-center gap-4">
                 <FormLabel htmlFor="price" className="text-right">
-                  New Price:
+                  Новая цена:
                 </FormLabel>
                 <div className="col-span-3 flex items-center">
-                  <span className="mr-1">$</span>
+                  <span className="mr-1">₽</span>
                   <Input
                     id="price"
                     value={editedPrice}
@@ -262,7 +261,7 @@ export default function SubscriptionsPage() {
                 variant="outline"
                 onClick={() => setIsEditDialogOpen(false)}
               >
-                Cancel
+                Отмена
               </Button>
               <Button onClick={handleSavePrice}>Save Changes</Button>
             </DialogFooter>

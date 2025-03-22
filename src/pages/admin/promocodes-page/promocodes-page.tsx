@@ -274,11 +274,11 @@ export default function PromocodesPage() {
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>Code</TableHead>
-                  <TableHead>Discount</TableHead>
-                  <TableHead>Type</TableHead>
-                  <TableHead>Usage</TableHead>
-                  <TableHead>Expiry Date</TableHead>
+                  <TableHead>Код</TableHead>
+                  <TableHead>Скидка</TableHead>
+                  <TableHead>Тип</TableHead>
+                  <TableHead>Использование</TableHead>
+                  <TableHead>Дата истечения</TableHead>
                   <TableHead className="w-[80px]"></TableHead>
                 </TableRow>
               </TableHeader>
@@ -318,11 +318,11 @@ export default function PromocodesPage() {
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>Code</TableHead>
-                  <TableHead>Discount</TableHead>
-                  <TableHead>Type</TableHead>
-                  <TableHead>Usage</TableHead>
-                  <TableHead>Expiry Date</TableHead>
+                  <TableHead>Код</TableHead>
+                  <TableHead>Скидка</TableHead>
+                  <TableHead>Тип</TableHead>
+                  <TableHead>Использование</TableHead>
+                  <TableHead>Дата истечения</TableHead>
                   <TableHead className="w-[80px]"></TableHead>
                 </TableRow>
               </TableHeader>
@@ -357,15 +357,15 @@ export default function PromocodesPage() {
       <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
         <DialogContent className="sm:max-w-[500px]">
           <DialogHeader>
-            <DialogTitle>Create New Promocode</DialogTitle>
+            <DialogTitle>Создать новый промокод</DialogTitle>
             <DialogDescription>
-              Create a new promocode for your customers.
+              Создайте новый промокод для клиентов.
             </DialogDescription>
           </DialogHeader>
           <form onSubmit={handleCreatePromocode}>
             <div className="grid gap-4 py-4">
               <div className="grid grid-cols-4 items-center gap-4">
-                <FormLabel className="text-right">Code</FormLabel>
+                <FormLabel className="text-right">Код</FormLabel>
                 <div className="col-span-3 flex gap-2">
                   <Input
                     name="code"
@@ -385,7 +385,7 @@ export default function PromocodesPage() {
                 </div>
               </div>
               <div className="grid grid-cols-4 items-center gap-4">
-                <FormLabel className="text-right">Discount</FormLabel>
+                <FormLabel className="text-right">Скидка</FormLabel>
                 <Input
                   name="discount"
                   value={newPromocode.discount}
@@ -404,13 +404,17 @@ export default function PromocodesPage() {
                     <SelectValue placeholder="Select type" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="percentage">Percentage (%)</SelectItem>
-                    <SelectItem value="fixed">Fixed Amount ($)</SelectItem>
+                    <SelectItem value="percentage">Процент (%)</SelectItem>
+                    <SelectItem value="fixed">
+                      Фиксированная сумма (₽)
+                    </SelectItem>
                   </SelectContent>
                 </Select>
               </div>
               <div className="grid grid-cols-4 items-center gap-4">
-                <FormLabel className="text-right">Usage Limit</FormLabel>
+                <FormLabel className="text-right">
+                  Лимит использования
+                </FormLabel>
                 <Input
                   name="usageLimit"
                   value={newPromocode.usageLimit}
@@ -421,7 +425,7 @@ export default function PromocodesPage() {
                 />
               </div>
               <div className="grid grid-cols-4 items-center gap-4">
-                <FormLabel className="text-right">Expiry Date</FormLabel>
+                <FormLabel className="text-right">Дата истечения</FormLabel>
                 <Input
                   name="expiryDate"
                   value={newPromocode.expiryDate}
@@ -437,9 +441,9 @@ export default function PromocodesPage() {
                 variant="outline"
                 onClick={() => setIsCreateDialogOpen(false)}
               >
-                Cancel
+                Отмена
               </Button>
-              <Button type="submit">Create Promocode</Button>
+              <Button type="submit">Создать промокод</Button>
             </DialogFooter>
           </form>
         </DialogContent>
