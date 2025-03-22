@@ -16,7 +16,7 @@ export const IntroPage = () => {
       <div className="z-50 flex justify-between w-full lg:flex-row">
         <div className="flex flex-col items-center lg:items-start">
           <h1 className="text-[24px] lg:text-[40px] 2xl:text-[44px] lg:max-w-[710px] lg:text-left text-center font-bold">
-            Добро пожаловать (testerr)
+            Добро пожаловать (testerrr)
             <br />в приложение «Проныра»! 🧞‍♂️✨
           </h1>
           <img
