@@ -3,6 +3,9 @@
 echo "🚀 Deploying frontend..."
 
 cd /var/www/pronira
+git reset --hard          
+
+
 git pull origin main
 
 echo "📦 Installing dependencies..."
