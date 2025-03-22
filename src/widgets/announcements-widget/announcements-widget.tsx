@@ -1,5 +1,5 @@
 import { AnnouncementTab } from "@/entities/announcement/announcement-tab";
-import announcement_tab from "@/assets/announcement_tab.png";
+import announcement_tab from "/announcement_tab.png";
 
 const mockAnnouncements = [
   {

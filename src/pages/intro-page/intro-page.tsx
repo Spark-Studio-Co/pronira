@@ -1,9 +1,9 @@
-import image from "@/assets/main.png";
+import image from "/main.png";
 import { Button } from "@/shared/ui/button";
 import { Layout } from "@/shared/ui/layout";
 import { useNavigate } from "react-router-dom";
 
-import intro_bg from "@/assets/intro_bg.png";
+import intro_bg from "/intro_bg.png";
 
 export const IntroPage = () => {
   const navigation = useNavigate();

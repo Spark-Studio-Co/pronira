@@ -13,6 +13,15 @@ import { PaymentPage } from "./pages/payment-page/payment-page";
 import { SuccessPyamentPage } from "./pages/success-payment-page/success-payment-page";
 import { DeniedPyamentPage } from "./pages/payment-denied-page/payment-denied-page";
 import { PersonalDataPage } from "./pages/personal-data-page/personal-data-page";
+import Dashboard from "./pages/admin/dashboard-page/dashboard-page";
+import Promocodes from "./pages/admin/promocodes-page/promocodes-page";
+import Layout from "./components/layout/layout";
+import Users from "./pages/admin/users-page/users-page";
+import UsersPage from "./pages/admin/users-page/users-page";
+import PromocodesPage from "./pages/admin/promocodes-page/promocodes-page";
+import DashboardPage from "./pages/admin/dashboard-page/dashboard-page";
+import SubscriptionsPage from "./pages/admin/subscriptions-page/subscriptions-page";
+import Login from "./pages/admin/login-page/login-page";
 
 function AnimatedRoutes() {
   const location = useLocation();
@@ -29,6 +38,39 @@ function AnimatedRoutes() {
       <Route path="/payment" element={<PaymentPage />} />
       <Route path="/payment-success" element={<SuccessPyamentPage />} />
       <Route path="/payment-denied" element={<DeniedPyamentPage />} />
+      <Route
+        path="/admin"
+        element={
+          <Layout>
+            <DashboardPage />
+          </Layout>
+        }
+      />
+      <Route path="/admin/login" element={<Login />} />
+      <Route
+        path="/admin/promocodes"
+        element={
+          <Layout>
+            <PromocodesPage />
+          </Layout>
+        }
+      />
+      <Route
+        path="/admin/subscriptions"
+        element={
+          <Layout>
+            <SubscriptionsPage />
+          </Layout>
+        }
+      />
+      <Route
+        path="/admin/users"
+        element={
+          <Layout>
+            <UsersPage />
+          </Layout>
+        }
+      />
     </Routes>
   );
 }

@@ -1,7 +1,7 @@
-import background from "@/assets/success_payment_bg.png";
+import background from "/success_payment_bg.png";
 import { Button } from "@/shared/ui/button";
 import { useNavigate } from "react-router-dom";
-import image from "@/assets/money.png";
+import image from "/money.png";
 
 export const SuccessPyamentPage = () => {
   const navigate = useNavigate();

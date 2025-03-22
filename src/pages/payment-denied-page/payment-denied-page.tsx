@@ -1,7 +1,7 @@
-import background from "@/assets/success_payment_bg.png";
+import background from "/success_payment_bg.png";
 import { Button } from "@/shared/ui/button";
 import { useNavigate } from "react-router-dom";
-import denied from "@/assets/payment_denied.png";
+import denied from "/payment_denied.png";
 
 export const DeniedPyamentPage = () => {
   const navigate = useNavigate();

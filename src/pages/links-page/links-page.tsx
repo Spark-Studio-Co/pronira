@@ -2,7 +2,7 @@ import { Button } from "@/shared/ui/button";
 import { Layout } from "@/shared/ui/layout";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
-import treasure from "@/assets/treasure.png";
+import treasure from "/treasure.png";
 
 export const LinksPage = () => {
   const navigation = useNavigate();
