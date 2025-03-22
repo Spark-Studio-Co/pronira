@@ -10,7 +10,6 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
@@ -44,6 +43,7 @@ import {
   Search,
   Trash2,
 } from "lucide-react";
+import { Button } from "@/shared/ui/button";
 
 // Mock data
 const mockPromocodes = [
@@ -166,12 +166,13 @@ export default function PromocodesPage() {
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <h2 className="text-3xl font-bold tracking-tight">Промокоды</h2>
-        <Button onClick={() => setIsCreateDialogOpen(true)}>
-          <Plus className="mr-2 h-4 w-4" />
-          Создать промокод
-        </Button>
+        <Button
+          variant="primary"
+          className="mt-8 mb-8 lg:max-w-[382px]"
+          onClick={() => setIsCreateDialogOpen(true)}
+          text="Продолжить"
+        />
       </div>
-
       <Tabs defaultValue="all" className="w-full">
         <TabsList className="grid w-full md:w-auto grid-cols-3">
           <TabsTrigger value="all">Все промокоды</TabsTrigger>
