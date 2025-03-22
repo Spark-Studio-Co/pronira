@@ -14,4 +14,3 @@ echo "🏗️  Building frontend..."
 npx vite build
 
 echo "✅ Frontend deployed successfully!"
->>>>>>> 0ff00da (fix)
