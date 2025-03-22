@@ -8,6 +8,8 @@ import intro_bg from "/intro_bg.png";
 export const IntroPage = () => {
   const navigation = useNavigate();
 
+  // test
+
   return (
     <Layout isWelcome>
       <img src={intro_bg} className="hidden lg:block absolute top-0" />
