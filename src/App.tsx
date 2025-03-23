@@ -19,16 +19,17 @@ import PromocodesPage from "./pages/admin/promocodes-page/promocodes-page";
 import DashboardPage from "./pages/admin/dashboard-page/dashboard-page";
 import SubscriptionsPage from "./pages/admin/subscriptions-page/subscriptions-page";
 import Login from "./pages/admin/login-page/login-page";
-
-// test test
+import { AgentPage } from "./pages/agent-option-page/agent-option-page";
 
 function AnimatedRoutes() {
   const location = useLocation();
+  // const { data: userData } = useGetUser();
 
   return (
     <Routes location={location} key={location.pathname}>
       <Route path="/" element={<IntroPage />} />
       <Route path="/registration" element={<RegistrationPage />} />
+      <Route path="/agent" element={<AgentPage />} />
       <Route path="/categories" element={<CategoriesPage />} />
       <Route path="/links" element={<LinksPage />} />
       <Route path="/personal" element={<PersonalPage />} />

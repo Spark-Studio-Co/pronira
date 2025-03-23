@@ -4,6 +4,7 @@ import { Layout } from "@/shared/ui/layout";
 import { useNavigate } from "react-router-dom";
 
 import intro_bg from "/intro_bg.png";
+import { TelegramLoginButton } from "@/entities/auth/ui/telegram-login";
 
 export const IntroPage = () => {
   const navigation = useNavigate();
@@ -32,6 +33,7 @@ export const IntroPage = () => {
             так, что о новых объектах ты будешь узнавать один из первых. Ну что,
             жми на лампу и давай потанцуем
           </p>
+          {/* <TelegramLoginButton /> */}
           <Button
             onClick={() => navigation("/registration")}
             text="Продолжить"

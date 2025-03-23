@@ -1,4 +1,5 @@
 export interface UpdateUserDTO {
+  chatId: string;
   name: string;
   city: string;
   phoneNumber: string;

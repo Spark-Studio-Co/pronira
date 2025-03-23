@@ -3,11 +3,16 @@ import { Layout } from "@/shared/ui/layout";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 import treasure from "/treasure.png";
+import { useAuthStore } from "@/entities/auth/store/use-auth-store";
+import { useSendparserData } from "@/entities/parser/hooks/mutation/send-parser-data.mutation";
 
 export const LinksPage = () => {
-  const navigation = useNavigate();
+  const navigate = useNavigate();
   const [links, setLinks] = useState<{ [key: string]: string }>({});
   const [activeInputs, setActiveInputs] = useState<string[]>([]);
+  const { chatId } = useAuthStore();
+
+  const { mutateAsync: sendData, isPending } = useSendparserData();
 
   const categories = ["Квартиры", "Дома", "Участки", "Аренда"];
 
@@ -19,6 +24,31 @@ export const LinksPage = () => {
 
   const handleLinkChange = (category: string, value: string) => {
     setLinks((prev) => ({ ...prev, [category]: value }));
+  };
+
+  const handleSubmit = async () => {
+    if (!chatId) {
+      console.error("Chat ID не найден");
+      return;
+    }
+
+    const promises = Object.entries(links)
+      .filter(([_, url]) => url.trim() !== "")
+      .map(([category, url]) =>
+        sendData({
+          url,
+          chat_id: Number(chatId),
+          min_price: "0", // You can collect real values from inputs
+          max_price: "10000000000", // or from previous pages
+        })
+      );
+
+    try {
+      await Promise.all(promises);
+      navigate("/personal");
+    } catch (error) {
+      console.error("Ошибка при отправке ссылок:", error);
+    }
   };
 
   return (
@@ -57,11 +87,12 @@ export const LinksPage = () => {
         <img src={treasure} className="w-[400px]" alt="Money" />
       </div>
       <Button
-        onClick={() => navigation("/personal")}
-        text="Продолжить"
+        onClick={handleSubmit}
+        text={isPending ? "Отправляем..." : "Продолжить"}
         variant="primary"
         className="mt-[128px] mb-8"
         isLamp
+        disabled={isPending}
       />
     </Layout>
   );

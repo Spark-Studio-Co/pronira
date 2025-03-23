@@ -1,41 +1,117 @@
+"use client";
+
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
-import { Promocode } from "@/entities/promocode/promocode";
 import { Button } from "@/shared/ui/button";
 import { Input } from "@/shared/ui/input";
 import { Layout } from "@/shared/ui/layout";
 import { useUpdateUser } from "@/entities/auth/hooks/mutation/use-update-user.mutation";
+import { useAuthStore } from "@/entities/auth/store/use-auth-store";
 
 export const RegistrationPage = () => {
   const navigation = useNavigate();
+  const { saveChatId } = useAuthStore();
   const { mutate: updateUser, isPending } = useUpdateUser();
 
   const [formData, setFormData] = useState({
-    id: "",
+    chatId: "",
     name: "",
     phoneNumber: "",
     city: "",
     email: "",
-    role: "",
-    agencyName: "",
     password: "",
+  });
+
+  const [errors, setErrors] = useState({
+    chatId: "",
+    name: "",
+    phoneNumber: "",
+    city: "",
+    email: "",
+    password: "",
+  });
+
+  const [touched, setTouched] = useState({
+    chatId: false,
+    name: false,
+    phoneNumber: false,
+    city: false,
+    email: false,
+    password: false,
   });
 
   const handleInputChange = (key: string, value: string) => {
     setFormData((prev) => ({ ...prev, [key]: value }));
+
+    // Clear error when user types
+    if (errors[key as keyof typeof errors]) {
+      setErrors((prev) => ({ ...prev, [key]: "" }));
+    }
+  };
+
+  const handleBlur = (field: string) => {
+    setTouched((prev) => ({ ...prev, [field]: true }));
+    validateField(field, formData[field as keyof typeof formData]);
+  };
+
+  const validateField = (field: string, value: string) => {
+    let error = "";
+
+    if (!value) {
+      error = "Это поле обязательно";
+    } else if (field === "email" && !/\S+@\S+\.\S+/.test(value)) {
+      error = "Введите корректный email";
+    } else if (field === "phoneNumber" && !/^\+?[0-9]{10,12}$/.test(value)) {
+      error = "Введите корректный номер телефона";
+    } else if (field === "password" && value.length < 6) {
+      error = "Пароль должен содержать минимум 6 символов";
+    }
+
+    setErrors((prev) => ({ ...prev, [field]: error }));
+    return !error;
+  };
+
+  const validateForm = () => {
+    const fields = [
+      "chatId",
+      "name",
+      "phoneNumber",
+      "city",
+      "email",
+      "password",
+    ];
+    let isValid = true;
+    const newTouched = { ...touched };
+
+    fields.forEach((field) => {
+      newTouched[field as keyof typeof touched] = true;
+      const valid = validateField(
+        field,
+        formData[field as keyof typeof formData]
+      );
+      if (!valid) isValid = false;
+    });
+
+    setTouched(newTouched);
+    return isValid;
   };
 
   const handleSubmit = () => {
+    if (!validateForm()) return;
+
     updateUser(
       {
         ...formData,
-        id: Number(formData.id),
-        isAgent: formData.role === "Агент",
       },
       {
-        onSuccess: () => navigation("/categories"),
-        onError: (err) => console.error("Ошибка при регистрации:", err),
+        onSuccess: () => {
+          saveChatId(formData.chatId);
+          navigation("/agent");
+        },
+        onError: (err) => {
+          console.error("Ошибка при регистрации:", err);
+        },
       }
     );
   };
@@ -49,71 +125,84 @@ export const RegistrationPage = () => {
         <div className="w-full mt-8 flex flex-col gap-3 lg:grid lg:grid-cols-3 lg:gap-x-6 lg:gap-y-4">
           <div className="lg:col-span-1">
             <Input
-              placeholder="Ваш телеграм id"
-              value={formData.id}
-              onChange={(e) => handleInputChange("id", e.target.value)}
+              placeholder="Ваш телеграм чат id *"
+              value={formData.chatId}
+              onChange={(e: any) => handleInputChange("chatId", e.target.value)}
+              onBlur={() => handleBlur("chatId")}
             />
+            {touched.chatId && errors.chatId && (
+              <p className="mt-1 text-sm text-red-500">{errors.chatId}</p>
+            )}
           </div>
           <div className="lg:col-span-1">
             <Input
-              placeholder="Как тебя зовут?"
+              placeholder="Как тебя зовут? *"
               value={formData.name}
-              onChange={(e) => handleInputChange("name", e.target.value)}
+              onChange={(e: any) => handleInputChange("name", e.target.value)}
+              onBlur={() => handleBlur("name")}
             />
+            {touched.name && errors.name && (
+              <p className="mt-1 text-sm text-red-500">{errors.name}</p>
+            )}
           </div>
           <div className="lg:col-span-1">
             <Input
-              placeholder="Номер телефона привязанный к телеграм"
+              placeholder="Номер телефона привязанный к телеграм *"
               value={formData.phoneNumber}
-              onChange={(e) => handleInputChange("phoneNumber", e.target.value)}
+              onChange={(e: any) =>
+                handleInputChange("phoneNumber", e.target.value)
+              }
+              onBlur={() => handleBlur("phoneNumber")}
             />
+            {touched.phoneNumber && errors.phoneNumber && (
+              <p className="mt-1 text-sm text-red-500">{errors.phoneNumber}</p>
+            )}
           </div>
           <div className="lg:col-span-1">
             <Input
-              placeholder="Из какого ты города?"
+              placeholder="Из какого ты города? *"
               value={formData.city}
-              onChange={(e) => handleInputChange("city", e.target.value)}
+              onChange={(e: any) => handleInputChange("city", e.target.value)}
+              onBlur={() => handleBlur("city")}
             />
+            {touched.city && errors.city && (
+              <p className="mt-1 text-sm text-red-500">{errors.city}</p>
+            )}
           </div>
           <div className="lg:col-span-1">
             <Input
-              placeholder="Поделись электронной почтой"
+              placeholder="Поделись электронной почтой *"
               value={formData.email}
-              onChange={(e) => handleInputChange("email", e.target.value)}
+              onChange={(e: any) => handleInputChange("email", e.target.value)}
+              onBlur={() => handleBlur("email")}
             />
+            {touched.email && errors.email && (
+              <p className="mt-1 text-sm text-red-500">{errors.email}</p>
+            )}
           </div>
           <div className="lg:col-span-1">
             <Input
-              placeholder="Ты агент или частное лицо"
-              isSelector
-              options={["Агент", "Частное лицо"]}
-              value={formData.role}
-              onChange={(value: any) => handleInputChange("role", value)}
-            />
-          </div>
-          <div className="lg:col-span-1">
-            <Input
-              placeholder="Название агенства в котором работаешь"
-              value={formData.agencyName}
-              onChange={(e) => handleInputChange("agencyName", e.target.value)}
-            />
-          </div>
-          <div className="lg:col-span-1 lg:col-start-2">
-            <Input
-              placeholder="Придумай пароль для входа"
+              placeholder="Придумай пароль для входа *"
               value={formData.password}
-              onChange={(e) => handleInputChange("password", e.target.value)}
+              onChange={(e: any) =>
+                handleInputChange("password", e.target.value)
+              }
+              onBlur={() => handleBlur("password")}
+              type="password"
             />
+            {touched.password && errors.password && (
+              <p className="mt-1 text-sm text-red-500">{errors.password}</p>
+            )}
           </div>
-          <div className="lg:col-span-3 lg:flex lg:justify-center">
-            <Promocode />
-          </div>
+        </div>
+        <div className="w-full text-center mb-4">
+          <p className="text-sm text-gray-500">* Обязательные поля</p>
         </div>
         <Button
           onClick={handleSubmit}
           text={isPending ? "Отправляем..." : "Продолжить"}
           variant="primary"
-          className="mt-8 mb-8 lg:max-w-[382px] lg:mt-16"
+          className="mt-4 mb-8 lg:max-w-[382px] lg:mt-8"
           isLamp
         />
       </div>
