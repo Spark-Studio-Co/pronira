@@ -44,7 +44,6 @@ export const RegistrationPage = () => {
   const handleInputChange = (key: string, value: string) => {
     setFormData((prev) => ({ ...prev, [key]: value }));
 
-    // Clear error when user types
     if (errors[key as keyof typeof errors]) {
       setErrors((prev) => ({ ...prev, [key]: "" }));
     }
@@ -127,7 +126,7 @@ export const RegistrationPage = () => {
             <Input
               placeholder="Ваш телеграм чат id *"
               value={formData.chatId}
-              onChange={(e: any) => handleInputChange("chatId", e.target.value)}
+              onChange={(value) => handleInputChange("chatId", value)}
               onBlur={() => handleBlur("chatId")}
             />
             {touched.chatId && errors.chatId && (
@@ -138,7 +137,7 @@ export const RegistrationPage = () => {
             <Input
               placeholder="Как тебя зовут? *"
               value={formData.name}
-              onChange={(e: any) => handleInputChange("name", e.target.value)}
+              onChange={(value) => handleInputChange("name", value)}
               onBlur={() => handleBlur("name")}
             />
             {touched.name && errors.name && (
@@ -149,9 +148,7 @@ export const RegistrationPage = () => {
             <Input
               placeholder="Номер телефона привязанный к телеграм *"
               value={formData.phoneNumber}
-              onChange={(e: any) =>
-                handleInputChange("phoneNumber", e.target.value)
-              }
+              onChange={(value) => handleInputChange("phoneNumber", value)}
               onBlur={() => handleBlur("phoneNumber")}
             />
             {touched.phoneNumber && errors.phoneNumber && (
@@ -162,7 +159,7 @@ export const RegistrationPage = () => {
             <Input
               placeholder="Из какого ты города? *"
               value={formData.city}
-              onChange={(e: any) => handleInputChange("city", e.target.value)}
+              onChange={(value) => handleInputChange("city", value)}
               onBlur={() => handleBlur("city")}
             />
             {touched.city && errors.city && (
@@ -173,7 +170,7 @@ export const RegistrationPage = () => {
             <Input
               placeholder="Поделись электронной почтой *"
               value={formData.email}
-              onChange={(e: any) => handleInputChange("email", e.target.value)}
+              onChange={(value) => handleInputChange("email", value)}
               onBlur={() => handleBlur("email")}
             />
             {touched.email && errors.email && (
@@ -184,9 +181,7 @@ export const RegistrationPage = () => {
             <Input
               placeholder="Придумай пароль для входа *"
               value={formData.password}
-              onChange={(e: any) =>
-                handleInputChange("password", e.target.value)
-              }
+              onChange={(value) => handleInputChange("password", value)}
               onBlur={() => handleBlur("password")}
               type="password"
             />
