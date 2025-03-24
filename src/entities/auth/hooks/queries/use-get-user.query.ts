@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { getUser } from "../../api/get/get-user.api";
 
-export const useGetUser = (chatId: string) => {
+export const useGetUser = (chatId: string | null) => {
   return useQuery({
     queryKey: ["me", chatId],
     queryFn: ({ queryKey }) => {

@@ -2,7 +2,6 @@ import { QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Route, Routes, useLocation } from "react-router-dom";
 import reactQueryClient from "./shared/api/query-client";
 
-// Import pages
 import { CategoriesPage } from "./pages/categories-page/categories-page";
 import { IntroPage } from "./pages/intro-page/intro-page";
 import { RegistrationPage } from "./pages/registration-page/registration-page";

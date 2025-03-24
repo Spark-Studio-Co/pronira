@@ -7,4 +7,8 @@ export interface UpdateUserDTO {
   isAgent: boolean;
   agency: string;
   password: string;
+  rentLink?: string;
+  housesLink?: string;
+  groundsLink?: string;
+  flatsLink?: string;
 }

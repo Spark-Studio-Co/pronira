@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 import treasure from "/treasure.png";
 import { useAuthStore } from "@/entities/auth/store/use-auth-store";
-import { useSendparserData } from "@/entities/parser/hooks/mutation/send-parser-data.mutation";
+import { useUpdateUser } from "@/entities/auth/hooks/mutation/use-update-user.mutation";
 
 export const LinksPage = () => {
   const navigate = useNavigate();
@@ -12,7 +12,9 @@ export const LinksPage = () => {
   const [activeInputs, setActiveInputs] = useState<string[]>([]);
   const { chatId } = useAuthStore();
 
-  const { mutateAsync: sendData, isPending } = useSendparserData();
+  const { mutate: updateUser, isPending } = useUpdateUser();
+
+  // const { mutateAsync: sendData, isPending } = useSendparserData();
 
   const categories = ["Квартиры", "Дома", "Участки", "Аренда"];
 
@@ -26,30 +28,52 @@ export const LinksPage = () => {
     setLinks((prev) => ({ ...prev, [category]: value }));
   };
 
-  const handleSubmit = async () => {
+  const handleSubmit = () => {
     if (!chatId) {
       console.error("Chat ID не найден");
       return;
     }
 
-    const promises = Object.entries(links)
-      .filter(([_, url]) => url.trim() !== "")
-      .map(([category, url]) =>
-        sendData({
-          url,
-          chat_id: Number(chatId),
-          min_price: "0", // You can collect real values from inputs
-          max_price: "10000000000", // or from previous pages
-        })
-      );
+    const payload = {
+      chatId,
+      flatsLink: links["Квартиры"] || "",
+      housesLink: links["Дома"] || "",
+      groundsLink: links["Участки"] || "",
+      rentLink: links["Аренда"] || "",
+    };
 
-    try {
-      await Promise.all(promises);
-      navigate("/personal");
-    } catch (error) {
-      console.error("Ошибка при отправке ссылок:", error);
-    }
+    updateUser(payload, {
+      onSuccess: () => navigate("/personal"),
+      onError: (error) => {
+        console.error("Ошибка при отправке данных:", error);
+      },
+    });
   };
+
+  // const handleSubmit = async () => {
+  //   if (!chatId) {
+  //     console.error("Chat ID не найден");
+  //     return;
+  //   }
+
+  //   const promises = Object.entries(links)
+  //     .filter(([_, url]) => url.trim() !== "")
+  //     .map(([category, url]) =>
+  //       sendData({
+  //         url,
+  //         chat_id: Number(chatId),
+  //         min_price: "0", // You can collect real values from inputs
+  //         max_price: "10000000000", // or from previous pages
+  //       })
+  //     );
+
+  //   try {
+  //     await Promise.all(promises);
+  //     navigate("/personal");
+  //   } catch (error) {
+  //     console.error("Ошибка при отправке ссылок:", error);
+  //   }
+  // };
 
   return (
     <Layout isWelcome>
