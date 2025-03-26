@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react";
 import { Avatar } from "@/shared/ui/avatar";
 import { Button } from "@/shared/ui/button";
 import { InfoIcon } from "lucide-react";
@@ -12,21 +13,36 @@ export const ProfileTab = () => {
   const { mutate: activateParser } = useSendParserData();
   const { data: userData } = useGetUser(chatId);
 
-  const handleSubmit = async () => {
+  const [isParserActive, setIsParserActive] = useState(() => {
+    return localStorage.getItem("isParserActive") === "true";
+  });
+
+  useEffect(() => {
+    localStorage.setItem("isParserActive", String(isParserActive));
+  }, [isParserActive]);
+
+  const handleParserToggle = async () => {
     if (!chatId) {
       console.error("Chat ID не найден");
       return;
     }
 
-    activateParser({
-      url_flats: userData?.flatsLink,
-      url_grounds: userData?.groundsLink,
-      url_houses: userData?.housesLink,
-      url_rents: userData?.rentLink,
-      chat_id: Number(chatId),
-      min_price: "0",
-      max_price: "10000000000",
-    });
+    if (!isParserActive) {
+      activateParser({
+        url_flats: userData?.flatsLink,
+        url_grounds: userData?.groundsLink,
+        url_houses: userData?.housesLink,
+        url_rents: userData?.rentLink,
+        chat_id: Number(chatId),
+        min_price: "0",
+        max_price: "10000000000",
+      });
+    } else {
+      // Implement parser stop logic if needed
+      console.log("Парсер остановлен");
+    }
+
+    setIsParserActive((prev) => !prev);
   };
 
   return (
@@ -49,8 +65,8 @@ export const ProfileTab = () => {
         </div>
       </div>
       <Button
-        text="Запустить парсер"
-        onClick={handleSubmit}
+        text={isParserActive ? "Остановить парсер" : "Запустить парсер"}
+        onClick={handleParserToggle}
         className="mt-[19px]"
         variant="primary"
       />

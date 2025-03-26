@@ -36,7 +36,7 @@ export const IntroPage = () => {
           {/* <TelegramLoginButton /> */}
           <Button
             onClick={() => navigation("/registration")}
-            text="Продолжить"
+            text="Попробовать бесплатно"
             variant="primary"
             className="mt-8 mb-8 lg:max-w-[382px]"
             isLamp
