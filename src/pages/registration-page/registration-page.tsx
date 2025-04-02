@@ -19,7 +19,6 @@ export const RegistrationPage = () => {
     name: "",
     phoneNumber: "",
     city: "",
-    email: "",
     password: "",
     privacyPolicy: false,
     userAgreement: false,
@@ -31,7 +30,6 @@ export const RegistrationPage = () => {
     name: "",
     phoneNumber: "",
     city: "",
-    email: "",
     password: "",
     privacyPolicy: "",
     userAgreement: "",
@@ -101,12 +99,12 @@ export const RegistrationPage = () => {
       "name",
       "phoneNumber",
       "city",
-      "email",
       "password",
       "privacyPolicy",
       "userAgreement",
       "readmeAgreement",
     ];
+
     let isValid = true;
     const newTouched = { ...touched };
 
@@ -203,17 +201,6 @@ export const RegistrationPage = () => {
             />
             {touched.city && errors.city && (
               <p className="mt-1 text-sm text-red-500">{errors.city}</p>
-            )}
-          </div>
-          <div className="lg:col-span-1">
-            <Input
-              placeholder="Поделись электронной почтой *"
-              value={formData.email}
-              onChange={(value) => handleInputChange("email", value)}
-              onBlur={() => handleBlur("email")}
-            />
-            {touched.email && errors.email && (
-              <p className="mt-1 text-sm text-red-500">{errors.email}</p>
             )}
           </div>
           <div className="lg:col-span-1">
