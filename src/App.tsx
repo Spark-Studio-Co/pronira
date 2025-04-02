@@ -28,6 +28,7 @@ import { AgentPage } from "./pages/agent-option-page/agent-option-page";
 import { PersonalLinksPage } from "./pages/personal-links/personal-links.page";
 import PrivacyPolicyPage from "./pages/privacy-policy-page/privacy-policy-page";
 import UserAgreementPage from "./pages/user-agreement-page/user-agreement-page";
+import ReadmePage from "./pages/readme/readme-page";
 
 function NavRoutes() {
   const location = useLocation();
@@ -45,7 +46,7 @@ function NavRoutes() {
             element={<PersonalDataPage />}
           />
           <Route path="/privacy-policy" element={<PrivacyPolicyPage />} />
-          <Route path="/readme" element={<PrivacyPolicyPage />} />
+          <Route path="/readme" element={<ReadmePage />} />
           <Route path="/user-agreement" element={<UserAgreementPage />} />
           <Route path="/payment" element={<PaymentPage />} />
           <Route path="/payment-success" element={<SuccessPyamentPage />} />
@@ -56,7 +57,7 @@ function NavRoutes() {
         <>
           <Route path="/" element={<IntroPage />} />
           <Route path="/privacy-policy" element={<PrivacyPolicyPage />} />
-          <Route path="/readme" element={<PrivacyPolicyPage />} />
+          <Route path="/readme" element={<ReadmePage />} />
           <Route path="/user-agreement" element={<UserAgreementPage />} />
           <Route path="/registration" element={<RegistrationPage />} />
           <Route path="/agent" element={<AgentPage />} />
