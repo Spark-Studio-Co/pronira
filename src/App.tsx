@@ -19,6 +19,7 @@ import DashboardPage from "./pages/admin/dashboard-page/dashboard-page";
 import SubscriptionsPage from "./pages/admin/subscriptions-page/subscriptions-page";
 import Login from "./pages/admin/login-page/login-page";
 import { AgentPage } from "./pages/agent-option-page/agent-option-page";
+import { PersonalLinksPage } from "./pages/personal-links/personal-links.page";
 
 function AnimatedRoutes() {
   const location = useLocation();
@@ -32,6 +33,7 @@ function AnimatedRoutes() {
       <Route path="/categories" element={<CategoriesPage />} />
       <Route path="/links" element={<LinksPage />} />
       <Route path="/personal" element={<PersonalPage />} />
+      <Route path="/personal/links" element={<PersonalLinksPage />} />
       <Route path="/settings" element={<SettingsPage />} />
       <Route path="/settings/personal-data" element={<PersonalDataPage />} />
       <Route path="/payment" element={<PaymentPage />} />

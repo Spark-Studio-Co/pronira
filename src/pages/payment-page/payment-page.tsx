@@ -24,7 +24,7 @@ export const PaymentPage = () => {
         </span>
         <Button
           onClick={() => navigate("/payment-success")}
-          variant="secondary"
+          variant="primary"
           className="w-full mt-8"
           text="Оплатить"
         />

@@ -1,5 +1,3 @@
-import Loader from "./loader";
-
 interface FullscreenLoaderProps {
   isLoading?: boolean;
   message?: string;
@@ -10,7 +8,6 @@ interface FullscreenLoaderProps {
 export default function FullscreenLoader({
   isLoading = true,
   message = "Loading...",
-  color = "main",
   opacity = "medium",
 }: FullscreenLoaderProps) {
   if (!isLoading) return null;

@@ -2,9 +2,7 @@ import image from "/main.png";
 import { Button } from "@/shared/ui/button";
 import { Layout } from "@/shared/ui/layout";
 import { useNavigate } from "react-router-dom";
-
 import intro_bg from "/intro_bg.png";
-import { TelegramLoginButton } from "@/entities/auth/ui/telegram-login";
 
 export const IntroPage = () => {
   const navigation = useNavigate();
@@ -27,11 +25,11 @@ export const IntroPage = () => {
             Привет!
           </span>
           <p className="text-black text-[16px] text-center font-medium mt-4 lg:text-[17px] lg:text-left lg:font-[400] lg:mt-8 lg:leading-6 lg:max-w-[552px]">
-            Меня зовут Джин. я твой поисковый артефакт Я знаю, ты занимаешься
-            недвижимостью, иначе тебя бы здесь не было. <br />
+            Меня зовут Джин. <br /> Я твой поисковый артефак, я знаю, ты
+            занимаешься недвижимостью, иначе тебя бы здесь не было. <br />
             После нашего знакомства я открою тебе свою сокровищницу и сделаю
-            так, что о новых объектах ты будешь узнавать один из первых. Ну что,
-            жми на лампу и давай потанцуем
+            так, что о новых объектах ты будешь узнавать один из первых. <br />
+            Ну что, жми на лампу и давай потанцуем
           </p>
           {/* <TelegramLoginButton /> */}
           <Button

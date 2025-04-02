@@ -2,12 +2,12 @@
 
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-
 import { Button } from "@/shared/ui/button";
 import { Input } from "@/shared/ui/input";
 import { Layout } from "@/shared/ui/layout";
 import { useUpdateUser } from "@/entities/auth/hooks/mutation/use-update-user.mutation";
 import { useAuthStore } from "@/entities/auth/store/use-auth-store";
+import jin from "@/assets/greeting.png";
 
 export const RegistrationPage = () => {
   const navigation = useNavigate();
@@ -200,6 +200,9 @@ export const RegistrationPage = () => {
           className="mt-4 mb-8 lg:max-w-[382px] lg:mt-8"
           isLamp
         />
+      </div>
+      <div className="w-full flex items-center justify-center">
+        <img src={jin} className="w-[500px] h-[500px]" alt="Jin" />
       </div>
     </Layout>
   );

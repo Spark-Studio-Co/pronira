@@ -29,7 +29,7 @@ export const SettingsPage = () => {
         <Button
           text="Задать параметры поиска"
           className="w-full"
-          onClick={() => navigate("/links")}
+          onClick={() => navigate("/personal/links")}
         />
         <Button
           text="Получить промокод для друга"
@@ -48,25 +48,32 @@ export const SettingsPage = () => {
         />
         <Button
           text="Инструкция по установке"
-          className="w-full"
+          className="w-full bg-green-500"
           onClick={() => open()}
         />
         <Button
           text="Связаться с создателем"
-          variant="secondary"
           onClick={() => (
             (window.location.href = "https://wa.me/+79785054554"), "_blank"
           )}
-          className="w-full"
+          className="w-full bg-green-500"
         />
-        <Button text="Телеграмм канал" variant="secondary" className="w-full" />
+        <Button
+          onClick={() => (
+            (window.location.href = "https://t.me/Pravilo_N1_ne_byt_N2"),
+            "_blank"
+          )}
+          text="Телеграмм канал"
+          variant="secondary"
+          className="w-full bg-green-500"
+        />
       </div>
       <ProfileInstructionsPopup
         isOpen={isInstructionPopupOpen}
         onClose={close}
       />
       <PromoCodePopup isOpen={isOpen} onClose={handleCodePopupClose} />
-      <span className="flex flex-col justify-center w-full items-center text-center gap-2 mt-8">
+      <span className="flex flex-col justify-center w-full items-center text-center gap-2 mt-8 mb-32">
         ИП Тымченко Ярослав Викторович <br /> <br /> ИНН: 920001086086
       </span>
     </Layout>
