@@ -134,24 +134,28 @@ export const AgentPage = () => {
               )}
             </div>
 
-            <div>
-              <div className="flex items-center mb-2">
-                <Building2 className="w-4 h-4 mr-2 text-gray-500" />
-                <span className="font-medium">Название агентства *</span>
-              </div>
-              <Input
-                placeholder="Название агентства в котором работаешь"
-                value={formData.agencyName}
-                onChange={(value: string) =>
-                  handleInputChange("agencyName", value)
-                }
-                onBlur={() => handleBlur("agencyName")}
-              />
+            {formData.role === "Агент" && (
+              <div className="transition-all duration-300 ease-in-out">
+                <div className="flex items-center mb-2">
+                  <Building2 className="w-4 h-4 mr-2 text-gray-500" />
+                  <span className="font-medium">Название агентства *</span>
+                </div>
+                <Input
+                  placeholder="Название агентства в котором работаешь"
+                  value={formData.agencyName}
+                  onChange={(value: string) =>
+                    handleInputChange("agencyName", value)
+                  }
+                  onBlur={() => handleBlur("agencyName")}
+                />
 
-              {touched.agencyName && errors.agencyName && (
-                <p className="mt-1 text-sm text-red-500">{errors.agencyName}</p>
-              )}
-            </div>
+                {touched.agencyName && errors.agencyName && (
+                  <p className="mt-1 text-sm text-red-500">
+                    {errors.agencyName}
+                  </p>
+                )}
+              </div>
+            )}
           </div>
 
           <div className="w-full text-center mt-4">

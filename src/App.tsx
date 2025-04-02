@@ -1,5 +1,11 @@
 import { QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Route, Routes, useLocation } from "react-router-dom";
+import {
+  BrowserRouter,
+  Navigate,
+  Route,
+  Routes,
+  useLocation,
+} from "react-router-dom";
 import reactQueryClient from "./shared/api/query-client";
 
 import { CategoriesPage } from "./pages/categories-page/categories-page";
@@ -20,25 +26,43 @@ import SubscriptionsPage from "./pages/admin/subscriptions-page/subscriptions-pa
 import Login from "./pages/admin/login-page/login-page";
 import { AgentPage } from "./pages/agent-option-page/agent-option-page";
 import { PersonalLinksPage } from "./pages/personal-links/personal-links.page";
+import PrivacyPolicyPage from "./pages/privacy-policy-page/privacy-policy-page";
+import UserAgreementPage from "./pages/user-agreement-page/user-agreement-page";
 
-function AnimatedRoutes() {
+function NavRoutes() {
   const location = useLocation();
-  // const { data: userData } = useGetUser();
+  const isAuth = localStorage.getItem("isAuth") === "true";
 
   return (
     <Routes location={location} key={location.pathname}>
-      <Route path="/" element={<IntroPage />} />
-      <Route path="/registration" element={<RegistrationPage />} />
-      <Route path="/agent" element={<AgentPage />} />
-      <Route path="/categories" element={<CategoriesPage />} />
-      <Route path="/links" element={<LinksPage />} />
-      <Route path="/personal" element={<PersonalPage />} />
-      <Route path="/personal/links" element={<PersonalLinksPage />} />
-      <Route path="/settings" element={<SettingsPage />} />
-      <Route path="/settings/personal-data" element={<PersonalDataPage />} />
-      <Route path="/payment" element={<PaymentPage />} />
-      <Route path="/payment-success" element={<SuccessPyamentPage />} />
-      <Route path="/payment-denied" element={<DeniedPyamentPage />} />
+      {isAuth ? (
+        <>
+          <Route path="/personal" element={<PersonalPage />} />
+          <Route path="/personal/links" element={<PersonalLinksPage />} />
+          <Route path="/settings" element={<SettingsPage />} />
+          <Route
+            path="/settings/personal-data"
+            element={<PersonalDataPage />}
+          />
+          <Route path="/privacy-policy" element={<PrivacyPolicyPage />} />
+          <Route path="/user-agreement" element={<UserAgreementPage />} />
+          <Route path="/payment" element={<PaymentPage />} />
+          <Route path="/payment-success" element={<SuccessPyamentPage />} />
+          <Route path="/payment-denied" element={<DeniedPyamentPage />} />
+          <Route path="*" element={<Navigate to="/personal" />} />
+        </>
+      ) : (
+        <>
+          <Route path="/" element={<IntroPage />} />
+          <Route path="/privacy-policy" element={<PrivacyPolicyPage />} />
+          <Route path="/user-agreement" element={<UserAgreementPage />} />
+          <Route path="/registration" element={<RegistrationPage />} />
+          <Route path="/agent" element={<AgentPage />} />
+          <Route path="/categories" element={<CategoriesPage />} />
+          <Route path="/links" element={<LinksPage />} />
+          <Route path="*" element={<Navigate to="/" />} />
+        </>
+      )}
       <Route
         path="/admin"
         element={
@@ -80,7 +104,7 @@ function App() {
   return (
     <QueryClientProvider client={reactQueryClient}>
       <BrowserRouter>
-        <AnimatedRoutes />
+        <NavRoutes />
       </BrowserRouter>
     </QueryClientProvider>
   );

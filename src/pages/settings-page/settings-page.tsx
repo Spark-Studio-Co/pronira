@@ -1,26 +1,31 @@
 import { ProfileInstructionsPopup } from "@/entities/profile/profile-popup";
 import { useInstructionPopupStore } from "@/entities/profile/store/use-instruction-popup-store";
 import { PromoCodePopup } from "@/entities/promocode/promocode-popup";
+import { usePromoCodeStore } from "@/entities/promocode/store/use-promocode-store";
 import { Button } from "@/shared/ui/button";
 import { Layout } from "@/shared/ui/layout";
-import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 export const SettingsPage = () => {
   const navigate = useNavigate();
-  const [isOpen, setIsOpen] = useState<boolean>(false);
   const {
     isOpen: isInstructionPopupOpen,
     close,
     open,
   } = useInstructionPopupStore();
 
+  const {
+    isOpen: isPromoPopupOpen,
+    close: promoClose,
+    open: promoOpen,
+  } = usePromoCodeStore();
+
   const handleCodePopupOpen = () => {
-    setIsOpen(true);
+    promoOpen();
   };
 
   const handleCodePopupClose = () => {
-    setIsOpen(false);
+    promoClose();
   };
 
   return (
@@ -72,7 +77,10 @@ export const SettingsPage = () => {
         isOpen={isInstructionPopupOpen}
         onClose={close}
       />
-      <PromoCodePopup isOpen={isOpen} onClose={handleCodePopupClose} />
+      <PromoCodePopup
+        isOpen={isPromoPopupOpen}
+        onClose={handleCodePopupClose}
+      />
       <span className="flex flex-col justify-center w-full items-center text-center gap-2 mt-8 mb-32">
         ИП Тымченко Ярослав Викторович <br /> <br /> ИНН: 920001086086
       </span>

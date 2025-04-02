@@ -43,7 +43,10 @@ export const LinksPage = () => {
     };
 
     updateUser(payload, {
-      onSuccess: () => navigate("/personal"),
+      onSuccess: () => {
+        navigate("/personal");
+        localStorage.setItem("isAuth", "true");
+      },
       onError: (error) => {
         console.error("Ошибка при отправке данных:", error);
       },

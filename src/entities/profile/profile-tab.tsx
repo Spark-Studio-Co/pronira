@@ -6,12 +6,15 @@ import { useInstructionPopupStore } from "./store/use-instruction-popup-store";
 import { useGetUser } from "../auth/hooks/queries/use-get-user.query";
 import { useAuthStore } from "../auth/store/use-auth-store";
 import { useSendParserData } from "../parser/hooks/mutation/send-parser-data.mutation";
+import { ProfileTabSkeleton } from "./profile-skeleton";
+import { usePromoCodeStore } from "../promocode/store/use-promocode-store";
 
 export const ProfileTab = () => {
   const { open } = useInstructionPopupStore();
   const { chatId } = useAuthStore();
   const { mutate: activateParser } = useSendParserData();
-  const { data: userData } = useGetUser(chatId);
+  const { data: userData, isLoading } = useGetUser(chatId);
+  const { open: openPromo } = usePromoCodeStore();
 
   const [isParserActive, setIsParserActive] = useState(() => {
     return localStorage.getItem("isParserActive") === "true";
@@ -45,6 +48,10 @@ export const ProfileTab = () => {
     setIsParserActive((prev) => !prev);
   };
 
+  if (isLoading) {
+    return <ProfileTabSkeleton />;
+  }
+
   return (
     <div className="rounded-[16px] w-full flex flex-col bg-gray-light p-4">
       <div className="w-full flex items-center gap-4">
@@ -67,10 +74,15 @@ export const ProfileTab = () => {
       <Button
         text={isParserActive ? "Остановить парсер" : "Запустить парсер"}
         onClick={handleParserToggle}
-        className="mt-[19px]"
+        className={`mt-[19px] ${isParserActive ? "bg-red-500" : ""}`}
         variant="primary"
       />
-      <Button text="Создать промокод" className="mt-[19px]" variant="primary" />
+      <Button
+        text="Создать промокод"
+        className="mt-[19px]"
+        variant="primary"
+        onClick={() => openPromo()}
+      />
     </div>
   );
 };

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/shared/ui/button";
 import { Input } from "@/shared/ui/input";
 import { Layout } from "@/shared/ui/layout";
@@ -21,6 +21,8 @@ export const RegistrationPage = () => {
     city: "",
     email: "",
     password: "",
+    privacyPolicy: false,
+    userAgreement: false,
   });
 
   const [errors, setErrors] = useState({
@@ -30,6 +32,8 @@ export const RegistrationPage = () => {
     city: "",
     email: "",
     password: "",
+    privacyPolicy: "",
+    userAgreement: "",
   });
 
   const [touched, setTouched] = useState({
@@ -39,9 +43,11 @@ export const RegistrationPage = () => {
     city: false,
     email: false,
     password: false,
+    privacyPolicy: false,
+    userAgreement: false,
   });
 
-  const handleInputChange = (key: string, value: string) => {
+  const handleInputChange = (key: string, value: string | boolean) => {
     setFormData((prev) => ({ ...prev, [key]: value }));
 
     if (errors[key as keyof typeof errors]) {
@@ -54,16 +60,27 @@ export const RegistrationPage = () => {
     validateField(field, formData[field as keyof typeof formData]);
   };
 
-  const validateField = (field: string, value: string) => {
+  const validateField = (field: string, value: string | boolean) => {
     let error = "";
 
-    if (!value) {
+    if (field === "privacyPolicy") {
+      if (!value) {
+        error = "Необходимо принять политику конфиденциальности";
+      }
+    } else if (field === "userAgreement") {
+      if (!value) {
+        error = "Необходимо принять пользовательское соглашение";
+      }
+    } else if (!value) {
       error = "Это поле обязательно";
-    } else if (field === "email" && !/\S+@\S+\.\S+/.test(value)) {
+    } else if (field === "email" && !/\S+@\S+\.\S+/.test(value as string)) {
       error = "Введите корректный email";
-    } else if (field === "phoneNumber" && !/^\+?[0-9]{10,12}$/.test(value)) {
+    } else if (
+      field === "phoneNumber" &&
+      !/^\+?[0-9]{10,12}$/.test(value as string)
+    ) {
       error = "Введите корректный номер телефона";
-    } else if (field === "password" && value.length < 6) {
+    } else if (field === "password" && (value as string).length < 6) {
       error = "Пароль должен содержать минимум 6 символов";
     }
 
@@ -79,6 +96,8 @@ export const RegistrationPage = () => {
       "city",
       "email",
       "password",
+      "privacyPolicy",
+      "userAgreement",
     ];
     let isValid = true;
     const newTouched = { ...touched };
@@ -113,6 +132,14 @@ export const RegistrationPage = () => {
         },
       }
     );
+  };
+
+  const handlePrivacyPolicyChange = () => {
+    handleInputChange("privacyPolicy", !formData.privacyPolicy);
+  };
+
+  const handleUserAgreementChange = () => {
+    handleInputChange("userAgreement", !formData.userAgreement);
   };
 
   return (
@@ -190,7 +217,105 @@ export const RegistrationPage = () => {
             )}
           </div>
         </div>
-        <div className="w-full text-center mb-4">
+
+        {/* Checkboxes */}
+        <div className="w-full mt-6 flex flex-col gap-4 items-start">
+          {/* Privacy Policy Checkbox */}
+          <div
+            className="flex items-center cursor-pointer"
+            onClick={handlePrivacyPolicyChange}
+          >
+            <div
+              className={`w-5 h-5 flex items-center justify-center border rounded mr-2 ${
+                formData.privacyPolicy
+                  ? "bg-main border-main"
+                  : "border-gray-300"
+              }`}
+            >
+              {formData.privacyPolicy && (
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="h-3 w-3 text-white"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={3}
+                    d="M5 13l4 4L19 7"
+                  />
+                </svg>
+              )}
+            </div>
+            <span className="text-sm text-gray-700">
+              Я принимаю условия{" "}
+              <Link
+                to="/privacy-policy"
+                className="text-main underline"
+                rel="noreferrer"
+              >
+                политики конфиденциальности
+              </Link>{" "}
+              *
+            </span>
+          </div>
+          {touched.privacyPolicy && errors.privacyPolicy && (
+            <p className="mt-1 text-sm text-red-500 ml-7">
+              {errors.privacyPolicy}
+            </p>
+          )}
+
+          {/* User Agreement Checkbox */}
+          <div
+            className="flex items-center cursor-pointer"
+            onClick={handleUserAgreementChange}
+          >
+            <div
+              className={`w-5 h-5 flex items-center justify-center border rounded mr-2 ${
+                formData.userAgreement
+                  ? "bg-main border-main"
+                  : "border-gray-300"
+              }`}
+            >
+              {formData.userAgreement && (
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="h-3 w-3 text-white"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={3}
+                    d="M5 13l4 4L19 7"
+                  />
+                </svg>
+              )}
+            </div>
+            <span className="text-sm text-gray-700">
+              Я принимаю{" "}
+              <Link
+                to="/user-agreement"
+                className="text-main underline"
+                rel="noreferrer"
+              >
+                пользовательское соглашение
+              </Link>{" "}
+              *
+            </span>
+          </div>
+          {touched.userAgreement && errors.userAgreement && (
+            <p className="mt-1 text-sm text-red-500 ml-7">
+              {errors.userAgreement}
+            </p>
+          )}
+        </div>
+
+        <div className="w-full text-center mb-4 mt-4">
           <p className="text-sm text-gray-500">* Обязательные поля</p>
         </div>
         <Button
@@ -202,7 +327,11 @@ export const RegistrationPage = () => {
         />
       </div>
       <div className="w-full flex items-center justify-center">
-        <img src={jin} className="w-[500px] h-[500px]" alt="Jin" />
+        <img
+          src={jin || "/placeholder.svg"}
+          className="w-[500px] h-[500px]"
+          alt="Jin"
+        />
       </div>
     </Layout>
   );
