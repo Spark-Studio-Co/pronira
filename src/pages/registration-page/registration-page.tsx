@@ -23,6 +23,7 @@ export const RegistrationPage = () => {
     password: "",
     privacyPolicy: false,
     userAgreement: false,
+    readmeAgreement: false,
   });
 
   const [errors, setErrors] = useState({
@@ -34,6 +35,7 @@ export const RegistrationPage = () => {
     password: "",
     privacyPolicy: "",
     userAgreement: "",
+    readmeAgreement: "",
   });
 
   const [touched, setTouched] = useState({
@@ -45,6 +47,7 @@ export const RegistrationPage = () => {
     password: false,
     privacyPolicy: false,
     userAgreement: false,
+    readmeAgreement: false,
   });
 
   const handleInputChange = (key: string, value: string | boolean) => {
@@ -70,6 +73,10 @@ export const RegistrationPage = () => {
     } else if (field === "userAgreement") {
       if (!value) {
         error = "Необходимо принять пользовательское соглашение";
+      }
+    } else if (field === "readmeAgreement") {
+      if (!value) {
+        error = "Необходимо ознакомиться с информацией";
       }
     } else if (!value) {
       error = "Это поле обязательно";
@@ -98,6 +105,7 @@ export const RegistrationPage = () => {
       "password",
       "privacyPolicy",
       "userAgreement",
+      "readmeAgreement",
     ];
     let isValid = true;
     const newTouched = { ...touched };
@@ -140,6 +148,10 @@ export const RegistrationPage = () => {
 
   const handleUserAgreementChange = () => {
     handleInputChange("userAgreement", !formData.userAgreement);
+  };
+
+  const handleReadmeAgreementChange = () => {
+    handleInputChange("readmeAgreement", !formData.readmeAgreement);
   };
 
   return (
@@ -254,6 +266,7 @@ export const RegistrationPage = () => {
               <Link
                 to="/privacy-policy"
                 className="text-main underline"
+                target="_blank"
                 rel="noreferrer"
               >
                 политики конфиденциальности
@@ -301,6 +314,7 @@ export const RegistrationPage = () => {
               <Link
                 to="/user-agreement"
                 className="text-main underline"
+                target="_blank"
                 rel="noreferrer"
               >
                 пользовательское соглашение
@@ -311,6 +325,54 @@ export const RegistrationPage = () => {
           {touched.userAgreement && errors.userAgreement && (
             <p className="mt-1 text-sm text-red-500 ml-7">
               {errors.userAgreement}
+            </p>
+          )}
+
+          {/* Readme Checkbox */}
+          <div
+            className="flex items-center cursor-pointer"
+            onClick={handleReadmeAgreementChange}
+          >
+            <div
+              className={`w-5 h-5 flex items-center justify-center border rounded mr-2 ${
+                formData.readmeAgreement
+                  ? "bg-main border-main"
+                  : "border-gray-300"
+              }`}
+            >
+              {formData.readmeAgreement && (
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="h-3 w-3 text-white"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={3}
+                    d="M5 13l4 4L19 7"
+                  />
+                </svg>
+              )}
+            </div>
+            <span className="text-sm text-gray-700">
+              Я ознакомился с{" "}
+              <Link
+                to="/readme"
+                className="text-main underline"
+                target="_blank"
+                rel="noreferrer"
+              >
+                информацией о сервисе
+              </Link>{" "}
+              *
+            </span>
+          </div>
+          {touched.readmeAgreement && errors.readmeAgreement && (
+            <p className="mt-1 text-sm text-red-500 ml-7">
+              {errors.readmeAgreement}
             </p>
           )}
         </div>

@@ -45,6 +45,7 @@ function NavRoutes() {
             element={<PersonalDataPage />}
           />
           <Route path="/privacy-policy" element={<PrivacyPolicyPage />} />
+          <Route path="/readme" element={<PrivacyPolicyPage />} />
           <Route path="/user-agreement" element={<UserAgreementPage />} />
           <Route path="/payment" element={<PaymentPage />} />
           <Route path="/payment-success" element={<SuccessPyamentPage />} />
@@ -55,6 +56,7 @@ function NavRoutes() {
         <>
           <Route path="/" element={<IntroPage />} />
           <Route path="/privacy-policy" element={<PrivacyPolicyPage />} />
+          <Route path="/readme" element={<PrivacyPolicyPage />} />
           <Route path="/user-agreement" element={<UserAgreementPage />} />
           <Route path="/registration" element={<RegistrationPage />} />
           <Route path="/agent" element={<AgentPage />} />
