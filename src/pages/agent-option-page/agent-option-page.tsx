@@ -96,7 +96,7 @@ export const AgentPage = () => {
         isAgent: formData.role === "Агент",
       },
       {
-        onSuccess: () => navigation("/categories"),
+        onSuccess: () => navigation("/links"),
         onError: (err) => console.error("Ошибка при регистрации:", err),
       }
     );

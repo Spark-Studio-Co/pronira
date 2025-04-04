@@ -8,6 +8,7 @@ import { useAuthStore } from "../auth/store/use-auth-store";
 import { useSendParserData } from "../parser/hooks/mutation/send-parser-data.mutation";
 import { ProfileTabSkeleton } from "./profile-skeleton";
 import { usePromoCodeStore } from "../promocode/store/use-promocode-store";
+import { useParserPopupStore } from "../parser/store/use-parser-popup.store";
 
 export const ProfileTab = () => {
   const { open } = useInstructionPopupStore();
@@ -15,6 +16,7 @@ export const ProfileTab = () => {
   const { mutate: activateParser } = useSendParserData();
   const { data: userData, isLoading } = useGetUser(chatId);
   const { open: openPromo } = usePromoCodeStore();
+  const { open: openParserPopup } = useParserPopupStore();
 
   const [isParserActive, setIsParserActive] = useState(() => {
     return localStorage.getItem("isParserActive") === "true";
@@ -40,6 +42,8 @@ export const ProfileTab = () => {
         min_price: "0",
         max_price: "10000000000",
       });
+
+      openParserPopup();
     } else {
       // Implement parser stop logic if needed
       console.log("Парсер остановлен");

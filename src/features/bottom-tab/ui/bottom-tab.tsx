@@ -1,4 +1,6 @@
-import { House, Settings, Wallet } from "lucide-react";
+"use client";
+
+import { HomeIcon as House, Settings, Wallet } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { create } from "zustand";
 
@@ -28,23 +30,46 @@ export const BottomTab = () => {
       style={{
         boxShadow: "0px -4px 10px rgba(0, 0, 0, 0.1)",
       }}
-      className="w-full fixed flex items-center justify-between px-[78px] h-[85px] py-[27px]  bottom-0 bg-white rounded-t-[32px] shadow-2xl"
+      className="w-full fixed flex items-center justify-between px-[78px] h-[85px] py-[27px] bottom-0 bg-white rounded-t-[32px] shadow-2xl"
     >
-      <House
-        color={getColor("personal")}
-        size={32}
+      <div
+        className="flex flex-col items-center cursor-pointer"
         onClick={() => handleNavigation("/personal", "personal")}
-      />
-      <Wallet
-        color={getColor("payment")}
-        size={32}
+      >
+        <House color={getColor("personal")} size={32} />
+        <span
+          className="text-xs mt-1 font-medium"
+          style={{ color: getColor("personal") }}
+        >
+          Главная
+        </span>
+      </div>
+
+      <div
+        className="flex flex-col items-center cursor-pointer"
         onClick={() => handleNavigation("/payment", "payment")}
-      />
-      <Settings
-        color={getColor("settings")}
-        size={32}
+      >
+        <Wallet color={getColor("payment")} size={32} />
+        <span
+          className="text-xs mt-1 font-medium"
+          style={{ color: getColor("payment") }}
+        >
+          Оплата
+        </span>
+      </div>
+
+      <div
+        className="flex flex-col items-center cursor-pointer"
         onClick={() => handleNavigation("/settings", "settings")}
-      />
+      >
+        <Settings color={getColor("settings")} size={32} />
+        <span
+          className="text-xs mt-1 font-medium"
+          style={{ color: getColor("settings") }}
+        >
+          Настройки
+        </span>
+      </div>
     </div>
   );
 };

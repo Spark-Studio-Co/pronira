@@ -8,7 +8,6 @@ import {
 } from "react-router-dom";
 import reactQueryClient from "./shared/api/query-client";
 
-import { CategoriesPage } from "./pages/categories-page/categories-page";
 import { IntroPage } from "./pages/intro-page/intro-page";
 import { RegistrationPage } from "./pages/registration-page/registration-page";
 import { LinksPage } from "./pages/links-page/links-page";
@@ -61,7 +60,6 @@ function NavRoutes() {
           <Route path="/user-agreement" element={<UserAgreementPage />} />
           <Route path="/registration" element={<RegistrationPage />} />
           <Route path="/agent" element={<AgentPage />} />
-          <Route path="/categories" element={<CategoriesPage />} />
           <Route path="/links" element={<LinksPage />} />
           <Route path="*" element={<Navigate to="/" />} />
         </>

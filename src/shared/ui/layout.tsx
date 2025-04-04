@@ -20,7 +20,7 @@ export const Layout: React.FC<ILayout> = ({
     <div className="w-full min-h-full">
       <div
         className={`px-4 lg:px-0 pt-[90px] ${
-          isWelcome && " lg:pt-[161px]"
+          isWelcome && " lg:pt-[64px]"
         } flex flex-col items-center lg:items-start lg:max-w-[1300px] mx-auto relative`}
       >
         {isHeading && (

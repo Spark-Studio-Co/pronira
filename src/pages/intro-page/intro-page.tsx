@@ -10,11 +10,11 @@ export const IntroPage = () => {
   return (
     <Layout isWelcome>
       <img src={intro_bg} className="hidden lg:block absolute top-0" />
-      <div className="z-50 flex justify-between w-full lg:flex-row">
+      <div className="z-50 flex justify-between w-[90%] m-auto lg:flex-row">
         <div className="flex flex-col items-center lg:items-start">
           <h1 className="text-[24px] lg:text-[40px] 2xl:text-[44px] lg:max-w-[710px] lg:text-left text-center font-bold">
             Добро пожаловать
-            <br />в приложение «Проныра»! 🧞‍♂️✨
+            <br />в приложение «Проныра»!
           </h1>
           <img
             src={image}
@@ -29,7 +29,7 @@ export const IntroPage = () => {
             занимаешься недвижимостью, иначе тебя бы здесь не было. <br />
             После нашего знакомства я открою тебе свою сокровищницу и сделаю
             так, что о новых объектах ты будешь узнавать один из первых. <br />
-            Ну что, жми на лампу и давай потанцуем
+            Ну что, жми на кнопку и давай потанцуем
           </p>
           {/* <TelegramLoginButton /> */}
           <Button

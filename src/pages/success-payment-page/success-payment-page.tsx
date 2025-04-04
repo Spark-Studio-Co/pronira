@@ -22,7 +22,7 @@ export const SuccessPyamentPage = () => {
         </p>
         <Button
           onClick={() => navigate(-1)}
-          variant="secondary"
+          variant="primary"
           className="w-full mt-8"
           text="Вернуться назад"
         />
