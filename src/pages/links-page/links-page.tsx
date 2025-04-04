@@ -9,10 +9,8 @@ import pronira from "@/assets/pronira_cool.png";
 export const LinksPage = () => {
   const navigate = useNavigate();
   const [links, setLinks] = useState<{ [key: string]: string }>({});
-  const [keywords, setKeywords] = useState<{ [key: string]: string }>({});
   const [activeInputs, setActiveInputs] = useState<string[]>(["Квартиры"]);
   const { chatId } = useAuthStore();
-
   const { mutate: updateUser, isPending } = useUpdateUser();
 
   const categories = ["Квартиры", "Дома", "Участки", "Аренда"];
@@ -29,10 +27,6 @@ export const LinksPage = () => {
     setLinks((prev) => ({ ...prev, [category]: value }));
   };
 
-  const handleKeywordChange = (category: string, value: string) => {
-    setKeywords((prev) => ({ ...prev, [category]: value }));
-  };
-
   const handleSubmit = () => {
     if (!chatId) {
       console.error("Chat ID не найден");
@@ -45,7 +39,6 @@ export const LinksPage = () => {
       housesLink: links["Дома"] || "",
       groundsLink: links["Участки"] || "",
       rentLink: links["Аренда"] || "",
-      keywords: JSON.stringify(keywords),
     };
 
     updateUser(payload, {
@@ -99,14 +92,6 @@ export const LinksPage = () => {
                     value={links[category] || ""}
                     onChange={(e) => handleLinkChange(category, e.target.value)}
                     className="w-full p-3 bg-gray-200 rounded-full text-black"
-                  />
-                  <textarea
-                    placeholder="Напиши здесь ключевые слова по которым ты хочешь чтобы Проныра искал новые объявления. Будь готов к тому, что новых объявлений будет меньше в виду более тонких настроек"
-                    value={keywords[category] || ""}
-                    onChange={(e) =>
-                      handleKeywordChange(category, e.target.value)
-                    }
-                    className="w-full p-3 bg-gray-200 rounded-lg text-black min-h-[100px]"
                   />
                 </div>
               )}
