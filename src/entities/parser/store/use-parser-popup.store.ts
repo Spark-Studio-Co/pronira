@@ -7,7 +7,7 @@ interface ParserPopupState {
 }
 
 export const useParserPopupStore = create<ParserPopupState>((set) => ({
-  isOpen: true,
+  isOpen: false,
   open: () => set({ isOpen: true }),
   close: () => set({ isOpen: false }),
 }));
