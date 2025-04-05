@@ -28,9 +28,14 @@ export const SettingsPage = () => {
     promoClose();
   };
 
+  const handleLogout = () => {
+    localStorage.setItem("isAuth", "false");
+    navigate("/");
+  };
+
   return (
     <Layout isWelcome={false} isHeading heading="Настройки" isCenter>
-      <div className="flex flex-col items-center justify-center w-[408px] mx-auto gap-y-8">
+      <div className="flex flex-col items-center justify-center w-[408px] mx-auto gap-y-4">
         <Button
           text="Задать параметры поиска"
           className="w-full"
@@ -42,7 +47,7 @@ export const SettingsPage = () => {
           onClick={handleCodePopupOpen}
         />
         <Button
-          text="Принять платеж за поисковой артефакт"
+          text="Отправить платеж за поисковой артефакт"
           className="w-full"
           onClick={() => navigate("/payment")}
         />
@@ -71,6 +76,11 @@ export const SettingsPage = () => {
           text="Телеграмм канал"
           variant="secondary"
           className="w-full bg-green-500"
+        />
+        <Button
+          text="Выйти"
+          onClick={handleLogout}
+          className="w-full bg-red-500"
         />
       </div>
       <ProfileInstructionsPopup

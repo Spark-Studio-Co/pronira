@@ -122,7 +122,7 @@ export const AgentPage = () => {
                 <span className="font-medium">Твой статус *</span>
               </div>
               <Input
-                placeholder="Ты агент или частное лицо"
+                placeholder="Ты агент или частное лицо?"
                 isSelector
                 options={["Агент", "Частное лицо"]}
                 value={formData.role}

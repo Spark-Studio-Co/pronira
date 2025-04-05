@@ -36,7 +36,14 @@ export const IntroPage = () => {
             onClick={() => navigation("/registration")}
             text="Попробовать бесплатно"
             variant="primary"
-            className="mt-8 mb-8 lg:max-w-[382px]"
+            className="mt-8 mb-4 lg:max-w-[382px]"
+            isLamp
+          />
+          <Button
+            onClick={() => navigation("/video")}
+            text="Как мной пользоваться"
+            variant="primary"
+            className="mt-2 mb-8 lg:max-w-[382px]"
             isLamp
           />
         </div>

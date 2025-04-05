@@ -5,6 +5,10 @@ import { useState } from "react";
 import { useAuthStore } from "@/entities/auth/store/use-auth-store";
 import { useUpdateUser } from "@/entities/auth/hooks/mutation/use-update-user.mutation";
 import pronira from "@/assets/pronira_cool.png";
+import rent from "@/assets/rents.jpg";
+import grounds from "@/assets/grounds.jpg";
+import houses from "@/assets/houses.jpg";
+import flats from "@/assets/flats.jpg";
 
 export const LinksPage = () => {
   const navigate = useNavigate();
@@ -52,6 +56,13 @@ export const LinksPage = () => {
     });
   };
 
+  const categoryImages = {
+    Квартиры: flats,
+    Дома: houses,
+    Участки: grounds,
+    Аренда: rent,
+  } as any;
+
   return (
     <Layout isWelcome>
       <div className="flex flex-col items-center w-full max-w-3xl mx-auto">
@@ -71,19 +82,25 @@ export const LinksPage = () => {
         </div>
 
         <div className="flex gap-4 w-full flex-col">
-          {categories.map((category) => (
+          {categories.map((category: any) => (
             <div key={category} className="w-full">
-              <button
-                onClick={() => handleInputToggle(category)}
-                className={`w-full rounded-full px-4 py-3 text-left flex items-start justify-start transition-colors ${
-                  activeInputs.includes(category)
-                    ? "bg-[#1E88E5] text-white"
-                    : "bg-main text-white"
-                }`}
-              >
-                {category}
-              </button>
-
+              <div className="flex w-full gap-4">
+                <img
+                  src={categoryImages[category] || rent}
+                  className="w-[64px] h-[64px] rounded-full"
+                  alt={category}
+                />
+                <button
+                  onClick={() => handleInputToggle(category)}
+                  className={`w-full rounded-full  px-4 py-3 text-left flex items-center justify-start transition-colors ${
+                    activeInputs.includes(category)
+                      ? "bg-[#1E88E5] flex items-center justify-center text-white"
+                      : "bg-main text-white"
+                  }`}
+                >
+                  {category}
+                </button>
+              </div>
               {activeInputs.includes(category) && (
                 <div className="flex flex-col gap-2 mt-2">
                   <input

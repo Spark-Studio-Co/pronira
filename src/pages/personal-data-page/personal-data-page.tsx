@@ -15,7 +15,7 @@ export const PersonalDataPage = () => {
           <Input placeholder="Из какого ты города?" />
         </div>
         <div className="lg:col-span-1">
-          <Input placeholder="Ты агент или частное лицо" />
+          <Input placeholder="Ты агент или частное лицо?" />
         </div>
         <div className="lg:col-span-1">
           <Input placeholder="Название агенства в котором работаешь" />
