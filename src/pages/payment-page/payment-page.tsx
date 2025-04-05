@@ -20,10 +20,18 @@ const paymentMethods = [
   { id: "sber", name: "Сбер" },
 ];
 
+const propertyCategories = [
+  { id: "rent", name: "Аренда", price: 500 },
+  { id: "apartments", name: "Квартиры", price: 500 },
+  { id: "houses", name: "Дома", price: 500 },
+  { id: "land", name: "Участки", price: 500 },
+];
+
 export const PaymentPage = () => {
   const navigate = useNavigate();
   const [selectedPeriod, setSelectedPeriod] = useState(paymentPeriods[0]);
   const [selectedMethod, setSelectedMethod] = useState(paymentMethods[0]);
+  const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
 
   const handlePeriodChange = (e: any) => {
     const periodId = e.target.value;
@@ -37,10 +45,28 @@ export const PaymentPage = () => {
     setSelectedMethod(method as any);
   };
 
+  const handleCategoryChange = (e: any) => {
+    const categoryId = e.target.value;
+
+    if (selectedCategories.includes(categoryId)) {
+      setSelectedCategories(
+        selectedCategories.filter((id) => id !== categoryId)
+      );
+    } else {
+      setSelectedCategories([...selectedCategories, categoryId]);
+    }
+  };
+
+  const calculateTotalPrice = () => {
+    const periodPrice = selectedPeriod.price;
+    const categoriesPrice = selectedCategories.length * 500;
+    return periodPrice + categoriesPrice;
+  };
+
   return (
     <Layout isWelcome={false} isHeading heading="Отправить платеж" isCenter>
       <div className="flex flex-col lg:items-center justify-center w-full lg:max-w-[408px] mx-auto">
-        <span className="font-[400] text-black lg:text-center  mb-4">
+        <span className="font-[400] text-black lg:text-center mb-4">
           За какой период собираешься оплатить Проныру?
         </span>
 
@@ -60,6 +86,29 @@ export const PaymentPage = () => {
                 </option>
               ))}
             </select>
+          </div>
+
+          <div className="mb-2">
+            <label className="text-sm font-medium mb-1 block">
+              Выбери категории (+500 руб. каждая)
+            </label>
+            <div className="flex flex-col gap-2">
+              {propertyCategories.map((category) => (
+                <div key={category.id} className="flex items-center">
+                  <input
+                    type="checkbox"
+                    id={category.id}
+                    value={category.id}
+                    checked={selectedCategories.includes(category.id)}
+                    onChange={handleCategoryChange}
+                    className="mr-2 h-4 w-4"
+                  />
+                  <label htmlFor={category.id}>
+                    {category.name} (+{category.price} руб.)
+                  </label>
+                </div>
+              ))}
+            </div>
           </div>
 
           <div className="mb-2">
@@ -86,7 +135,7 @@ export const PaymentPage = () => {
         <span className="text-black font-bold text-[24px] mt-8 text-center">
           Итого к оплате:{" "}
           <span className="text-main font-bold text-[24px]">
-            {selectedPeriod.price} руб.
+            {calculateTotalPrice()} руб.
           </span>
         </span>
         <Button

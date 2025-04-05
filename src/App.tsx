@@ -52,6 +52,7 @@ function NavRoutes() {
           <Route path="/payment-success" element={<SuccessPyamentPage />} />
           <Route path="/payment-denied" element={<DeniedPyamentPage />} />
           <Route path="*" element={<Navigate to="/personal" />} />
+          <Route path="/video" element={<VideoPage />} />
         </>
       ) : (
         <>

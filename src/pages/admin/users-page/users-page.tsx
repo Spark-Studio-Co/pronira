@@ -16,31 +16,10 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuLabel,
-  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import {
-  MoreHorizontal,
-  Search,
-  UserPlus,
-  Filter,
-  Download,
-} from "lucide-react";
+
+import { MoreHorizontal, Search, UserPlus } from "lucide-react";
 
 // Mock data
 const mockUsers = [
@@ -112,19 +91,12 @@ const mockUsers = [
 
 export default function UsersPage() {
   const [searchTerm, setSearchTerm] = useState("");
-  const [selectedUser, setSelectedUser] = useState(null);
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
 
   const filteredUsers = mockUsers.filter(
     (user) =>
       user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       user.email.toLowerCase().includes(searchTerm.toLowerCase())
   );
-
-  const handleViewDetails = (user: any) => {
-    setSelectedUser(user);
-    setIsDialogOpen(true);
-  };
 
   return (
     <div className="space-y-6">
