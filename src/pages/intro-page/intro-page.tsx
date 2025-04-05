@@ -41,7 +41,7 @@ export const IntroPage = () => {
           />
           <Button
             onClick={() => navigation("/video")}
-            text="Как мной пользоваться"
+            text="Инструкция по установке"
             variant="primary"
             className="mt-2 mb-8 lg:max-w-[382px]"
             isLamp
