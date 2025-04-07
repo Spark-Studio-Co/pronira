@@ -41,12 +41,12 @@ export const IntroPage = () => {
           <img
             src={jin || "/placeholder.svg?height=600&width=571"}
             alt="Jin"
-            className="w-[271px] h-[300px] lg:flex hidden"
+            className="w-[271px] h-[300px] lg:flex hidden -scale-x-100"
           />
         </div>
 
         {/* Two Column Benefits Section */}
-        <div className="mt-12 grid grid-cols-1 lg:grid-cols-2 gap-8 bg-white rounded-lg p-8 shadow-sm">
+        <div className="mt-12 grid grid-cols-1 lg:grid-cols-2 gap-8 bg-white rounded-lg p-4 shadow-sm">
           {/* Left Column - For Whom */}
           <div>
             <h2 className="text-[22px] font-bold mb-6 text-center">
@@ -62,14 +62,14 @@ export const IntroPage = () => {
               <li className="flex items-start">
                 <span className="text-main mr-2">•</span>
                 <span>
-                  Специалисты, которые работают в недвижимости и хотят быстрее
+                  Агенты, которые только пришли в недвижимости и хотят быстрее
                   найти на первую сделку
                 </span>
               </li>
               <li className="flex items-start">
                 <span className="text-main mr-2">•</span>
                 <span>
-                  Застройщики в поиске инвестиций объектов для строительства
+                  Застройщики в поиске ликвидных объектов для строительства
                 </span>
               </li>
               <li className="flex items-start">
@@ -98,7 +98,7 @@ export const IntroPage = () => {
               </li>
               <li className="flex items-start">
                 <span className="text-main mr-2">•</span>
-                <span>Первым быть объектов от собственника</span>
+                <span>Первым брать объекты от собственника</span>
               </li>
               <li className="flex items-start">
                 <span className="text-main mr-2">•</span>
@@ -111,7 +111,7 @@ export const IntroPage = () => {
               <li className="flex items-start">
                 <span className="text-main mr-2">•</span>
                 <span>
-                  Первыми узнать о новых земельных объектах под инвестиции
+                  Первыми узнать о новых ликвидных объектах под инвестиции
                 </span>
               </li>
               <li className="flex items-start">
@@ -138,21 +138,21 @@ export const IntroPage = () => {
             onClick={() => navigation("/registration")}
             text="Попробуй! Это БЕСПЛАТНО"
             variant="primary"
-            className="w-full max-w-[500px] mb-4"
+            className="w-full max-w-[500px] mb-4 !rounded-md"
             isLamp
           />
           <Button
             onClick={() => navigation("/video")}
             text="Видео инструкция"
             variant="primary"
-            className="w-full max-w-[500px] mb-4"
+            className="w-full max-w-[500px] mb-4 !rounded-md"
             isLamp
           />
           <Link to="/login" className="w-full max-w-[500px]">
             <Button
               text="ВОЙТИ В ЛК"
               variant="primary"
-              className="w-full"
+              className="w-full !rounded-md"
               isLamp
             />
           </Link>
