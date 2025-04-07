@@ -29,6 +29,7 @@ import PrivacyPolicyPage from "./pages/privacy-policy-page/privacy-policy-page";
 import UserAgreementPage from "./pages/user-agreement-page/user-agreement-page";
 import ReadmePage from "./pages/readme/readme-page";
 import { VideoPage } from "./pages/video-page/video-page";
+import LoginPage from "./pages/login-page/login-page";
 
 function NavRoutes() {
   const location = useLocation();
@@ -57,6 +58,7 @@ function NavRoutes() {
       ) : (
         <>
           <Route path="/" element={<IntroPage />} />
+          <Route path="/login" element={<LoginPage />} />
           <Route path="/video" element={<VideoPage />} />
           <Route path="/privacy-policy" element={<PrivacyPolicyPage />} />
           <Route path="/readme" element={<ReadmePage />} />

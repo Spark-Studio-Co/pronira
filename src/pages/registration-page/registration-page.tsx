@@ -76,7 +76,7 @@ export const RegistrationPage = () => {
       }
     } else if (field === "readmeAgreement") {
       if (!value) {
-        error = "Необходимо ознакомиться с информацией";
+        error = "Необходим�� ознакомиться с информацией";
       }
     } else if (!value) {
       error = "Это поле обязательно";
@@ -229,8 +229,6 @@ export const RegistrationPage = () => {
             )}
           </div>
         </div>
-
-        {/* Checkboxes */}
         <div className="w-full mt-6 flex flex-col gap-4 items-start">
           {/* Privacy Policy Checkbox */}
           <div
@@ -376,17 +374,26 @@ export const RegistrationPage = () => {
             </p>
           )}
         </div>
-
         <div className="w-full text-center mb-4 mt-4">
           <p className="text-sm text-gray-500">* Обязательные поля</p>
         </div>
-        <Button
-          onClick={handleSubmit}
-          text={isPending ? "Отправляем..." : "Продолжить"}
-          variant="primary"
-          className="mt-4 mb-8 lg:max-w-[382px] lg:mt-8"
-          isLamp
-        />
+
+        <div className="w-full flex flex-col items-center gap-4">
+          <Button
+            onClick={handleSubmit}
+            text={isPending ? "Отправляем..." : "Продолжить"}
+            variant="primary"
+            className="mt-4 lg:max-w-[382px] lg:mt-8"
+            isLamp
+          />
+
+          <p className="text-sm text-gray-600 mb-8">
+            Уже есть аккаунт?{" "}
+            <Link to="/login" className="text-main hover:underline">
+              Войти
+            </Link>
+          </p>
+        </div>
       </div>
       <div className="w-full flex items-center justify-center">
         <img
@@ -398,3 +405,5 @@ export const RegistrationPage = () => {
     </Layout>
   );
 };
+
+export default RegistrationPage;
