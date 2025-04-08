@@ -30,6 +30,7 @@ import UserAgreementPage from "./pages/user-agreement-page/user-agreement-page";
 import ReadmePage from "./pages/readme/readme-page";
 import { VideoPage } from "./pages/video-page/video-page";
 import LoginPage from "./pages/login-page/login-page";
+import TBankPaymentPage from "./pages/t-bank-payment-page/t-bank-payment-page";
 
 function NavRoutes() {
   const location = useLocation();
@@ -49,6 +50,7 @@ function NavRoutes() {
           <Route path="/privacy-policy" element={<PrivacyPolicyPage />} />
           <Route path="/readme" element={<ReadmePage />} />
           <Route path="/user-agreement" element={<UserAgreementPage />} />
+          <Route path="/payment/t-bank" element={<TBankPaymentPage />} />
           <Route path="/payment" element={<PaymentPage />} />
           <Route path="/payment-success" element={<SuccessPyamentPage />} />
           <Route path="/payment-denied" element={<DeniedPyamentPage />} />

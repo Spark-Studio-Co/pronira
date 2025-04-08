@@ -1,10 +1,9 @@
 "use client";
 
 import { Layout } from "@/shared/ui/layout";
-import { Input } from "@/shared/ui/input";
 import { Button } from "@/shared/ui/button";
 import { useNavigate } from "react-router-dom";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 const paymentPeriods = [
   { id: "1", name: "1 месяц", price: 100, label: "1 мес 100 руб" },
@@ -34,20 +33,17 @@ export const PaymentPage = () => {
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
 
   const handlePeriodChange = (e: any) => {
-    const periodId = e.target.value;
-    const period = paymentPeriods.find((p) => p.id === periodId);
-    setSelectedPeriod(period as any);
+    const period = paymentPeriods.find((p) => p.id === e.target.value);
+    if (period) setSelectedPeriod(period);
   };
 
   const handleMethodChange = (e: any) => {
-    const methodId = e.target.value;
-    const method = paymentMethods.find((m) => m.id === methodId);
-    setSelectedMethod(method as any);
+    const method = paymentMethods.find((m) => m.id === e.target.value);
+    if (method) setSelectedMethod(method);
   };
 
   const handleCategoryChange = (e: any) => {
     const categoryId = e.target.value;
-
     if (selectedCategories.includes(categoryId)) {
       setSelectedCategories(
         selectedCategories.filter((id) => id !== categoryId)
@@ -63,6 +59,61 @@ export const PaymentPage = () => {
     return periodPrice + categoriesPrice;
   };
 
+  useEffect(() => {
+    // Load the Tinkoff script if needed
+    if (selectedMethod.id === "tbank") {
+      const script = document.createElement("script");
+      script.src = "https://securepay.tinkoff.ru/html/payForm/js/tinkoff_v2.js";
+      script.async = true;
+      document.body.appendChild(script);
+    }
+  }, [selectedMethod]);
+
+  useEffect(() => {
+    const form = document.getElementById(
+      "payform-tbank"
+    ) as HTMLFormElement | null;
+    if (!form) return;
+
+    form.addEventListener("submit", function (e) {
+      e.preventDefault();
+
+      const { description, amount, email, phone, receipt } = form as any;
+
+      if (receipt) {
+        if (!email.value && !phone.value) {
+          return alert("Поле E-mail или Phone не должно быть пустым");
+        }
+
+        form.receipt.value = JSON.stringify({
+          EmailCompany: "mail@mail.com",
+          Taxation: "patent",
+          FfdVersion: "1.2",
+          Items: [
+            {
+              Name: description.value || "Оплата",
+              Price: Math.round(amount.value * 100),
+              Quantity: 1,
+              Amount: Math.round(amount.value * 100),
+              PaymentMethod: "full_prepayment",
+              PaymentObject: "service",
+              Tax: "none",
+              MeasurementUnit: "pc",
+            },
+          ],
+        });
+      }
+
+      // @ts-ignore
+      if (typeof pay === "function") {
+        // @ts-ignore
+        pay(form);
+      } else {
+        alert("Скрипт оплаты Tinkoff не загружен");
+      }
+    });
+  }, [selectedMethod]);
+
   return (
     <Layout isWelcome={false} isHeading heading="Отправить платеж" isCenter>
       <div className="flex flex-col lg:items-center justify-center w-full lg:max-w-[408px] mx-auto">
@@ -76,7 +127,7 @@ export const PaymentPage = () => {
               Выбери период оплаты
             </label>
             <select
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-3 py-2 border border-gray-300 rounded-md"
               value={selectedPeriod.id}
               onChange={handlePeriodChange}
             >
@@ -116,7 +167,7 @@ export const PaymentPage = () => {
               Выбери способ оплаты
             </label>
             <select
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-3 py-2 border border-gray-300 rounded-md"
               value={selectedMethod.id}
               onChange={handleMethodChange}
             >
@@ -127,10 +178,6 @@ export const PaymentPage = () => {
               ))}
             </select>
           </div>
-
-          <Input placeholder="Номер карты" />
-          <Input placeholder="Дата" />
-          <Input placeholder="Код" />
         </div>
         <span className="text-black font-bold text-[24px] mt-8 text-center">
           Итого к оплате:{" "}
@@ -138,12 +185,25 @@ export const PaymentPage = () => {
             {calculateTotalPrice()} руб.
           </span>
         </span>
-        <Button
-          onClick={() => navigate("/payment-success")}
-          variant="primary"
-          className="w-full mt-8"
-          text="Оплатить"
-        />
+        {selectedMethod.id === "tbank" ? (
+          <Button
+            onClick={() =>
+              navigate(
+                `/payment/t-bank?amount=${calculateTotalPrice()}&description=Подписка`
+              )
+            }
+            variant="primary"
+            className="w-full mt-8"
+            text="Перейти к оплате"
+          />
+        ) : (
+          <Button
+            onClick={() => navigate("/payment-success")}
+            variant="primary"
+            className="w-full mt-8"
+            text="Оплатить"
+          />
+        )}
       </div>
     </Layout>
   );
