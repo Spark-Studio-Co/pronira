@@ -8,12 +8,21 @@ import { useUpdateUser } from "@/entities/auth/hooks/mutation/use-update-user.mu
 
 export const PersonalDataPage = () => {
   const { mutate: updateUser, isPending } = useUpdateUser();
-
   const [chatId, setChatId] = useState("");
 
   useEffect(() => {
-    const storedChatId = localStorage.getItem("chatId");
-    if (storedChatId) setChatId(storedChatId);
+    const stored = localStorage.getItem("auth-storage");
+    if (stored) {
+      try {
+        const parsed = JSON.parse(stored);
+        const chatIdFromStorage = parsed?.state?.chatId;
+        if (chatIdFromStorage) {
+          setChatId(chatIdFromStorage);
+        }
+      } catch (error) {
+        console.error("Ошибка при получении chatId из localStorage", error);
+      }
+    }
   }, []);
 
   const [formData, setFormData] = useState({

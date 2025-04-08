@@ -85,11 +85,7 @@ export const LoginPage = () => {
       {
         onSuccess: () => {
           localStorage.setItem("isAuth", "true");
-
-          saveChatId(formData.chatId);
-          if (formData.rememberMe) {
-            localStorage.setItem("chatId", formData.chatId);
-          }
+          localStorage.setItem("chatId", formData.chatId);
 
           navigation("/agent");
         },
