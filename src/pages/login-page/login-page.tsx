@@ -82,9 +82,10 @@ export const LoginPage = () => {
         password: formData.password,
       },
       {
-        onSuccess: (data: any) => {
+        onSuccess: () => {
           saveChatId(formData.chatId);
           saveRole("user");
+          localStorage.setItem("isAuth", "true");
           navigate("/personal");
         },
         onError: () => {
