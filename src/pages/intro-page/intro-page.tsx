@@ -19,7 +19,7 @@ export const IntroPage = () => {
       <div className="z-50 flex flex-col w-[90%] m-auto">
         {/* Header Section */}
         <div className="flex flex-col lg:flex-row justify-between items-center">
-          <div className="flex flex-col items-center lg:items-start">
+          <div className="flex flex-col items-center lg:items-start px-20">
             <h1 className="text-[24px] lg:text-[40px] 2xl:text-[44px] lg:max-w-[710px] lg:text-left text-center font-bold">
               Добро пожаловать
               <br />в приложение «Проныра»!
@@ -41,15 +41,15 @@ export const IntroPage = () => {
           <img
             src={jin || "/placeholder.svg?height=600&width=571"}
             alt="Jin"
-            className="w-[271px] h-[300px] lg:flex hidden -scale-x-100"
+            className="w-[271px] h-[300px] mr-32 lg:flex hidden -scale-x-100"
           />
         </div>
 
         {/* Two Column Benefits Section */}
-        <div className="mt-12 grid grid-cols-1 lg:grid-cols-2 gap-8 bg-white rounded-lg p-4 shadow-sm">
+        <div className="mt-2 grid grid-cols-1 lg:grid-cols-2 gap-8 bg-white rounded-lg p-4 shadow-sm">
           {/* Left Column - For Whom */}
           <div>
-            <h2 className="text-[22px] font-bold mb-6 text-center">
+            <h2 className="text-[22px] font-bold mb-6 text-left">
               Для кого создан:
             </h2>
             <ul className="space-y-3">
@@ -63,7 +63,7 @@ export const IntroPage = () => {
                 <span className="text-main mr-2">•</span>
                 <span>
                   Агенты, которые только пришли в недвижимости и хотят быстрее
-                  найти на первую сделку
+                  выйти на первую сделку
                 </span>
               </li>
               <li className="flex items-start">
@@ -85,7 +85,7 @@ export const IntroPage = () => {
 
           {/* Right Column - Benefits */}
           <div>
-            <h2 className="text-[22px] font-bold mb-6 text-center">
+            <h2 className="text-[22px] font-bold mb-6 text-left">
               Что получишь:
             </h2>
             <ul className="space-y-3">
@@ -111,22 +111,22 @@ export const IntroPage = () => {
               <li className="flex items-start">
                 <span className="text-main mr-2">•</span>
                 <span>
-                  Первыми узнать о новых ликвидных объектах под инвестиции
+                  Первому узнавать о новых ликвидных объектах под инвестиции
                 </span>
               </li>
               <li className="flex items-start">
                 <span className="text-main mr-2">•</span>
-                <span>Выбрать лучшие предложения под застройку</span>
+                <span>Выбирать лучшие предложения под застройку</span>
               </li>
               <li className="flex items-start">
                 <span className="text-main mr-2">•</span>
                 <span>
-                  Знать конкурентов и повысить свою эффективность многократно
+                  Знать конкурентов и показать свою экспертность покупателю
                 </span>
               </li>
               <li className="flex items-start">
                 <span className="text-main mr-2">•</span>
-                <span>В разы проще подобрать объект под запрос</span>
+                <span>В разы проще подобирать объект под запрос</span>
               </li>
             </ul>
           </div>
