@@ -85,8 +85,7 @@ export const LoginPage = () => {
         onSuccess: (data: any) => {
           saveChatId(formData.chatId);
           saveRole("user");
-
-          navigate("/agent");
+          navigate("/personal");
         },
         onError: () => {
           setErrors({
