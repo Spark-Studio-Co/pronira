@@ -6,12 +6,12 @@ import { Button } from "@/shared/ui/button";
 import { Input } from "@/shared/ui/input";
 import { Layout } from "@/shared/ui/layout";
 import { useAuthStore } from "@/entities/auth/store/use-auth-store";
-import jin from "@/assets/greeting.png";
 import { useLogin } from "@/entities/auth/hooks/mutation/use-login.mutation";
+import jin from "@/assets/greeting.png";
 
 export const LoginPage = () => {
-  const navigation = useNavigate();
-  const { saveChatId } = useAuthStore();
+  const navigate = useNavigate();
+  const { saveChatId, saveRole } = useAuthStore();
   const { mutate: login, isPending } = useLogin();
 
   const [formData, setFormData] = useState({
@@ -32,7 +32,6 @@ export const LoginPage = () => {
 
   const handleInputChange = (key: string, value: string | boolean) => {
     setFormData((prev) => ({ ...prev, [key]: value }));
-
     if (errors[key as keyof typeof errors]) {
       setErrors((prev) => ({ ...prev, [key]: "" }));
     }
@@ -83,14 +82,13 @@ export const LoginPage = () => {
         password: formData.password,
       },
       {
-        onSuccess: () => {
-          localStorage.setItem("isAuth", "true");
-          localStorage.setItem("chatId", formData.chatId);
+        onSuccess: (data: any) => {
+          saveChatId(formData.chatId);
+          saveRole("user");
 
-          navigation("/agent");
+          navigate("/agent");
         },
-        onError: (err) => {
-          console.error("Ошибка при входе:", err);
+        onError: () => {
           setErrors({
             chatId: "Неверный чат ID или пароль",
             password: "Неверный чат ID или пароль",
@@ -130,17 +128,16 @@ export const LoginPage = () => {
           <div>
             <Input
               placeholder="Пароль *"
+              type="password"
               value={formData.password}
               onChange={(value) => handleInputChange("password", value)}
               onBlur={() => handleBlur("password")}
-              type="password"
             />
             {touched.password && errors.password && (
               <p className="mt-1 text-sm text-destructive">{errors.password}</p>
             )}
           </div>
 
-          {/* Remember Me Checkbox */}
           <div
             className="flex items-center cursor-pointer mt-2"
             onClick={handleRememberMeChange}
