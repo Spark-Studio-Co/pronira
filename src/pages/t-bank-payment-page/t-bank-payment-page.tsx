@@ -91,7 +91,7 @@ export default function TBankPaymentPage() {
         </div>
 
         <form id="payform-tbank" onSubmit={handleSubmit} className="space-y-4">
-          <input type="hidden" name="terminalkey" value="1744092581993DEMO" />
+          <input type="hidden" name="terminalkey" value="1744092582040" />
           <input type="hidden" name="frame" value="false" />
           <input type="hidden" name="language" value="ru" />
           <input type="hidden" name="receipt" value="" />
