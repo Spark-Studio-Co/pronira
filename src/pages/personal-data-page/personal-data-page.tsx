@@ -29,8 +29,6 @@ export const PersonalDataPage = () => {
     name: "",
     phoneNumber: "",
     city: "",
-    isAgent: false,
-    agency: "",
     password: "",
     email: "",
   });
@@ -39,8 +37,6 @@ export const PersonalDataPage = () => {
     name: "",
     phoneNumber: "",
     city: "",
-    isAgent: "",
-    agency: "",
     password: "",
     email: "",
   });
@@ -50,7 +46,6 @@ export const PersonalDataPage = () => {
     phoneNumber: false,
     city: false,
     isAgent: false,
-    agency: false,
     password: false,
     email: false,
   });
@@ -131,8 +126,6 @@ export const PersonalDataPage = () => {
       name: formData.name,
       phoneNumber: formData.phoneNumber,
       city: formData.city,
-      isAgent: formData.isAgent,
-      agency: formData.agency,
       password: formData.password,
       email: formData.email,
     };
@@ -161,7 +154,6 @@ export const PersonalDataPage = () => {
             <p className="mt-1 text-sm text-red-500">{errors.name}</p>
           )}
         </div>
-
         <div className="lg:col-span-1">
           <Input
             placeholder="Номер телефона привязанный к телеграм"
@@ -173,7 +165,6 @@ export const PersonalDataPage = () => {
             <p className="mt-1 text-sm text-red-500">{errors.phoneNumber}</p>
           )}
         </div>
-
         <div className="lg:col-span-1">
           <Input
             placeholder="Из какого ты города?"
@@ -185,30 +176,7 @@ export const PersonalDataPage = () => {
             <p className="mt-1 text-sm text-red-500">{errors.city}</p>
           )}
         </div>
-
-        <div className="lg:col-span-1">
-          <Input
-            placeholder="Ты агент или частное лицо?"
-            value={formData.isAgent ? "агент" : "частное лицо"}
-            onChange={(val) =>
-              handleChange("isAgent", val.toLowerCase().includes("агент"))
-            }
-            onBlur={() => handleBlur("isAgent")}
-          />
-        </div>
-
-        <div className="lg:col-span-1">
-          <Input
-            placeholder="Название агентства в котором работаешь"
-            value={formData.agency}
-            onChange={(val) => handleChange("agency", val)}
-            onBlur={() => handleBlur("agency")}
-          />
-          {touched.agency && errors.agency && (
-            <p className="mt-1 text-sm text-red-500">{errors.agency}</p>
-          )}
-        </div>
-
+        ы{" "}
         <div className="lg:col-span-1">
           <Input
             placeholder="Электронная почта"
@@ -220,7 +188,6 @@ export const PersonalDataPage = () => {
             <p className="mt-1 text-sm text-red-500">{errors.email}</p>
           )}
         </div>
-
         <div className="lg:col-span-1 lg:col-start-2">
           <Input
             placeholder="Придумай пароль для входа"
