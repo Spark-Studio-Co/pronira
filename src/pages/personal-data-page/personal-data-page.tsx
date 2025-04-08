@@ -176,7 +176,6 @@ export const PersonalDataPage = () => {
             <p className="mt-1 text-sm text-red-500">{errors.city}</p>
           )}
         </div>
-        ы{" "}
         <div className="lg:col-span-1">
           <Input
             placeholder="Электронная почта"
