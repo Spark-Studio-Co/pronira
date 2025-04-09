@@ -1,3 +1,4 @@
+import { useAuthStore } from "@/entities/auth/store/use-auth-store";
 import { ProfileInstructionsPopup } from "@/entities/profile/profile-popup";
 import { useInstructionPopupStore } from "@/entities/profile/store/use-instruction-popup-store";
 import { PromoCodePopup } from "@/entities/promocode/promocode-popup";
@@ -8,6 +9,7 @@ import { useNavigate } from "react-router-dom";
 
 export const SettingsPage = () => {
   const navigate = useNavigate();
+  const { removeChatId } = useAuthStore();
   const {
     isOpen: isInstructionPopupOpen,
     close,
@@ -30,6 +32,7 @@ export const SettingsPage = () => {
 
   const handleLogout = () => {
     localStorage.setItem("isAuth", "false");
+    removeChatId();
     navigate("/");
   };
 
