@@ -17,7 +17,6 @@ export const IntroPage = () => {
         className="hidden lg:block absolute top-0"
       />
       <div className="z-50 flex flex-col w-[90%] m-auto">
-        {/* Header Section */}
         <div className="flex flex-col lg:flex-row justify-between items-center">
           <div className="flex flex-col items-center lg:items-start lg:px-20">
             <h1 className="text-[24px] lg:text-[40px] 2xl:text-[44px] lg:max-w-[710px] lg:text-left text-center font-bold">

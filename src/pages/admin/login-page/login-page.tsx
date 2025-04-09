@@ -1,5 +1,3 @@
-"use client";
-
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -15,15 +13,44 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Eye, EyeOff, Lock, Mail } from "lucide-react";
+import { adminLogin } from "@/entities/admin/api/post/admin-login.api";
 
 export default function Login() {
-  const [email, setEmail] = useState("");
-  const navigate = useNavigate();
+  const [email, setEmail] = useState(""); // username
   const [password, setPassword] = useState("");
   const [rememberMe, setRememberMe] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
+  const navigate = useNavigate();
+
+  const handleLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsLoading(true);
+    setError("");
+
+    try {
+      const response = await adminLogin({
+        username: email,
+        password,
+      });
+
+      const { access_token } = response;
+
+      if (rememberMe) {
+        localStorage.setItem("admin_token", access_token);
+      } else {
+        sessionStorage.setItem("admin_token", access_token);
+      }
+
+      navigate("/admin");
+    } catch (err: any) {
+      console.error("Login error:", err);
+      setError("Неверный логин или пароль");
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-muted/40 p-4">
@@ -37,15 +64,15 @@ export default function Login() {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <form className="space-y-4">
+          <form className="space-y-4" onSubmit={handleLogin}>
             <div className="space-y-2">
-              <Label htmlFor="email">Почта</Label>
+              <Label htmlFor="email">Логин</Label>
               <div className="relative">
                 <Mail className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
                 <Input
                   id="email"
-                  type="email"
-                  placeholder="admin@example.com"
+                  type="text"
+                  placeholder="admin"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   className="pl-10"
@@ -56,9 +83,6 @@ export default function Login() {
             <div className="space-y-2">
               <div className="flex items-center justify-between">
                 <Label htmlFor="password">Пароль</Label>
-                <a href="#" className="text-sm text-primary hover:underline">
-                  Забыли пароль?
-                </a>
               </div>
               <div className="relative">
                 <Lock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
@@ -100,19 +124,14 @@ export default function Login() {
               </Label>
             </div>
             {error && <div className="text-destructive text-sm">{error}</div>}
-            <Button
-              type="submit"
-              className="w-full"
-              disabled={isLoading}
-              onClick={() => navigate("/admin")}
-            >
+            <Button type="submit" className="w-full" disabled={isLoading}>
               {isLoading ? "Вход..." : "Войти"}
             </Button>
           </form>
         </CardContent>
         <CardFooter className="flex justify-center">
           <p className="text-sm text-muted-foreground">
-            Для теста используйте: admin@example.com / password
+            Тестовый вход: admin / password
           </p>
         </CardFooter>
       </Card>
