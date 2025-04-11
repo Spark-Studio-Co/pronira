@@ -32,6 +32,7 @@ import { VideoPage } from "./pages/video-page/video-page";
 import LoginPage from "./pages/login-page/login-page";
 import TBankPaymentPage from "./pages/t-bank-payment-page/t-bank-payment-page";
 import AdminProtectedRoute from "./lib/route-guards/admin-protected.route";
+import SubscriptionPolicy from "./pages/subscription-policy/subscription-policy";
 
 function NavRoutes() {
   const location = useLocation();
@@ -49,7 +50,7 @@ function NavRoutes() {
             element={<PersonalDataPage />}
           />
           <Route path="/privacy-policy" element={<PrivacyPolicyPage />} />
-          <Route path="/subscription-policy" element={<SubscriptionsPage />} />
+          <Route path="/subscription-policy" element={<SubscriptionPolicy />} />
           <Route path="/readme" element={<ReadmePage />} />
           <Route path="/user-agreement" element={<UserAgreementPage />} />
           <Route path="/payment/t-bank" element={<TBankPaymentPage />} />
@@ -65,7 +66,7 @@ function NavRoutes() {
           <Route path="/login" element={<LoginPage />} />
           <Route path="/video" element={<VideoPage />} />
           <Route path="/privacy-policy" element={<PrivacyPolicyPage />} />
-          <Route path="/subscription-policy" element={<SubscriptionsPage />} />
+          <Route path="/subscription-policy" element={<SubscriptionPolicy />} />
           <Route path="/readme" element={<ReadmePage />} />
           <Route path="/user-agreement" element={<UserAgreementPage />} />
           <Route path="/registration" element={<RegistrationPage />} />
