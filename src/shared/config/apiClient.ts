@@ -1,7 +1,7 @@
 // src/shared/api/query-client.ts
 import axios from "axios";
 
-const BASE_URL = "http://localhost:6001/";
+const BASE_URL = "https://xn----7sbhlqzghjcdke5k.xn--p1ai/api";
 
 export const apiClient = axios.create({
   baseURL: BASE_URL,

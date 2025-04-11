@@ -1,5 +1,3 @@
-"use client";
-
 import { useState } from "react";
 import {
   Table,
@@ -10,7 +8,6 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -18,96 +15,29 @@ import {
   DropdownMenuLabel,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-
-import { MoreHorizontal, Search, UserPlus } from "lucide-react";
-
-// Mock data
-const mockUsers = [
-  {
-    id: 1,
-    name: "John Doe",
-    email: "john@example.com",
-    status: "Active",
-    plan: "Premium",
-    joined: "Jan 10, 2023",
-  },
-  {
-    id: 2,
-    name: "Jane Smith",
-    email: "jane@example.com",
-    status: "Active",
-    plan: "Basic",
-    joined: "Feb 15, 2023",
-  },
-  {
-    id: 3,
-    name: "Robert Johnson",
-    email: "robert@example.com",
-    status: "Inactive",
-    plan: "Premium",
-    joined: "Mar 22, 2023",
-  },
-  {
-    id: 4,
-    name: "Emily Davis",
-    email: "emily@example.com",
-    status: "Active",
-    plan: "Pro",
-    joined: "Apr 5, 2023",
-  },
-  {
-    id: 5,
-    name: "Michael Wilson",
-    email: "michael@example.com",
-    status: "Active",
-    plan: "Basic",
-    joined: "May 18, 2023",
-  },
-  {
-    id: 6,
-    name: "Sarah Brown",
-    email: "sarah@example.com",
-    status: "Inactive",
-    plan: "Pro",
-    joined: "Jun 30, 2023",
-  },
-  {
-    id: 7,
-    name: "David Miller",
-    email: "david@example.com",
-    status: "Active",
-    plan: "Premium",
-    joined: "Jul 12, 2023",
-  },
-  {
-    id: 8,
-    name: "Lisa Anderson",
-    email: "lisa@example.com",
-    status: "Active",
-    plan: "Basic",
-    joined: "Aug 24, 2023",
-  },
-];
+import { Button } from "@/components/ui/button";
+import { Search, Loader2, MoreHorizontal } from "lucide-react";
+import { useGetUsers } from "@/entities/users/hooks/queries/use-get-users.query";
 
 export default function UsersPage() {
   const [searchTerm, setSearchTerm] = useState("");
+  const { data: users, isLoading, error } = useGetUsers();
 
-  const filteredUsers = mockUsers.filter(
-    (user) =>
-      user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      user.email.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  // Filter users based on search term
+  const filteredUsers =
+    users?.filter(
+      (user) =>
+        user.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        user.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        user.phoneNumber?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        user.city?.toLowerCase().includes(searchTerm.toLowerCase())
+    ) || [];
 
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <h2 className="text-3xl font-bold tracking-tight">Пользователи</h2>
-        <Button>
-          <UserPlus className="mr-2 h-4 w-4" />
-          Добавить пользователя
-        </Button>
       </div>
-
       <div className="flex flex-col sm:flex-row gap-4 justify-between items-start sm:items-center">
         <div className="relative w-full sm:w-64">
           <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
@@ -123,32 +53,59 @@ export default function UsersPage() {
         <Table>
           <TableHeader>
             <TableRow>
+              <TableHead>ID</TableHead>
               <TableHead>Имя</TableHead>
-              <TableHead>Почта</TableHead>
-              <TableHead>Статус</TableHead>
-              <TableHead>Присоединился</TableHead>
+              <TableHead>Город</TableHead>
+              <TableHead>Роль</TableHead>
+              <TableHead>Телефон</TableHead>
+              <TableHead>Email</TableHead>
+              <TableHead>Агентство</TableHead>
+              <TableHead>Баланс</TableHead>
+              <TableHead>Подписка</TableHead>
               <TableHead className="w-[80px]"></TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
-            {filteredUsers.length > 0 ? (
+            {isLoading ? (
+              <TableRow>
+                <TableCell colSpan={10} className="h-24 text-center">
+                  <div className="flex justify-center items-center">
+                    <Loader2 className="h-6 w-6 animate-spin mr-2" />
+                    Загрузка пользователей...
+                  </div>
+                </TableCell>
+              </TableRow>
+            ) : error ? (
+              <TableRow>
+                <TableCell
+                  colSpan={10}
+                  className="h-24 text-center text-red-500"
+                >
+                  Ошибка при загрузке пользователей: {error.message}
+                </TableCell>
+              </TableRow>
+            ) : filteredUsers.length > 0 ? (
               filteredUsers.map((user) => (
                 <TableRow key={user.id}>
-                  <TableCell className="font-medium">{user.name}</TableCell>
+                  <TableCell className="font-medium">{user.id}</TableCell>
+                  <TableCell>{user.name}</TableCell>
+                  <TableCell>{user.city}</TableCell>
+                  <TableCell>{user.role}</TableCell>
+                  <TableCell>{user.phoneNumber}</TableCell>
                   <TableCell>{user.email}</TableCell>
+                  <TableCell>{user.agencyName || "-"}</TableCell>
+                  <TableCell>{user.balance} ₽</TableCell>
                   <TableCell>
                     <span
                       className={`px-2 py-1 rounded-full text-xs ${
-                        user.status === "Active"
+                        user.subscriptionActive
                           ? "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300"
                           : "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300"
                       }`}
                     >
-                      {user.status}
+                      {user.subscriptionActive ? "Активна" : "Неактивна"}
                     </span>
                   </TableCell>
-                  <TableCell>{user.plan}</TableCell>
-                  <TableCell>{user.joined}</TableCell>
                   <TableCell>
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
@@ -159,6 +116,8 @@ export default function UsersPage() {
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end">
                         <DropdownMenuLabel>Действия</DropdownMenuLabel>
+                        <DropdownMenuItem>Просмотреть профиль</DropdownMenuItem>
+                        <DropdownMenuItem>Редактировать</DropdownMenuItem>
                         <DropdownMenuItem className="text-destructive">
                           Удалить пользователя
                         </DropdownMenuItem>
@@ -169,7 +128,7 @@ export default function UsersPage() {
               ))
             ) : (
               <TableRow>
-                <TableCell colSpan={6} className="h-24 text-center">
+                <TableCell colSpan={10} className="h-24 text-center">
                   Пользователи не найдены.
                 </TableCell>
               </TableRow>
