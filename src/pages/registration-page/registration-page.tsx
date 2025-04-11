@@ -168,7 +168,6 @@ export const RegistrationPage = () => {
     handleInputChange("readmeAgreement", !formData.readmeAgreement);
   };
 
-  // Added handler for subscription agreement
   const handleSubscriptionAgreementChange = () => {
     handleInputChange("subscriptionAgreement", !formData.subscriptionAgreement);
   };
