@@ -16,7 +16,7 @@ export const SubscriptionPolicy = () => {
           <section className="mb-6">
             <p className="text-dark mb-4">
               Настоящее соглашение регулирует условия использования платной
-              подписки на платформе <strong>PointApp</strong>.
+              подписки на платформе <strong>Проныра</strong>.
             </p>
 
             <h3 className="text-lg font-semibold text-main mb-2">
