@@ -49,6 +49,7 @@ function NavRoutes() {
             element={<PersonalDataPage />}
           />
           <Route path="/privacy-policy" element={<PrivacyPolicyPage />} />
+          <Route path="/subscription-policy" element={<SubscriptionsPage />} />
           <Route path="/readme" element={<ReadmePage />} />
           <Route path="/user-agreement" element={<UserAgreementPage />} />
           <Route path="/payment/t-bank" element={<TBankPaymentPage />} />
@@ -64,6 +65,7 @@ function NavRoutes() {
           <Route path="/login" element={<LoginPage />} />
           <Route path="/video" element={<VideoPage />} />
           <Route path="/privacy-policy" element={<PrivacyPolicyPage />} />
+          <Route path="/subscription-policy" element={<SubscriptionsPage />} />
           <Route path="/readme" element={<ReadmePage />} />
           <Route path="/user-agreement" element={<UserAgreementPage />} />
           <Route path="/registration" element={<RegistrationPage />} />
