@@ -6,6 +6,7 @@ import { useInstructionPopupStore } from "./store/use-instruction-popup-store";
 import { useGetUser } from "../auth/hooks/queries/use-get-user.query";
 import { useAuthStore } from "../auth/store/use-auth-store";
 import { useSendParserData } from "../parser/hooks/mutation/send-parser-data.mutation";
+import { useDeleteParser } from "../parser/hooks/mutation/use-delete-parser.mutation"; // ⬅️ добавили
 import { ProfileTabSkeleton } from "./profile-skeleton";
 import { usePromoCodeStore } from "../promocode/store/use-promocode-store";
 import { useParserPopupStore } from "../parser/store/use-parser-popup.store";
@@ -14,6 +15,7 @@ export const ProfileTab = () => {
   const { open } = useInstructionPopupStore();
   const { chatId } = useAuthStore();
   const { mutate: activateParser } = useSendParserData();
+  const { mutate: deleteParser } = useDeleteParser(); // ⬅️ используем delete
   const { data: userData, isLoading } = useGetUser(chatId);
   const { open: openPromo } = usePromoCodeStore();
   const { open: openParserPopup } = useParserPopupStore();
@@ -45,8 +47,8 @@ export const ProfileTab = () => {
 
       openParserPopup();
     } else {
-      // Implement parser stop logic if needed
-      console.log("Парсер остановлен");
+      // 🛑 Остановка парсера
+      deleteParser();
     }
 
     setIsParserActive((prev) => !prev);
