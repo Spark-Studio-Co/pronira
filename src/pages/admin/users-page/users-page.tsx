@@ -23,7 +23,6 @@ export default function UsersPage() {
   const [searchTerm, setSearchTerm] = useState("");
   const { data: users, isLoading, error } = useGetUsers();
 
-  // Filter users based on search term
   const filteredUsers =
     users?.filter(
       (user) =>
@@ -116,8 +115,6 @@ export default function UsersPage() {
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end">
                         <DropdownMenuLabel>Действия</DropdownMenuLabel>
-                        <DropdownMenuItem>Просмотреть профиль</DropdownMenuItem>
-                        <DropdownMenuItem>Редактировать</DropdownMenuItem>
                         <DropdownMenuItem className="text-destructive">
                           Удалить пользователя
                         </DropdownMenuItem>

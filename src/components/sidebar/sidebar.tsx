@@ -2,15 +2,7 @@
 
 import { Link, useLocation } from "react-router-dom";
 import { cn } from "@/lib/utils";
-import {
-  LayoutDashboard,
-  Users,
-  Tag,
-  CreditCard,
-  Settings,
-  Menu,
-  X,
-} from "lucide-react";
+import { LayoutDashboard, Users, Tag, Menu, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
 import { useMobile } from "@/shared/hooks/use-is-mobile";
@@ -30,11 +22,6 @@ const navItems = [
     title: "Промокоды",
     href: "/admin/promocodes",
     icon: Tag,
-  },
-  {
-    title: "Подписки",
-    href: "/admin/subscriptions",
-    icon: CreditCard,
   },
 ];
 
@@ -107,26 +94,6 @@ export default function Sidebar() {
               ))}
             </ul>
           </nav>
-          <div className="p-4 border-t">
-            <div
-              className={cn(
-                "flex items-center gap-3",
-                !isOpen && !isMobile && "justify-center"
-              )}
-            >
-              <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center text-primary-foreground">
-                A
-              </div>
-              {(isOpen || !isMobile) && (
-                <div className={cn(!isOpen && !isMobile && "hidden")}>
-                  <p className="font-medium">Admin User</p>
-                  <p className="text-xs text-muted-foreground">
-                    admin@example.com
-                  </p>
-                </div>
-              )}
-            </div>
-          </div>
         </div>
       </div>
     </>

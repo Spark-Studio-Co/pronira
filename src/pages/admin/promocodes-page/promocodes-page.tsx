@@ -10,6 +10,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
@@ -17,455 +18,371 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
+  DialogTrigger,
 } from "@/components/ui/dialog";
-import { FormLabel } from "@/components/ui/form";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuLabel,
-  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import * as z from "zod";
 import {
-  Copy,
+  Form,
+  FormControl,
+  FormDescription,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import {
+  Search,
+  Loader2,
   MoreHorizontal,
   Plus,
-  RefreshCw,
-  Search,
-  Trash2,
+  Tag,
+  Percent,
 } from "lucide-react";
-import { Button } from "@/components/ui/button";
 import { useGetPromocodes } from "@/entities/promocode/hooks/queries/use-get-promocodes.query";
 import { useCreatePromocode } from "@/entities/promocode/hooks/mutations/use-create-promocode.mutation";
-import { useDeletePromocode } from "@/entities/promocode/hooks/mutations/use-delete-promocode.mutation";
-import { usePatchPromocode } from "@/entities/promocode/hooks/mutations/use-patch-promocode.mutation";
+
+// Form schema for creating a promocode
+const formSchema = z.object({
+  code: z
+    .string()
+    .min(3, { message: "Код должен содержать минимум 3 символа" })
+    .max(20, { message: "Код должен содержать максимум 20 символов" })
+    .regex(/^[A-Z0-9]+$/, {
+      message: "Код должен содержать только заглавные буквы и цифры",
+    }),
+  discount: z
+    .number()
+    .min(1, { message: "Скидка должна быть минимум 1%" })
+    .max(100, { message: "Скидка не может превышать 100%" }),
+  maxUsage: z
+    .number()
+    .min(1, { message: "Максимальное использование должно быть минимум 1" }),
+});
+
+type FormValues = z.infer<typeof formSchema>;
 
 export default function PromocodesPage() {
   const [searchTerm, setSearchTerm] = useState("");
-  const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
-  const [newPromocode, setNewPromocode] = useState({
-    code: "",
-    discount: "",
-    type: "percentage",
-    usageLimit: "",
-    expiryDate: "",
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const { data: promocodes, isLoading, error } = useGetPromocodes();
+  const createPromocodeMutation = useCreatePromocode();
+
+  // Setup form
+  const form = useForm<FormValues>({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      code: "",
+      discount: 10,
+      maxUsage: 100,
+    },
   });
 
-  // Use React Query hooks
-  const { data: promocodes = [], isLoading } = useGetPromocodes();
-  const createPromocodeMutation = useCreatePromocode();
-  const deletePromocodeMutation = useDeletePromocode();
-  const patchPromocodeMutation = usePatchPromocode();
+  // Filter promocodes based on search term
+  const filteredPromocodes =
+    promocodes?.filter((promocode) =>
+      promocode.code.toLowerCase().includes(searchTerm.toLowerCase())
+    ) || [];
 
-  const filteredPromocodes = promocodes.filter((promo) =>
-    promo.code.toLowerCase().includes(searchTerm.toLowerCase())
-  );
-
-  const activePromocodes = filteredPromocodes.filter(
-    (promo) => promo.status === "Active"
-  );
-
-  const expiredPromocodes = filteredPromocodes.filter(
-    (promo) => promo.status === "Expired"
-  );
-
-  const handleInputChange = (e: any) => {
-    const { name, value } = e.target;
-    setNewPromocode((prev) => ({ ...prev, [name]: value }));
-  };
-
-  const handleSelectChange = (name: string, value: any) => {
-    setNewPromocode((prev) => ({ ...prev, [name]: value }));
-  };
-
-  const generateRandomCode = () => {
-    const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-    let result = "";
-    for (let i = 0; i < 8; i++) {
-      result += chars.charAt(Math.floor(Math.random() * chars.length));
-    }
-    setNewPromocode((prev) => ({ ...prev, code: result }));
-  };
-
-  const handleCreatePromocode = async (e) => {
-    e.preventDefault();
-
+  // Handle form submission
+  const onSubmit = async (values: FormValues) => {
     try {
-      await createPromocodeMutation.mutateAsync(newPromocode as any);
-      setIsCreateDialogOpen(false);
-
-      // Reset form
-      setNewPromocode({
-        code: "",
-        discount: "",
-        type: "percentage",
-        usageLimit: "",
-        expiryDate: "",
+      await createPromocodeMutation.mutateAsync({
+        code: values.code,
+        discount: values.discount,
+        maxUsage: values.maxUsage,
+        usageCount: 0, // New promocodes start with 0 usage
       });
+
+      form.reset();
+      setDialogOpen(false);
     } catch (error) {}
   };
 
-  const handleDeletePromocode = async (id) => {
-    try {
-      await deletePromocodeMutation.mutateAsync(id);
-    } catch (error) {}
-  };
-
-  const copyToClipboard = (code) => {
-    navigator.clipboard.writeText(code);
+  // Calculate usage percentage
+  const getUsagePercentage = (usageCount: number, maxUsage: number) => {
+    return Math.round((usageCount / maxUsage) * 100);
   };
 
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <h2 className="text-3xl font-bold tracking-tight">Промокоды</h2>
-        <Button
-          onClick={() => setIsCreateDialogOpen(true)}
-          className="mt-8 mb-8 lg:max-w-[382px]"
-        >
-          <Plus className="mr-2 h-4 w-4" />
-          Создать промокод
-        </Button>
-      </div>
-      <Tabs defaultValue="all" className="w-full">
-        <TabsList className="grid w-full md:w-auto grid-cols-3">
-          <TabsTrigger value="all">Все промокоды</TabsTrigger>
-          <TabsTrigger value="active">Активные</TabsTrigger>
-          <TabsTrigger value="expired">Устаревшие</TabsTrigger>
-        </TabsList>
-        <div className="flex flex-col sm:flex-row gap-4 justify-between items-start sm:items-center mt-6">
-          <div className="relative w-full sm:w-64">
-            <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
-            <Input
-              placeholder="Искать промокоды..."
-              className="pl-8"
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-            />
-          </div>
-        </div>
-        <TabsContent value="all" className="mt-4">
-          <div className="rounded-md border">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Код</TableHead>
-                  <TableHead>Скидка</TableHead>
-                  <TableHead>Тип</TableHead>
-                  <TableHead>Статус</TableHead>
-                  <TableHead>Использование</TableHead>
-                  <TableHead>Дата истечения</TableHead>
-                  <TableHead className="w-[80px]"></TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {isLoading ? (
-                  <TableRow>
-                    <TableCell colSpan={7} className="h-24 text-center">
-                      Загрузка промокодов...
-                    </TableCell>
-                  </TableRow>
-                ) : filteredPromocodes.length > 0 ? (
-                  filteredPromocodes.map((promo) => (
-                    <TableRow key={promo.id}>
-                      <TableCell className="font-medium">
-                        {promo.code}
-                      </TableCell>
-                      <TableCell>{promo.discount}</TableCell>
-                      <TableCell>{promo.type}</TableCell>
-                      <TableCell>
-                        <span
-                          className={`px-2 py-1 rounded-full text-xs ${
-                            promo.status === "Active"
-                              ? "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300"
-                              : promo.status === "Expired"
-                              ? "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300"
-                              : "bg-amber-100 text-amber-800 dark:bg-amber-900 dark:text-amber-300"
-                          }`}
-                        >
-                          {promo.status}
-                        </span>
-                      </TableCell>
-                      <TableCell>
-                        {promo.usageCount}/{promo.usageLimit}
-                      </TableCell>
-                      <TableCell>{promo.expiryDate}</TableCell>
-                      <TableCell>
-                        <DropdownMenu>
-                          <DropdownMenuTrigger asChild>
-                            <Button variant="ghost" size="icon">
-                              <MoreHorizontal className="h-4 w-4" />
-                              <span className="sr-only">Open menu</span>
-                            </Button>
-                          </DropdownMenuTrigger>
-                          <DropdownMenuContent align="end">
-                            <DropdownMenuLabel>Действия</DropdownMenuLabel>
-                            <DropdownMenuSeparator />
-                            <DropdownMenuItem
-                              onClick={() => copyToClipboard(promo.code)}
-                            >
-                              <Copy className="mr-2 h-4 w-4" />
-                              Скопировать промокод
-                            </DropdownMenuItem>
-                            <DropdownMenuSeparator />
-                            <DropdownMenuItem
-                              className="text-destructive"
-                              onClick={() => handleDeletePromocode(promo.id)}
-                            >
-                              <Trash2 className="mr-2 h-4 w-4" />
-                              Удалить промокод
-                            </DropdownMenuItem>
-                          </DropdownMenuContent>
-                        </DropdownMenu>
-                      </TableCell>
-                    </TableRow>
-                  ))
-                ) : (
-                  <TableRow>
-                    <TableCell colSpan={7} className="h-24 text-center">
-                      Промокоды не найдены.
-                    </TableCell>
-                  </TableRow>
-                )}
-              </TableBody>
-            </Table>
-          </div>
-        </TabsContent>
-
-        <TabsContent value="active" className="mt-4">
-          <div className="rounded-md border">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Код</TableHead>
-                  <TableHead>Скидка</TableHead>
-                  <TableHead>Тип</TableHead>
-                  <TableHead>Использование</TableHead>
-                  <TableHead>Дата истечения</TableHead>
-                  <TableHead className="w-[80px]"></TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {isLoading ? (
-                  <TableRow>
-                    <TableCell colSpan={6} className="h-24 text-center">
-                      Загрузка промокодов...
-                    </TableCell>
-                  </TableRow>
-                ) : activePromocodes.length > 0 ? (
-                  activePromocodes.map((promo) => (
-                    <TableRow key={promo.id}>
-                      <TableCell className="font-medium">
-                        {promo.code}
-                      </TableCell>
-                      <TableCell>{promo.discount}</TableCell>
-                      <TableCell>{promo.type}</TableCell>
-                      <TableCell>
-                        {promo.usageCount}/{promo.usageLimit}
-                      </TableCell>
-                      <TableCell>{promo.expiryDate}</TableCell>
-                      <TableCell>
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          onClick={() => copyToClipboard(promo.code)}
-                        >
-                          <Copy className="h-4 w-4" />
-                          <span className="sr-only">Copy code</span>
-                        </Button>
-                      </TableCell>
-                    </TableRow>
-                  ))
-                ) : (
-                  <TableRow>
-                    <TableCell colSpan={6} className="h-24 text-center">
-                      Активные промокоды не найдены.
-                    </TableCell>
-                  </TableRow>
-                )}
-              </TableBody>
-            </Table>
-          </div>
-        </TabsContent>
-
-        <TabsContent value="expired" className="mt-4">
-          <div className="rounded-md border">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Код</TableHead>
-                  <TableHead>Скидка</TableHead>
-                  <TableHead>Тип</TableHead>
-                  <TableHead>Использование</TableHead>
-                  <TableHead>Дата истечения</TableHead>
-                  <TableHead className="w-[80px]"></TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {isLoading ? (
-                  <TableRow>
-                    <TableCell colSpan={6} className="h-24 text-center">
-                      Загрузка промокодов...
-                    </TableCell>
-                  </TableRow>
-                ) : expiredPromocodes.length > 0 ? (
-                  expiredPromocodes.map((promo) => (
-                    <TableRow key={promo.id}>
-                      <TableCell className="font-medium">
-                        {promo.code}
-                      </TableCell>
-                      <TableCell>{promo.discount}</TableCell>
-                      <TableCell>{promo.type}</TableCell>
-                      <TableCell>
-                        {promo.usageCount}/{promo.usageLimit}
-                      </TableCell>
-                      <TableCell>{promo.expiryDate}</TableCell>
-                      <TableCell>
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          onClick={() => {
-                            patchPromocodeMutation.mutate({
-                              id: promo.id,
-                              data: { status: "Active" },
-                            });
-                          }}
-                        >
-                          <RefreshCw className="h-4 w-4" />
-                          <span className="sr-only">Reactivate</span>
-                        </Button>
-                      </TableCell>
-                    </TableRow>
-                  ))
-                ) : (
-                  <TableRow>
-                    <TableCell colSpan={6} className="h-24 text-center">
-                      Устаревшие промокоды не найдены.
-                    </TableCell>
-                  </TableRow>
-                )}
-              </TableBody>
-            </Table>
-          </div>
-        </TabsContent>
-      </Tabs>
-
-      <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
-        <DialogContent className="sm:max-w-[500px]">
-          <DialogHeader>
-            <DialogTitle>Создать новый промокод</DialogTitle>
-            <DialogDescription>
-              Создайте новый промокод для клиентов.
-            </DialogDescription>
-          </DialogHeader>
-          <form onSubmit={handleCreatePromocode}>
-            <div className="grid gap-4 py-4">
-              <div className="grid grid-cols-4 items-center gap-4">
-                <FormLabel className="text-right">Код</FormLabel>
-                <div className="col-span-3 flex gap-2">
-                  <Input
-                    name="code"
-                    value={newPromocode.code}
-                    onChange={handleInputChange}
-                    placeholder="e.g. SUMMER20"
-                    className="flex-1"
-                    required
-                  />
-                  <Button
-                    type="button"
-                    variant="outline"
-                    size="icon"
-                    onClick={generateRandomCode}
-                  >
-                    <RefreshCw className="h-4 w-4" />
-                  </Button>
-                </div>
-              </div>
-              <div className="grid grid-cols-4 items-center gap-4">
-                <FormLabel className="text-right">Скидка</FormLabel>
-                <Input
+        <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+          <DialogTrigger asChild>
+            <Button>
+              <Plus className="mr-2 h-4 w-4" />
+              Создать промокод
+            </Button>
+          </DialogTrigger>
+          <DialogContent className="sm:max-w-[425px]">
+            <DialogHeader>
+              <DialogTitle>Создать новый промокод</DialogTitle>
+              <DialogDescription>
+                Заполните форму ниже для создания нового промокода. Нажмите
+                "Создать" когда закончите.
+              </DialogDescription>
+            </DialogHeader>
+            <Form {...form}>
+              <form
+                onSubmit={form.handleSubmit(onSubmit)}
+                className="space-y-4"
+              >
+                <FormField
+                  control={form.control}
+                  name="code"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Код промокода</FormLabel>
+                      <FormControl>
+                        <Input placeholder="SUMMER20" {...field} />
+                      </FormControl>
+                      <FormDescription>
+                        Используйте заглавные буквы и цифры для лучшей
+                        читаемости.
+                      </FormDescription>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
                   name="discount"
-                  value={newPromocode.discount}
-                  onChange={handleInputChange}
-                  placeholder="e.g. 20 or 20.00"
-                  className="col-span-3"
-                  required
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Скидка (%)</FormLabel>
+                      <FormControl>
+                        <Input
+                          type="number"
+                          {...field}
+                          onChange={(e) =>
+                            field.onChange(Number(e.target.value))
+                          }
+                        />
+                      </FormControl>
+                      <FormDescription>
+                        Процент скидки, который предоставляет промокод.
+                      </FormDescription>
+                      <FormMessage />
+                    </FormItem>
+                  )}
                 />
-              </div>
-              <div className="grid grid-cols-4 items-center gap-4">
-                <FormLabel className="text-right">Тип</FormLabel>
-                <Select
-                  value={newPromocode.type}
-                  onValueChange={(value) => handleSelectChange("type", value)}
-                  required
-                >
-                  <SelectTrigger className="col-span-3">
-                    <SelectValue placeholder="Выберите тип" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="percentage">Процент (%)</SelectItem>
-                    <SelectItem value="fixed">
-                      Фиксированная сумма (₽)
-                    </SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-              <div className="grid grid-cols-4 items-center gap-4">
-                <FormLabel className="text-right">
-                  Лимит использования
-                </FormLabel>
-                <Input
-                  name="usageLimit"
-                  value={newPromocode.usageLimit}
-                  onChange={handleInputChange}
-                  type="number"
-                  placeholder="e.g. 100"
-                  className="col-span-3"
-                  required
+                <FormField
+                  control={form.control}
+                  name="maxUsage"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>
+                        Максимальное количество использований
+                      </FormLabel>
+                      <FormControl>
+                        <Input
+                          type="number"
+                          {...field}
+                          onChange={(e) =>
+                            field.onChange(Number(e.target.value))
+                          }
+                        />
+                      </FormControl>
+                      <FormDescription>
+                        Сколько раз промокод может быть использован до
+                        деактивации.
+                      </FormDescription>
+                      <FormMessage />
+                    </FormItem>
+                  )}
                 />
-              </div>
-              <div className="grid grid-cols-4 items-center gap-4">
-                <FormLabel className="text-right">Дата истечения</FormLabel>
-                <Input
-                  name="expiryDate"
-                  value={newPromocode.expiryDate}
-                  onChange={handleInputChange}
-                  type="date"
-                  className="col-span-3"
-                  required
-                />
-              </div>
+                <DialogFooter>
+                  <Button
+                    type="submit"
+                    disabled={createPromocodeMutation.isPending}
+                  >
+                    {createPromocodeMutation.isPending ? (
+                      <>
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        Создание...
+                      </>
+                    ) : (
+                      "Создать"
+                    )}
+                  </Button>
+                </DialogFooter>
+              </form>
+            </Form>
+          </DialogContent>
+        </Dialog>
+      </div>
+
+      <div className="flex flex-col sm:flex-row gap-4 justify-between items-start sm:items-center">
+        <div className="relative w-full sm:w-64">
+          <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
+          <Input
+            placeholder="Поиск промокодов..."
+            className="pl-8"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+          />
+        </div>
+      </div>
+
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">
+              Всего промокодов
+            </CardTitle>
+            <Tag className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{promocodes?.length || 0}</div>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">
+              Активные промокоды
+            </CardTitle>
+            <Tag className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">
+              {promocodes?.filter((p) => p.usageCount < p.maxUsage).length || 0}
             </div>
-            <DialogFooter>
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() => setIsCreateDialogOpen(false)}
-                disabled={createPromocodeMutation.isPending}
-              >
-                Отмена
-              </Button>
-              <Button
-                type="submit"
-                disabled={createPromocodeMutation.isPending}
-              >
-                {createPromocodeMutation.isPending
-                  ? "Создание..."
-                  : "Создать промокод"}
-              </Button>
-            </DialogFooter>
-          </form>
-        </DialogContent>
-      </Dialog>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">
+              Средняя скидка
+            </CardTitle>
+            <Percent className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">
+              {promocodes?.length
+                ? Math.round(
+                    promocodes.reduce((acc, promo) => acc + promo.discount, 0) /
+                      promocodes.length
+                  )
+                : 0}
+              %
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
+      <div className="rounded-md border">
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>Код</TableHead>
+              <TableHead>Скидка</TableHead>
+              <TableHead>Использовано</TableHead>
+              <TableHead>Макс. использований</TableHead>
+              <TableHead>Статус</TableHead>
+              <TableHead>Использование</TableHead>
+              <TableHead className="w-[80px]"></TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {isLoading ? (
+              <TableRow>
+                <TableCell colSpan={7} className="h-24 text-center">
+                  <div className="flex justify-center items-center">
+                    <Loader2 className="h-6 w-6 animate-spin mr-2" />
+                    Загрузка промокодов...
+                  </div>
+                </TableCell>
+              </TableRow>
+            ) : error ? (
+              <TableRow>
+                <TableCell
+                  colSpan={7}
+                  className="h-24 text-center text-red-500"
+                >
+                  Ошибка при загрузке промокодов: {error.message}
+                </TableCell>
+              </TableRow>
+            ) : filteredPromocodes.length > 0 ? (
+              filteredPromocodes.map((promocode) => (
+                <TableRow key={promocode.id}>
+                  <TableCell className="font-medium">
+                    {promocode.code}
+                  </TableCell>
+                  <TableCell>{promocode.discount}%</TableCell>
+                  <TableCell>{promocode.usageCount}</TableCell>
+                  <TableCell>{promocode.maxUsage}</TableCell>
+                  <TableCell>
+                    <span
+                      className={`px-2 py-1 rounded-full text-xs ${
+                        promocode.usageCount < promocode.maxUsage
+                          ? "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300"
+                          : "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300"
+                      }`}
+                    >
+                      {promocode.usageCount < promocode.maxUsage
+                        ? "Активен"
+                        : "Использован"}
+                    </span>
+                  </TableCell>
+                  <TableCell>
+                    <div className="w-full bg-gray-200 rounded-full h-2.5 dark:bg-gray-700">
+                      <div
+                        className="bg-primary h-2.5 rounded-full"
+                        style={{
+                          width: `${getUsagePercentage(
+                            promocode.usageCount,
+                            promocode.maxUsage
+                          )}%`,
+                        }}
+                      ></div>
+                    </div>
+                    <div className="text-xs text-muted-foreground mt-1">
+                      {getUsagePercentage(
+                        promocode.usageCount,
+                        promocode.maxUsage
+                      )}
+                      %
+                    </div>
+                  </TableCell>
+                  <TableCell>
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button variant="ghost" size="icon">
+                          <MoreHorizontal className="h-4 w-4" />
+                          <span className="sr-only">Открыть меню</span>
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end">
+                        <DropdownMenuLabel>Действия</DropdownMenuLabel>
+                        <DropdownMenuItem>Редактировать</DropdownMenuItem>
+                        <DropdownMenuItem className="text-destructive">
+                          Удалить
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  </TableCell>
+                </TableRow>
+              ))
+            ) : (
+              <TableRow>
+                <TableCell colSpan={7} className="h-24 text-center">
+                  Промокоды не найдены.
+                </TableCell>
+              </TableRow>
+            )}
+          </TableBody>
+        </Table>
+      </div>
     </div>
   );
 }
