@@ -43,71 +43,11 @@ import {
   Search,
   Trash2,
 } from "lucide-react";
-import { Button } from "@/shared/ui/button";
-
-// Mock data
-const mockPromocodes = [
-  {
-    id: 1,
-    code: "SUMMER20",
-    discount: "20%",
-    type: "Percentage",
-    status: "Active",
-    usageLimit: 100,
-    usageCount: 45,
-    expiryDate: "2023-08-31",
-  },
-  {
-    id: 2,
-    code: "WELCOME10",
-    discount: "10%",
-    type: "Percentage",
-    status: "Active",
-    usageLimit: 200,
-    usageCount: 120,
-    expiryDate: "2023-12-31",
-  },
-  {
-    id: 3,
-    code: "FLASH50",
-    discount: "$50",
-    type: "Fixed",
-    status: "Expired",
-    usageLimit: 50,
-    usageCount: 50,
-    expiryDate: "2023-06-15",
-  },
-  {
-    id: 4,
-    code: "SPECIAL25",
-    discount: "25%",
-    type: "Percentage",
-    status: "Active",
-    usageLimit: 75,
-    usageCount: 30,
-    expiryDate: "2023-09-30",
-  },
-  {
-    id: 5,
-    code: "NEWUSER15",
-    discount: "15%",
-    type: "Percentage",
-    status: "Active",
-    usageLimit: 300,
-    usageCount: 89,
-    expiryDate: "2023-10-31",
-  },
-  {
-    id: 6,
-    code: "HOLIDAY100",
-    discount: "$100",
-    type: "Fixed",
-    status: "Scheduled",
-    usageLimit: 25,
-    usageCount: 0,
-    expiryDate: "2023-12-25",
-  },
-];
+import { Button } from "@/components/ui/button";
+import { useGetPromocodes } from "@/entities/promocode/hooks/queries/use-get-promocodes.query";
+import { useCreatePromocode } from "@/entities/promocode/hooks/mutations/use-create-promocode.mutation";
+import { useDeletePromocode } from "@/entities/promocode/hooks/mutations/use-delete-promocode.mutation";
+import { usePatchPromocode } from "@/entities/promocode/hooks/mutations/use-patch-promocode.mutation";
 
 export default function PromocodesPage() {
   const [searchTerm, setSearchTerm] = useState("");
@@ -120,16 +60,30 @@ export default function PromocodesPage() {
     expiryDate: "",
   });
 
-  const filteredPromocodes = mockPromocodes.filter((promo) =>
+  // Use React Query hooks
+  const { data: promocodes = [], isLoading } = useGetPromocodes();
+  const createPromocodeMutation = useCreatePromocode();
+  const deletePromocodeMutation = useDeletePromocode();
+  const patchPromocodeMutation = usePatchPromocode();
+
+  const filteredPromocodes = promocodes.filter((promo) =>
     promo.code.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  const handleInputChange = (e) => {
+  const activePromocodes = filteredPromocodes.filter(
+    (promo) => promo.status === "Active"
+  );
+
+  const expiredPromocodes = filteredPromocodes.filter(
+    (promo) => promo.status === "Expired"
+  );
+
+  const handleInputChange = (e: any) => {
     const { name, value } = e.target;
     setNewPromocode((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleSelectChange = (name, value) => {
+  const handleSelectChange = (name: string, value: any) => {
     setNewPromocode((prev) => ({ ...prev, [name]: value }));
   };
 
@@ -142,20 +96,28 @@ export default function PromocodesPage() {
     setNewPromocode((prev) => ({ ...prev, code: result }));
   };
 
-  const handleCreatePromocode = (e) => {
+  const handleCreatePromocode = async (e) => {
     e.preventDefault();
-    // Here you would typically send this to your API
-    console.log("Creating promocode:", newPromocode);
-    setIsCreateDialogOpen(false);
 
-    // Reset form
-    setNewPromocode({
-      code: "",
-      discount: "",
-      type: "percentage",
-      usageLimit: "",
-      expiryDate: "",
-    });
+    try {
+      await createPromocodeMutation.mutateAsync(newPromocode as any);
+      setIsCreateDialogOpen(false);
+
+      // Reset form
+      setNewPromocode({
+        code: "",
+        discount: "",
+        type: "percentage",
+        usageLimit: "",
+        expiryDate: "",
+      });
+    } catch (error) {}
+  };
+
+  const handleDeletePromocode = async (id) => {
+    try {
+      await deletePromocodeMutation.mutateAsync(id);
+    } catch (error) {}
   };
 
   const copyToClipboard = (code) => {
@@ -167,11 +129,12 @@ export default function PromocodesPage() {
       <div className="flex justify-between items-center">
         <h2 className="text-3xl font-bold tracking-tight">Промокоды</h2>
         <Button
-          variant="primary"
-          className="mt-8 mb-8 lg:max-w-[382px]"
           onClick={() => setIsCreateDialogOpen(true)}
-          text="Продолжить"
-        />
+          className="mt-8 mb-8 lg:max-w-[382px]"
+        >
+          <Plus className="mr-2 h-4 w-4" />
+          Создать промокод
+        </Button>
       </div>
       <Tabs defaultValue="all" className="w-full">
         <TabsList className="grid w-full md:w-auto grid-cols-3">
@@ -205,7 +168,13 @@ export default function PromocodesPage() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {filteredPromocodes.length > 0 ? (
+                {isLoading ? (
+                  <TableRow>
+                    <TableCell colSpan={7} className="h-24 text-center">
+                      Загрузка промокодов...
+                    </TableCell>
+                  </TableRow>
+                ) : filteredPromocodes.length > 0 ? (
                   filteredPromocodes.map((promo) => (
                     <TableRow key={promo.id}>
                       <TableCell className="font-medium">
@@ -248,7 +217,10 @@ export default function PromocodesPage() {
                               Скопировать промокод
                             </DropdownMenuItem>
                             <DropdownMenuSeparator />
-                            <DropdownMenuItem className="text-destructive">
+                            <DropdownMenuItem
+                              className="text-destructive"
+                              onClick={() => handleDeletePromocode(promo.id)}
+                            >
                               <Trash2 className="mr-2 h-4 w-4" />
                               Удалить промокод
                             </DropdownMenuItem>
@@ -283,9 +255,14 @@ export default function PromocodesPage() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {filteredPromocodes
-                  .filter((promo) => promo.status === "Active")
-                  .map((promo) => (
+                {isLoading ? (
+                  <TableRow>
+                    <TableCell colSpan={6} className="h-24 text-center">
+                      Загрузка промокодов...
+                    </TableCell>
+                  </TableRow>
+                ) : activePromocodes.length > 0 ? (
+                  activePromocodes.map((promo) => (
                     <TableRow key={promo.id}>
                       <TableCell className="font-medium">
                         {promo.code}
@@ -307,7 +284,14 @@ export default function PromocodesPage() {
                         </Button>
                       </TableCell>
                     </TableRow>
-                  ))}
+                  ))
+                ) : (
+                  <TableRow>
+                    <TableCell colSpan={6} className="h-24 text-center">
+                      Активные промокоды не найдены.
+                    </TableCell>
+                  </TableRow>
+                )}
               </TableBody>
             </Table>
           </div>
@@ -327,9 +311,14 @@ export default function PromocodesPage() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {filteredPromocodes
-                  .filter((promo) => promo.status === "Expired")
-                  .map((promo) => (
+                {isLoading ? (
+                  <TableRow>
+                    <TableCell colSpan={6} className="h-24 text-center">
+                      Загрузка промокодов...
+                    </TableCell>
+                  </TableRow>
+                ) : expiredPromocodes.length > 0 ? (
+                  expiredPromocodes.map((promo) => (
                     <TableRow key={promo.id}>
                       <TableCell className="font-medium">
                         {promo.code}
@@ -341,13 +330,29 @@ export default function PromocodesPage() {
                       </TableCell>
                       <TableCell>{promo.expiryDate}</TableCell>
                       <TableCell>
-                        <Button variant="ghost" size="icon">
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => {
+                            patchPromocodeMutation.mutate({
+                              id: promo.id,
+                              data: { status: "Active" },
+                            });
+                          }}
+                        >
                           <RefreshCw className="h-4 w-4" />
                           <span className="sr-only">Reactivate</span>
                         </Button>
                       </TableCell>
                     </TableRow>
-                  ))}
+                  ))
+                ) : (
+                  <TableRow>
+                    <TableCell colSpan={6} className="h-24 text-center">
+                      Устаревшие промокоды не найдены.
+                    </TableCell>
+                  </TableRow>
+                )}
               </TableBody>
             </Table>
           </div>
@@ -373,6 +378,7 @@ export default function PromocodesPage() {
                     onChange={handleInputChange}
                     placeholder="e.g. SUMMER20"
                     className="flex-1"
+                    required
                   />
                   <Button
                     type="button"
@@ -392,16 +398,18 @@ export default function PromocodesPage() {
                   onChange={handleInputChange}
                   placeholder="e.g. 20 or 20.00"
                   className="col-span-3"
+                  required
                 />
               </div>
               <div className="grid grid-cols-4 items-center gap-4">
-                <FormLabel className="text-right">Type</FormLabel>
+                <FormLabel className="text-right">Тип</FormLabel>
                 <Select
                   value={newPromocode.type}
                   onValueChange={(value) => handleSelectChange("type", value)}
+                  required
                 >
                   <SelectTrigger className="col-span-3">
-                    <SelectValue placeholder="Select type" />
+                    <SelectValue placeholder="Выберите тип" />
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="percentage">Процент (%)</SelectItem>
@@ -422,6 +430,7 @@ export default function PromocodesPage() {
                   type="number"
                   placeholder="e.g. 100"
                   className="col-span-3"
+                  required
                 />
               </div>
               <div className="grid grid-cols-4 items-center gap-4">
@@ -432,6 +441,7 @@ export default function PromocodesPage() {
                   onChange={handleInputChange}
                   type="date"
                   className="col-span-3"
+                  required
                 />
               </div>
             </div>
@@ -440,10 +450,18 @@ export default function PromocodesPage() {
                 type="button"
                 variant="outline"
                 onClick={() => setIsCreateDialogOpen(false)}
+                disabled={createPromocodeMutation.isPending}
               >
                 Отмена
               </Button>
-              <Button type="submit">Создать промокод</Button>
+              <Button
+                type="submit"
+                disabled={createPromocodeMutation.isPending}
+              >
+                {createPromocodeMutation.isPending
+                  ? "Создание..."
+                  : "Создать промокод"}
+              </Button>
             </DialogFooter>
           </form>
         </DialogContent>

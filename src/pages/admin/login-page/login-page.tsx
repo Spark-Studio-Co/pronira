@@ -16,7 +16,7 @@ import { Eye, EyeOff, Lock, Mail } from "lucide-react";
 import { adminLogin } from "@/entities/admin/api/post/admin-login.api";
 
 export default function Login() {
-  const [email, setEmail] = useState(""); // username
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [rememberMe, setRememberMe] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
@@ -37,11 +37,7 @@ export default function Login() {
 
       const { access_token } = response;
 
-      if (rememberMe) {
-        localStorage.setItem("admin_token", access_token);
-      } else {
-        sessionStorage.setItem("admin_token", access_token);
-      }
+      localStorage.setItem("admin_token", access_token);
 
       navigate("/admin");
     } catch (err: any) {
@@ -112,16 +108,6 @@ export default function Login() {
                   </span>
                 </Button>
               </div>
-            </div>
-            <div className="flex items-center space-x-2">
-              <Checkbox
-                id="remember"
-                checked={rememberMe}
-                onCheckedChange={(checked) => setRememberMe(checked === true)}
-              />
-              <Label htmlFor="remember" className="text-sm">
-                Запомнить меня
-              </Label>
             </div>
             {error && <div className="text-destructive text-sm">{error}</div>}
             <Button type="submit" className="w-full" disabled={isLoading}>

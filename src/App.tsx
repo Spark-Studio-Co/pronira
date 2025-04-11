@@ -31,6 +31,7 @@ import ReadmePage from "./pages/readme/readme-page";
 import { VideoPage } from "./pages/video-page/video-page";
 import LoginPage from "./pages/login-page/login-page";
 import TBankPaymentPage from "./pages/t-bank-payment-page/t-bank-payment-page";
+import AdminProtectedRoute from "./lib/route-guards/admin-protected.route";
 
 function NavRoutes() {
   const location = useLocation();
@@ -74,34 +75,42 @@ function NavRoutes() {
       <Route
         path="/admin"
         element={
-          <Layout>
-            <DashboardPage />
-          </Layout>
+          <AdminProtectedRoute>
+            <Layout>
+              <DashboardPage />
+            </Layout>
+          </AdminProtectedRoute>
         }
       />
       <Route path="/admin/login" element={<Login />} />
       <Route
         path="/admin/promocodes"
         element={
-          <Layout>
-            <PromocodesPage />
-          </Layout>
+          <AdminProtectedRoute>
+            <Layout>
+              <PromocodesPage />
+            </Layout>
+          </AdminProtectedRoute>
         }
       />
       <Route
         path="/admin/subscriptions"
         element={
-          <Layout>
-            <SubscriptionsPage />
-          </Layout>
+          <AdminProtectedRoute>
+            <Layout>
+              <SubscriptionsPage />
+            </Layout>
+          </AdminProtectedRoute>
         }
       />
       <Route
         path="/admin/users"
         element={
-          <Layout>
-            <UsersPage />
-          </Layout>
+          <AdminProtectedRoute>
+            <Layout>
+              <UsersPage />
+            </Layout>
+          </AdminProtectedRoute>
         }
       />
     </Routes>
