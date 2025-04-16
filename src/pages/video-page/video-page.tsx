@@ -1,4 +1,3 @@
-import image from "/main.png";
 import { Button } from "@/shared/ui/button";
 import { Layout } from "@/shared/ui/layout";
 import { useNavigate } from "react-router-dom";
@@ -15,11 +14,29 @@ export const VideoPage = () => {
           <h1 className="text-[24px] lg:text-[40px] 2xl:text-[44px] lg:max-w-[710px] lg:text-left text-center font-bold">
             Видео инструкция
           </h1>
-          <img
-            src={image}
-            alt="Main Image"
-            className="w-[350px] h-[367.5px] mt-8 lg:hidden"
-          />
+          <div
+            style={{
+              position: "relative",
+              width: "100%",
+              height: 0,
+              paddingBottom: "56.25%",
+            }}
+          >
+            <iframe
+              src="https://streamable.com/e/zllsf4?autoplay=1"
+              allow="fullscreen; autoplay"
+              allowFullScreen
+              style={{
+                border: "none",
+                width: "100%",
+                height: "100%",
+                position: "absolute",
+                left: 0,
+                top: 0,
+                overflow: "hidden",
+              }}
+            />
+          </div>
           <Button
             onClick={() => navigation("/")}
             text="Назад"
