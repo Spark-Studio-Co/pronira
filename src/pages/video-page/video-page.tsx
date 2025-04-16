@@ -6,7 +6,7 @@ import intro_bg from "/intro_bg.png";
 export const VideoPage = () => {
   const navigation = useNavigate();
 
-  // test
+  // test test
 
   return (
     <Layout isWelcome>
