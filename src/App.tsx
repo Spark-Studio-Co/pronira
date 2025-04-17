@@ -33,6 +33,7 @@ import LoginPage from "./pages/login-page/login-page";
 import TBankPaymentPage from "./pages/t-bank-payment-page/t-bank-payment-page";
 import AdminProtectedRoute from "./lib/route-guards/admin-protected.route";
 import SubscriptionPolicy from "./pages/subscription-policy/subscription-policy";
+import { TariffsPage } from "./pages/tariffs-page/tariffs-page";
 
 function NavRoutes() {
   const location = useLocation();
@@ -59,6 +60,7 @@ function NavRoutes() {
           <Route path="/payment-denied" element={<DeniedPyamentPage />} />
           <Route path="*" element={<Navigate to="/personal" />} />
           <Route path="/video" element={<VideoPage />} />
+          <Route path="/tariffs" element={<TariffsPage />} />
         </>
       ) : (
         <>

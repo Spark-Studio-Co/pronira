@@ -18,18 +18,7 @@ export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 }
 
 const Button = forwardRef<HTMLButtonElement, ButtonProps>(
-  (
-    {
-      className,
-      variant = "primary",
-      disabled,
-      text,
-      isLamp,
-      children,
-      ...props
-    },
-    ref
-  ) => {
+  ({ className, variant = "primary", disabled, text, ...props }, ref) => {
     return (
       <button
         className={cn(
@@ -42,7 +31,6 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
         {...props}
       >
         {text}
-        {/* {isLamp && <img src={lamp} alt="Lamp" />} */}
       </button>
     );
   }

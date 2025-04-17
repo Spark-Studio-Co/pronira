@@ -445,11 +445,14 @@ export const RegistrationPage = () => {
         </div>
 
         <div className="w-full flex flex-col items-center gap-4">
+          <p className="mt-4 text-main hover:underline lg:mt-8">
+            Бесплатный пробный период 24 часа
+          </p>
           <Button
             onClick={handleSubmit}
             text={isPending ? "Отправляем..." : "Продолжить"}
             variant="primary"
-            className="mt-4 lg:max-w-[382px] lg:mt-8"
+            className="lg:max-w-[382px]"
             isLamp
           />
 
