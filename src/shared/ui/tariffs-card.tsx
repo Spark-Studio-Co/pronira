@@ -17,7 +17,6 @@ export const TariffsCard: React.FC<TariffsCardProps> = ({
   title,
   items,
   isActive = false,
-
   highlightedNote,
 }) => {
   const titleClass = `rounded-sm w-full mb-4 py-3 text-center font-semibold ${
@@ -32,12 +31,12 @@ export const TariffsCard: React.FC<TariffsCardProps> = ({
     isActive ? "bg-gray-100 text-dark" : "bg-main text-white"
   }`;
 
-  const borderClass = `flex-1 border-2 w-[20vw] p-4 rounded-xl flex flex-col ${
+  const borderClass = `flex-1 border-2 p-4 rounded-xl flex flex-col ${
     isActive ? "border-gray-300" : "border-gray-400"
   }`;
 
   return (
-    <div className="flex flex-col h-full justify-between min-h-[300px]">
+    <div className="flex flex-col h-full justify-between min-h-[300px] w-full lg:w-[25vw]">
       <span className={titleClass}>{title}</span>
       <div className={borderClass}>
         <div className="space-y-2">

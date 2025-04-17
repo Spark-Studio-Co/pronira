@@ -20,7 +20,7 @@ export const tariffs = [
   },
   {
     title: "Для Профи",
-    price: "4 300 руб",
+    price: "",
     buttonText: "Купить",
     items: [
       { text: "Новые Дома", icon: House, iconAlt: "Дом" },
@@ -30,7 +30,7 @@ export const tariffs = [
     ],
     highlightedNote: (
       <div className="text-left">
-        <p className="font-bold text-[16px]">Доступны ВСЕ категории +</p>
+        <p className="font-bold text-[14px]">Доступны ВСЕ категории +</p>
         <span className="font-bold text-[12px]">1. Продавец понизил цену</span>
         <br />
         <p className="text-[8px]">
@@ -41,20 +41,17 @@ export const tariffs = [
           2. Поиск новых по ключевым словам
         </p>
 
-        <span className="text-[8px]">
-          Пример: Ключевые слова «первая линия»
-        </span>
-        <br />
+        <p className="text-[8px]">Пример: Ключевые слова «первая линия»</p>
         <p className="text-[8px]">
           Проныра пришлет только те новые, где есть эта фраза
         </p>
 
         <p className="text-[8px] text-red-600 font-semibold">
           ВНИМАНИЕ!{" "}
-          <span className="text-black font-normal">
+          <p className="text-black font-normal">
             Поиск по ключевым — это более тонкие настройки. <br />
             Будь готов к тому, что количество сильно уменьшится
-          </span>
+          </p>
         </p>
       </div>
     ),
@@ -62,7 +59,7 @@ export const tariffs = [
   },
   {
     title: "Для БОЛЬШИХ продаж",
-    price: "7 900 руб",
+    price: "",
     buttonText: "Купить",
     items: [
       { text: "Новые Дома", icon: House, iconAlt: "Дом" },
@@ -74,16 +71,16 @@ export const tariffs = [
 
     highlightedNote: (
       <div className="text-center text-dark">
-        <p className="font-bold text-[16px]">
+        <p className="font-bold text-[20px]">
           Бизнес класс <br /> Всё, как у Профи +
         </p>
 
-        <p className="font-bold text-[14px]">Активная Кнопка</p>
+        <p className="font-bold text-[14px] mt-4">Активная Кнопка</p>
         <button className="border-2 border-dark text-dark px-4 py-1 rounded text-sm">
           Поиск под запрос
         </button>
 
-        <p className="text-[10px] text-dark/90">
+        <p className="text-[10px] text-dark/90 mt-4">
           Проныра пришлет всё по ключевым словам <br />
           за последние несколько месяцев
         </p>
