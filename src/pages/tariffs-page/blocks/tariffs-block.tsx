@@ -1,9 +1,12 @@
 import { tariffs } from "@/shared/content/tariffs-block-content";
 import { TariffsCard } from "@/shared/ui/tariffs-card";
+import { useNavigate } from "react-router-dom";
 
 // import TariffsImage from "@/assets/treasure.png";
 
 export default function TariffBlock() {
+  const navigation = useNavigate();
+
   return (
     <div className="mx-auto px-4 py-12 pb-16 w-[80vw]">
       <div className="w-full flex justify-center mb-3">
@@ -23,6 +26,7 @@ export default function TariffBlock() {
             />
             <div className="mt-4">
               <button
+                onClick={() => navigation("/payment")}
                 className={`w-full py-3 px-6 rounded-sm ${
                   tariff.isActive
                     ? "text-dark bg-gray-300"

@@ -55,7 +55,6 @@ function NavRoutes() {
           <Route path="/readme" element={<ReadmePage />} />
           <Route path="/user-agreement" element={<UserAgreementPage />} />
           <Route path="/payment/t-bank" element={<TBankPaymentPage />} />
-          <Route path="/payment" element={<PaymentPage />} />
           <Route path="/payment-success" element={<SuccessPyamentPage />} />
           <Route path="/payment-denied" element={<DeniedPyamentPage />} />
           <Route path="*" element={<Navigate to="/personal" />} />
@@ -63,6 +62,7 @@ function NavRoutes() {
         </>
       ) : (
         <>
+          <Route path="/payment" element={<PaymentPage />} />
           <Route path="/tariffs" element={<TariffsPage />} />
           <Route path="/" element={<IntroPage />} />
           <Route path="/login" element={<LoginPage />} />
