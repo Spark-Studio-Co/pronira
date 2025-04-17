@@ -60,10 +60,10 @@ function NavRoutes() {
           <Route path="/payment-denied" element={<DeniedPyamentPage />} />
           <Route path="*" element={<Navigate to="/personal" />} />
           <Route path="/video" element={<VideoPage />} />
-          <Route path="/tariffs" element={<TariffsPage />} />
         </>
       ) : (
         <>
+          <Route path="/tariffs" element={<TariffsPage />} />
           <Route path="/" element={<IntroPage />} />
           <Route path="/login" element={<LoginPage />} />
           <Route path="/video" element={<VideoPage />} />
