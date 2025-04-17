@@ -134,15 +134,15 @@ export const IntroPage = () => {
         {/* Action Buttons */}
         <div className="flex flex-col items-center mt-8 mb-12">
           <Button
-            onClick={() => navigation("/tariffs")}
-            text="Ознакомиться с тарифами"
+            onClick={() => navigation("/registration")}
+            text="Попробуй! Это БЕСПЛАТНО"
             variant="primary"
             className="w-full max-w-[500px] mb-4 !rounded-md"
             isLamp
           />
           <Button
-            onClick={() => navigation("/registration")}
-            text="Попробуй! Это БЕСПЛАТНО"
+            onClick={() => navigation("/tariffs")}
+            text="Ознакомиться с тарифами"
             variant="primary"
             className="w-full max-w-[500px] mb-4 !rounded-md"
             isLamp
