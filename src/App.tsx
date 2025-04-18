@@ -37,6 +37,7 @@ import { TariffsPage } from "./pages/tariffs-page/tariffs-page";
 import TariffsPageAdmin from "./pages/admin/tariffs-page/tariffs-page";
 import StatisticsPage from "./pages/admin/statistic-page/statistic-page";
 import SettingsPageAdmin from "./pages/admin/settings-page/settings-page";
+import ResetPasswordPage from "./pages/reset-password/reset-password";
 
 function NavRoutes() {
   const location = useLocation();
@@ -62,6 +63,7 @@ function NavRoutes() {
           <Route path="/payment-denied" element={<DeniedPyamentPage />} />
           <Route path="*" element={<Navigate to="/personal" />} />
           <Route path="/video" element={<VideoPage />} />
+          <Route path="/reset-password" element={<ResetPasswordPage />} />
         </>
       ) : (
         <>
@@ -78,6 +80,7 @@ function NavRoutes() {
           <Route path="/agent" element={<AgentPage />} />
           <Route path="/links" element={<LinksPage />} />
           <Route path="*" element={<Navigate to="/" />} />
+          <Route path="/reset-password" element={<ResetPasswordPage />} />
         </>
       )}
       <Route

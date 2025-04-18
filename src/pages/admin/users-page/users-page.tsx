@@ -27,7 +27,7 @@ import {
 
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
-import { Search, Loader2, MoreHorizontal } from "lucide-react";
+import { Search, MoreHorizontal } from "lucide-react";
 import { useGetUsers } from "@/entities/users/hooks/queries/use-get-users.query";
 
 type User = {

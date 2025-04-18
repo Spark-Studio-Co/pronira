@@ -10,6 +10,7 @@ import { useDeleteParser } from "../parser/hooks/mutation/use-delete-parser.muta
 import { ProfileTabSkeleton } from "./profile-skeleton";
 import { usePromoCodeStore } from "../promocode/store/use-promocode-store";
 import { useParserPopupStore } from "../parser/store/use-parser-popup.store";
+import { useNavigate } from "react-router-dom";
 
 export const ProfileTab = () => {
   const { open } = useInstructionPopupStore();
@@ -24,6 +25,7 @@ export const ProfileTab = () => {
     return localStorage.getItem("isParserActive") === "true";
   });
 
+  const navigate = useNavigate();
   useEffect(() => {
     localStorage.setItem("isParserActive", String(isParserActive));
   }, [isParserActive]);
@@ -88,6 +90,12 @@ export const ProfileTab = () => {
         className="mt-[19px]"
         variant="primary"
         onClick={() => openPromo()}
+      />
+      <Button
+        text="Поменять пароль"
+        className="mt-[19px] bg-red-500"
+        variant="secondary"
+        onClick={() => navigate("/reset-password")}
       />
     </div>
   );

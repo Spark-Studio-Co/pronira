@@ -1,5 +1,3 @@
-"use client";
-
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/shared/ui/button";
@@ -8,6 +6,7 @@ import { Layout } from "@/shared/ui/layout";
 import { useAuthStore } from "@/entities/auth/store/use-auth-store";
 import { useLogin } from "@/entities/auth/hooks/mutation/use-login.mutation";
 import jin from "@/assets/greeting.png";
+import { Eye, EyeOff } from "lucide-react"; // Импортируем иконки глаза
 
 export const LoginPage = () => {
   const navigate = useNavigate();
@@ -29,6 +28,8 @@ export const LoginPage = () => {
     chatId: false,
     password: false,
   });
+
+  const [showPassword, setShowPassword] = useState(false); // Состояние для отображения пароля
 
   const handleInputChange = (key: string, value: string | boolean) => {
     setFormData((prev) => ({ ...prev, [key]: value }));
@@ -110,6 +111,10 @@ export const LoginPage = () => {
     handleInputChange("rememberMe", !formData.rememberMe);
   };
 
+  const togglePasswordVisibility = () => {
+    setShowPassword(!showPassword);
+  };
+
   return (
     <Layout isWelcome>
       <div className="flex items-center justify-center flex-col w-full">
@@ -133,14 +138,25 @@ export const LoginPage = () => {
             )}
           </div>
 
-          <div>
+          <div className="relative">
             <Input
               placeholder="Пароль *"
-              type="password"
+              type={showPassword ? "text" : "password"}
               value={formData.password}
               onChange={(value) => handleInputChange("password", value)}
               onBlur={() => handleBlur("password")}
             />
+            <button
+              type="button"
+              className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+              onClick={togglePasswordVisibility}
+            >
+              {showPassword ? (
+                <EyeOff className="h-5 w-5" />
+              ) : (
+                <Eye className="h-5 w-5" />
+              )}
+            </button>
             {touched.password && errors.password && (
               <p className="mt-1 text-sm text-destructive">{errors.password}</p>
             )}
@@ -193,7 +209,7 @@ export const LoginPage = () => {
           </p>
 
           <Link
-            to="/forgot-password"
+            to="/reset-password"
             className="text-sm text-main hover:underline"
           >
             Забыли пароль?
