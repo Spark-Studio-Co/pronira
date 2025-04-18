@@ -2,12 +2,26 @@
 
 import { Link, useLocation } from "react-router-dom";
 import { cn } from "@/lib/utils";
-import { LayoutDashboard, Users, Tag, Menu, X } from "lucide-react";
+import {
+  LayoutDashboard,
+  Users,
+  Tag,
+  Menu,
+  X,
+  Settings,
+  ChartLineIcon,
+  DollarSign,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
 import { useMobile } from "@/shared/hooks/use-is-mobile";
 
 const navItems = [
+  {
+    title: "Тарифы",
+    href: "/admin/tariffs",
+    icon: DollarSign,
+  },
   {
     title: "Главная",
     href: "/admin",
@@ -22,6 +36,16 @@ const navItems = [
     title: "Промокоды",
     href: "/admin/promocodes",
     icon: Tag,
+  },
+  {
+    title: "Статистика",
+    href: "/admin/statistic",
+    icon: ChartLineIcon,
+  },
+  {
+    title: "Настройки",
+    href: "/admin/settings",
+    icon: Settings,
   },
 ];
 

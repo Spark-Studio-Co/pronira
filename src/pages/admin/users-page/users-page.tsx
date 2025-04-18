@@ -1,3 +1,5 @@
+"use client";
+
 import { useState } from "react";
 import {
   Table,
@@ -12,25 +14,67 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuLabel,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+
+import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Search, Loader2, MoreHorizontal } from "lucide-react";
 import { useGetUsers } from "@/entities/users/hooks/queries/use-get-users.query";
 
+type User = {
+  id: string;
+  name: string;
+  email: string;
+  city?: string;
+  role?: string;
+  phoneNumber?: string;
+  agencyName?: string;
+  balance?: number;
+  subscriptionActive?: boolean;
+  plan?: string;
+  status?: string;
+  category?: string;
+  phone?: string;
+  address?: string;
+  connectedAt?: string;
+};
+
 export default function UsersPage() {
   const [searchTerm, setSearchTerm] = useState("");
-  const { data: users, isLoading, error } = useGetUsers();
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [selectedUser, setSelectedUser] = useState<User | null>(null);
+  const [isDataOpen, setIsDataOpen] = useState(false);
 
-  const filteredUsers =
-    users?.filter(
-      (user) =>
-        user.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        user.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        user.phoneNumber?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        user.city?.toLowerCase().includes(searchTerm.toLowerCase())
-    ) || [];
+  const { data: users = [] } = useGetUsers() as {
+    data: User[];
+    isLoading: boolean;
+    error: any;
+  };
+
+  const filteredUsers = users.filter((user) =>
+    [user.name, user.email, user.phoneNumber, user.city].some((field) =>
+      field?.toLowerCase().includes(searchTerm.toLowerCase())
+    )
+  );
+
+  const handleEditUser = (user: User) => {
+    setSelectedUser(user);
+    setIsDialogOpen(true);
+  };
+
+  const handleDataUser = (user: User) => {
+    setSelectedUser(user);
+    setIsDataOpen(true);
+  };
 
   return (
     <div className="space-y-6">
@@ -48,43 +92,26 @@ export default function UsersPage() {
           />
         </div>
       </div>
-      <div className="rounded-md border">
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>ID</TableHead>
-              <TableHead>Имя</TableHead>
-              <TableHead>Город</TableHead>
-              <TableHead>Роль</TableHead>
-              <TableHead>Телефон</TableHead>
-              <TableHead>Email</TableHead>
-              <TableHead>Агентство</TableHead>
-              <TableHead>Баланс</TableHead>
-              <TableHead>Подписка</TableHead>
-              <TableHead className="w-[80px]"></TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {isLoading ? (
+      <div className="overflow-x-auto">
+        <div className="rounded-md border min-w-[900px] w-full max-w-[1200px] mx-auto">
+          <Table className="text-sm">
+            <TableHeader>
               <TableRow>
-                <TableCell colSpan={10} className="h-24 text-center">
-                  <div className="flex justify-center items-center">
-                    <Loader2 className="h-6 w-6 animate-spin mr-2" />
-                    Загрузка пользователей...
-                  </div>
-                </TableCell>
+                <TableHead className="w-[60px]">ID</TableHead>
+                <TableHead>Имя</TableHead>
+                <TableHead>Город</TableHead>
+                <TableHead>Роль</TableHead>
+                <TableHead>Телефон</TableHead>
+                <TableHead>Email</TableHead>
+                <TableHead>Агентство</TableHead>
+                <TableHead>Баланс</TableHead>
+                <TableHead>Подписка</TableHead>
+                <TableHead>Дата подключения</TableHead>
+                <TableHead className="w-[60px]"></TableHead>
               </TableRow>
-            ) : error ? (
-              <TableRow>
-                <TableCell
-                  colSpan={10}
-                  className="h-24 text-center text-red-500"
-                >
-                  Ошибка при загрузке пользователей: {error.message}
-                </TableCell>
-              </TableRow>
-            ) : filteredUsers.length > 0 ? (
-              filteredUsers.map((user) => (
+            </TableHeader>
+            <TableBody>
+              {filteredUsers.map((user) => (
                 <TableRow key={user.id}>
                   <TableCell className="font-medium">{user.id}</TableCell>
                   <TableCell>{user.name}</TableCell>
@@ -106,6 +133,11 @@ export default function UsersPage() {
                     </span>
                   </TableCell>
                   <TableCell>
+                    {user.connectedAt
+                      ? new Date(user.connectedAt).toLocaleDateString("ru-RU")
+                      : "—"}
+                  </TableCell>
+                  <TableCell>
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
                         <Button variant="ghost" size="icon">
@@ -114,7 +146,12 @@ export default function UsersPage() {
                         </Button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end">
-                        <DropdownMenuLabel>Действия</DropdownMenuLabel>
+                        <DropdownMenuItem onClick={() => handleEditUser(user)}>
+                          Редактировать
+                        </DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => handleDataUser(user)}>
+                          Данные
+                        </DropdownMenuItem>
                         <DropdownMenuItem className="text-destructive">
                           Удалить пользователя
                         </DropdownMenuItem>
@@ -122,17 +159,114 @@ export default function UsersPage() {
                     </DropdownMenu>
                   </TableCell>
                 </TableRow>
-              ))
-            ) : (
-              <TableRow>
-                <TableCell colSpan={10} className="h-24 text-center">
-                  Пользователи не найдены.
-                </TableCell>
-              </TableRow>
-            )}
-          </TableBody>
-        </Table>
+              ))}
+            </TableBody>
+          </Table>
+        </div>
       </div>
+
+      {/* Диалог редактирования */}
+      {selectedUser && (
+        <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+          <DialogContent className="sm:max-w-[500px]">
+            <DialogHeader>
+              <DialogTitle>Редактировать пользователя</DialogTitle>
+              <DialogDescription>
+                Изменение данных пользователя {selectedUser.name}
+              </DialogDescription>
+            </DialogHeader>
+            <div className="grid gap-4 py-4">
+              <div className="grid grid-cols-4 items-center gap-4">
+                <Label htmlFor="name">Имя</Label>
+                <Input
+                  defaultValue={selectedUser.name}
+                  className="col-span-3"
+                />
+              </div>
+              <div className="grid grid-cols-4 items-center gap-4">
+                <Label>Email</Label>
+                <Input
+                  defaultValue={selectedUser.email}
+                  className="col-span-3"
+                />
+              </div>
+              <div className="grid grid-cols-4 items-center gap-4">
+                <Label>Город</Label>
+                <Input
+                  defaultValue={selectedUser.city}
+                  className="col-span-3"
+                />
+              </div>
+              <div className="grid grid-cols-4 items-center gap-4">
+                <Label>Телефон</Label>
+                <Input
+                  defaultValue={selectedUser.phoneNumber}
+                  className="col-span-3"
+                />
+              </div>
+              <div className="grid grid-cols-4 items-center gap-4">
+                <Label>Роль</Label>
+                <Input
+                  defaultValue={selectedUser.role}
+                  className="col-span-3"
+                />
+              </div>
+              <div className="grid grid-cols-4 items-center gap-4">
+                <Label>Баланс</Label>
+                <Input
+                  defaultValue={selectedUser.balance?.toString()}
+                  className="col-span-3"
+                />
+              </div>
+            </div>
+            <DialogFooter>
+              <Button type="submit">Сохранить</Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+      )}
+      {selectedUser && (
+        <Dialog open={isDataOpen} onOpenChange={setIsDataOpen}>
+          <DialogContent className="sm:max-w-[500px]">
+            <DialogHeader>
+              <DialogTitle>Данные пользователя</DialogTitle>
+            </DialogHeader>
+            <DialogDescription>
+              Изменение данных пользователя {selectedUser.name}
+            </DialogDescription>
+            <div className="grid gap-4 py-4">
+              <div className="grid grid-cols-4 items-center gap-4">
+                <Label htmlFor="name">Коммерция</Label>
+                <Input
+                  defaultValue={selectedUser.name}
+                  className="col-span-3"
+                />
+              </div>
+              <div className="grid grid-cols-4 items-center gap-4">
+                <Label>Участки</Label>
+                <Input
+                  defaultValue={selectedUser.email}
+                  className="col-span-3"
+                />
+              </div>
+              <div className="grid grid-cols-4 items-center gap-4">
+                <Label>Дома</Label>
+                <Input
+                  defaultValue={selectedUser.city}
+                  className="col-span-3"
+                />
+              </div>
+              <div className="grid grid-cols-4 items-center gap-4">
+                <Label>Коммерция</Label>
+                <Input
+                  defaultValue={selectedUser.phoneNumber}
+                  className="col-span-3"
+                />
+              </div>
+            </div>
+          </DialogContent>
+        </Dialog>
+      )}
     </div>
   );
 }

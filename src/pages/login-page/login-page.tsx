@@ -86,7 +86,15 @@ export const LoginPage = () => {
           saveChatId(formData.chatId);
           saveRole("user");
           localStorage.setItem("isAuth", "true");
-          navigate("/personal");
+
+          // Проверяем, есть ли редирект после логина
+          const redirectPath = localStorage.getItem("redirectAfterLogin");
+          if (redirectPath) {
+            localStorage.removeItem("redirectAfterLogin"); // очищаем, чтобы не зациклилось
+            navigate(redirectPath);
+          } else {
+            navigate("/personal");
+          }
         },
         onError: () => {
           setErrors({

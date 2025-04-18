@@ -1,9 +1,8 @@
-"use client";
-
 import { Layout } from "@/shared/ui/layout";
 import { Button } from "@/shared/ui/button";
 import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
+import { UnauthorizedPopup } from "@/features/popup/ui/popup";
 
 const paymentPeriods = [
   { id: "1", name: "1 месяц", price: 100, label: "1 мес 100 руб" },
@@ -31,6 +30,31 @@ export const PaymentPage = () => {
   const [selectedPeriod, setSelectedPeriod] = useState(paymentPeriods[0]);
   const [selectedMethod, setSelectedMethod] = useState(paymentMethods[0]);
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
+  const [showAuthModal, setShowAuthModal] = useState(false);
+  const isAuth = localStorage.getItem("isAuth") === "true";
+
+  const handlePayment = () => {
+    if (isAuth) {
+      if (selectedMethod.id === "tbank") {
+        navigate(
+          `/payment/t-bank?amount=${calculateTotalPrice()}&description=Подписка`
+        );
+      } else {
+        navigate("/payment/t-bank");
+      }
+    } else {
+      localStorage.setItem("redirectAfterLogin", "/payment/t-bank");
+      setShowAuthModal(true);
+    }
+  };
+
+  const handleLogin = () => {
+    navigate("/login");
+  };
+
+  const handleRegister = () => {
+    navigate("/register");
+  };
 
   const handlePeriodChange = (e: any) => {
     const period = paymentPeriods.find((p) => p.id === e.target.value);
@@ -198,13 +222,20 @@ export const PaymentPage = () => {
           />
         ) : (
           <Button
-            onClick={() => navigate("/payment-success")}
+            onClick={handlePayment}
             variant="primary"
             className="w-full mt-8"
             text="Оплатить"
           />
         )}
       </div>
+      {showAuthModal && (
+        <UnauthorizedPopup
+          onClose={() => setShowAuthModal(false)}
+          onLogin={handleLogin}
+          onRegister={handleRegister}
+        />
+      )}
     </Layout>
   );
 };
