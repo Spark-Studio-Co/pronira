@@ -92,6 +92,12 @@ export const ProfileTab = () => {
         onClick={() => openPromo()}
       />
       <Button
+        text="Связаться с создателем"
+        className="mt-[19px]"
+        variant="primary"
+      />
+      <Button text="Вывести средства" className="mt-[19px]" variant="primary" />
+      <Button
         text="Поменять пароль"
         className="mt-[19px] bg-red-500"
         variant="secondary"
