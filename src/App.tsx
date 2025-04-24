@@ -62,6 +62,7 @@ function NavRoutes() {
           <Route path="/payment-success" element={<SuccessPyamentPage />} />
           <Route path="/payment-denied" element={<DeniedPyamentPage />} />
           <Route path="*" element={<Navigate to="/personal" />} />
+          <Route path="/tariffs" element={<TariffsPage />} />
           <Route path="/video" element={<VideoPage />} />
           <Route path="/reset-password" element={<ResetPasswordPage />} />
         </>
@@ -70,6 +71,8 @@ function NavRoutes() {
           <Route path="/payment" element={<PaymentPage />} />
           <Route path="/tariffs" element={<TariffsPage />} />
           <Route path="/" element={<IntroPage />} />
+          <Route path="/payment/t-bank" element={<TBankPaymentPage />} />
+
           <Route path="/login" element={<LoginPage />} />
           <Route path="/video" element={<VideoPage />} />
           <Route path="/privacy-policy" element={<PrivacyPolicyPage />} />
