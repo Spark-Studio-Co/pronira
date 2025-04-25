@@ -11,6 +11,7 @@ import {
   Settings,
   ChartLineIcon,
   DollarSign,
+  HouseIcon,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
@@ -39,8 +40,13 @@ const navItems = [
   },
   {
     title: "Статистика",
-    href: "/admin/statistic",
+    href: "/admin/statistics",
     icon: ChartLineIcon,
+  },
+  {
+    title: "Назад",
+    href: "/",
+    icon: HouseIcon,
   },
 ];
 

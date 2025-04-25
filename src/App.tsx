@@ -34,6 +34,7 @@ import TBankPaymentPage from "./pages/t-bank-payment-page/t-bank-payment-page";
 import AdminProtectedRoute from "./lib/route-guards/admin-protected.route";
 import SubscriptionPolicy from "./pages/subscription-policy/subscription-policy";
 import { TariffsPage } from "./pages/tariffs-page/tariffs-page";
+import StatisticsPage from "./pages/admin/statistic-page/statistic-page";
 
 function NavRoutes() {
   const location = useLocation();
@@ -116,6 +117,16 @@ function NavRoutes() {
           <AdminProtectedRoute>
             <Layout>
               <UsersPage />
+            </Layout>
+          </AdminProtectedRoute>
+        }
+      />
+      <Route
+        path="/admin/statistics"
+        element={
+          <AdminProtectedRoute>
+            <Layout>
+              <StatisticsPage />
             </Layout>
           </AdminProtectedRoute>
         }

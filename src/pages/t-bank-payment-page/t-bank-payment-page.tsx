@@ -1,9 +1,9 @@
 "use client";
 
-import type React from "react";
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { CreditCard, Mail, Phone, User, FileText, Coins } from "lucide-react";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
+import { useTariffStore } from "@/entities/tariffs/store/use-tariff-store"; // 👈 Zustand store
 
 declare global {
   interface Window {
@@ -13,14 +13,24 @@ declare global {
 
 export default function TBankPaymentPage() {
   const location = useLocation();
+  const navigate = useNavigate();
   const query = new URLSearchParams(location.search);
+  const { selectedTariff } = useTariffStore(); // 👈 Get selected tariff
 
-  const defaultAmount = query.get("amount") || "100";
-  const defaultDescription = query.get("description") || "Оплата подписки";
+  const defaultAmount =
+    selectedTariff?.price?.toString() || query.get("amount") || "100";
+  const defaultDescription =
+    selectedTariff?.title || query.get("description") || "Оплата подписки";
 
   const [isScriptLoaded, setIsScriptLoaded] = useState(false);
 
   useEffect(() => {
+    // Redirect if no tariff is selected
+    if (!selectedTariff) {
+      navigate("/tariffs"); // or "/" if that's your default
+    }
+
+    // Load Tinkoff script
     const script = document.createElement("script");
     script.src = "https://securepay.tinkoff.ru/html/payForm/js/tinkoff_v2.js";
     script.async = true;
@@ -32,7 +42,7 @@ export default function TBankPaymentPage() {
         document.body.removeChild(script);
       }
     };
-  }, []);
+  }, [selectedTariff, navigate]);
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -80,6 +90,10 @@ export default function TBankPaymentPage() {
     }
   };
 
+  useEffect(() => {
+    console.log(selectedTariff);
+  }, []);
+
   return (
     <div className="min-h-screen flex items-center justify-center p-4 bg-gradient-to-b from-[#e1eaf8] to-white dark:from-[#1e1e1e] dark:to-[#2a2a2a]">
       <div className="w-full max-w-md p-6 bg-white dark:bg-[#222] rounded-lg shadow-lg border border-[#6798de]/20">
@@ -88,6 +102,12 @@ export default function TBankPaymentPage() {
           <p className="text-gray-500 dark:text-gray-400">
             Безопасная оплата через Тинькофф Банк
           </p>
+          {selectedTariff && (
+            <p className="text-sm text-gray-700 dark:text-gray-300 mt-2">
+              Вы выбрали тариф: <strong>{selectedTariff.title}</strong> —{" "}
+              <strong>{selectedTariff.price} ₽</strong>
+            </p>
+          )}
         </div>
 
         <form id="payform-tbank" onSubmit={handleSubmit} className="space-y-4">
@@ -99,26 +119,26 @@ export default function TBankPaymentPage() {
           <div className="space-y-2">
             <label
               htmlFor="amount"
-              className="text-sm font-medium text-gray-700 dark:text-gray-300 flex items-center gap-2"
+              className="text-sm font-medium flex items-center gap-2 text-gray-700 dark:text-gray-300"
             >
               <Coins className="h-4 w-4 text-[#6798de]" />
               Сумма
             </label>
             <input
               id="amount"
+              disabled
               name="amount"
               type="text"
-              placeholder="Сумма платежа"
               defaultValue={defaultAmount}
               required
-              className="w-full px-3 py-2 border border-[#DFE3F3] rounded-md focus:outline-none focus:ring-2 focus:ring-[#6798de]/20 focus:border-[#6798de] bg-white dark:bg-[#333] dark:border-gray-700 dark:text-white transition-colors"
+              className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 bg-white dark:bg-[#333] dark:text-white transition-colors"
             />
           </div>
 
           <div className="space-y-2">
             <label
               htmlFor="description"
-              className="text-sm font-medium text-gray-700 dark:text-gray-300 flex items-center gap-2"
+              className="text-sm font-medium flex items-center gap-2 text-gray-700 dark:text-gray-300"
             >
               <FileText className="h-4 w-4 text-[#6798de]" />
               Описание
@@ -127,16 +147,15 @@ export default function TBankPaymentPage() {
               id="description"
               name="description"
               type="text"
-              placeholder="Описание платежа"
               defaultValue={defaultDescription}
-              className="w-full px-3 py-2 border border-[#DFE3F3] rounded-md focus:outline-none focus:ring-2 focus:ring-[#6798de]/20 focus:border-[#6798de] bg-white dark:bg-[#333] dark:border-gray-700 dark:text-white transition-colors"
+              className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 bg-white dark:bg-[#333] dark:text-white transition-colors"
             />
           </div>
 
           <div className="space-y-2">
             <label
               htmlFor="name"
-              className="text-sm font-medium text-gray-700 dark:text-gray-300 flex items-center gap-2"
+              className="text-sm font-medium flex items-center gap-2 text-gray-700 dark:text-gray-300"
             >
               <User className="h-4 w-4 text-[#6798de]" />
               ФИО плательщика
@@ -146,14 +165,14 @@ export default function TBankPaymentPage() {
               name="name"
               type="text"
               placeholder="Иванов Иван Иванович"
-              className="w-full px-3 py-2 border border-[#DFE3F3] rounded-md focus:outline-none focus:ring-2 focus:ring-[#6798de]/20 focus:border-[#6798de] bg-white dark:bg-[#333] dark:border-gray-700 dark:text-white transition-colors"
+              className="w-full px-3 py-2 border rounded-md bg-white dark:bg-[#333] dark:text-white"
             />
           </div>
 
           <div className="space-y-2">
             <label
               htmlFor="email"
-              className="text-sm font-medium text-gray-700 dark:text-gray-300 flex items-center gap-2"
+              className="text-sm font-medium flex items-center gap-2 text-gray-700 dark:text-gray-300"
             >
               <Mail className="h-4 w-4 text-[#6798de]" />
               E-mail
@@ -163,14 +182,14 @@ export default function TBankPaymentPage() {
               name="email"
               type="email"
               placeholder="example@mail.com"
-              className="w-full px-3 py-2 border border-[#DFE3F3] rounded-md focus:outline-none focus:ring-2 focus:ring-[#6798de]/20 focus:border-[#6798de] bg-white dark:bg-[#333] dark:border-gray-700 dark:text-white transition-colors"
+              className="w-full px-3 py-2 border rounded-md bg-white dark:bg-[#333] dark:text-white"
             />
           </div>
 
           <div className="space-y-2">
             <label
               htmlFor="phone"
-              className="text-sm font-medium text-gray-700 dark:text-gray-300 flex items-center gap-2"
+              className="text-sm font-medium flex items-center gap-2 text-gray-700 dark:text-gray-300"
             >
               <Phone className="h-4 w-4 text-[#6798de]" />
               Телефон
@@ -180,13 +199,13 @@ export default function TBankPaymentPage() {
               name="phone"
               type="tel"
               placeholder="+7 (999) 123-45-67"
-              className="w-full px-3 py-2 border border-[#DFE3F3] rounded-md focus:outline-none focus:ring-2 focus:ring-[#6798de]/20 focus:border-[#6798de] bg-white dark:bg-[#333] dark:border-gray-700 dark:text-white transition-colors"
+              className="w-full px-3 py-2 border rounded-md bg-white dark:bg-[#333] dark:text-white"
             />
           </div>
 
           <button
             type="submit"
-            className="w-full flex items-center justify-center px-4 py-3 bg-[#FBC520] hover:bg-[#FAB619] text-[#3C2C0B] font-bold text-lg rounded-md transition-all duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-[#FBC520]/50"
+            className="w-full flex items-center justify-center px-4 py-3 bg-[#FBC520] hover:bg-[#FAB619] text-[#3C2C0B] font-bold text-lg rounded-md transition-all"
           >
             <CreditCard className="mr-2 h-5 w-5" />
             Оплатить

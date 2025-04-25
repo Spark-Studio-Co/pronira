@@ -1,11 +1,37 @@
 import { tariffs } from "@/shared/content/tariffs-block-content";
-import { TariffsCard } from "@/shared/ui/tariffs-card";
+import { TariffsCard } from "@/entities/tariffs/ui/tariffs-card";
 import { useNavigate } from "react-router-dom";
+import { useTariffStore } from "@/entities/tariffs/store/use-tariff-store";
 
-// import TariffsImage from "@/assets/treasure.png";
+// Utility to safely extract numeric price
+const parsePrice = (priceStr: string | number): number => {
+  if (typeof priceStr === "number") return priceStr;
+
+  const cleaned = priceStr.replace(/[^\d]/g, ""); // remove everything but digits
+  const numeric = Number(cleaned);
+
+  return isNaN(numeric) ? 0 : numeric;
+};
 
 export default function TariffBlock() {
-  const navigation = useNavigate();
+  const navigate = useNavigate();
+  const setSelectedTariff = useTariffStore((state) => state.setSelectedTariff);
+
+  const handleBuyClick = (tariff: (typeof tariffs)[number]) => {
+    const numericPrice = parsePrice(tariff.price);
+
+    if (!numericPrice) {
+      alert("Ошибка: Невозможно распознать цену тарифа.");
+      return;
+    }
+
+    setSelectedTariff({
+      title: tariff.title,
+      price: numericPrice,
+    });
+
+    navigate("/payment/t-bank");
+  };
 
   return (
     <div className="mx-auto px-4 py-12 pb-16 w-[80vw]">
@@ -26,7 +52,7 @@ export default function TariffBlock() {
             />
             <div className="mt-4">
               <button
-                onClick={() => navigation("/payment")}
+                onClick={() => handleBuyClick(tariff)}
                 className={`w-full py-3 px-6 rounded-sm ${
                   tariff.isActive
                     ? "text-dark bg-gray-300"
