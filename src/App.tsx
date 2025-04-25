@@ -34,10 +34,6 @@ import TBankPaymentPage from "./pages/t-bank-payment-page/t-bank-payment-page";
 import AdminProtectedRoute from "./lib/route-guards/admin-protected.route";
 import SubscriptionPolicy from "./pages/subscription-policy/subscription-policy";
 import { TariffsPage } from "./pages/tariffs-page/tariffs-page";
-import TariffsPageAdmin from "./pages/admin/tariffs-page/tariffs-page";
-import StatisticsPage from "./pages/admin/statistic-page/statistic-page";
-import SettingsPageAdmin from "./pages/admin/settings-page/settings-page";
-import ResetPasswordPage from "./pages/reset-password/reset-password";
 
 function NavRoutes() {
   const location = useLocation();
@@ -59,20 +55,18 @@ function NavRoutes() {
           <Route path="/readme" element={<ReadmePage />} />
           <Route path="/user-agreement" element={<UserAgreementPage />} />
           <Route path="/payment/t-bank" element={<TBankPaymentPage />} />
+          <Route path="/payment" element={<PaymentPage />} />
           <Route path="/payment-success" element={<SuccessPyamentPage />} />
           <Route path="/payment-denied" element={<DeniedPyamentPage />} />
           <Route path="*" element={<Navigate to="/personal" />} />
           <Route path="/tariffs" element={<TariffsPage />} />
           <Route path="/video" element={<VideoPage />} />
-          <Route path="/reset-password" element={<ResetPasswordPage />} />
         </>
       ) : (
         <>
-          <Route path="/payment" element={<PaymentPage />} />
           <Route path="/tariffs" element={<TariffsPage />} />
           <Route path="/" element={<IntroPage />} />
           <Route path="/payment/t-bank" element={<TBankPaymentPage />} />
-
           <Route path="/login" element={<LoginPage />} />
           <Route path="/video" element={<VideoPage />} />
           <Route path="/privacy-policy" element={<PrivacyPolicyPage />} />
@@ -83,7 +77,6 @@ function NavRoutes() {
           <Route path="/agent" element={<AgentPage />} />
           <Route path="/links" element={<LinksPage />} />
           <Route path="*" element={<Navigate to="/" />} />
-          <Route path="/reset-password" element={<ResetPasswordPage />} />
         </>
       )}
       <Route
@@ -108,16 +101,6 @@ function NavRoutes() {
         }
       />
       <Route
-        path="/admin/tariffs"
-        element={
-          <AdminProtectedRoute>
-            <Layout>
-              <TariffsPageAdmin />
-            </Layout>
-          </AdminProtectedRoute>
-        }
-      />
-      <Route
         path="/admin/subscriptions"
         element={
           <AdminProtectedRoute>
@@ -133,26 +116,6 @@ function NavRoutes() {
           <AdminProtectedRoute>
             <Layout>
               <UsersPage />
-            </Layout>
-          </AdminProtectedRoute>
-        }
-      />
-      <Route
-        path="/admin/statistic"
-        element={
-          <AdminProtectedRoute>
-            <Layout>
-              <StatisticsPage />
-            </Layout>
-          </AdminProtectedRoute>
-        }
-      />
-      <Route
-        path="/admin/settings"
-        element={
-          <AdminProtectedRoute>
-            <Layout>
-              <SettingsPageAdmin />
             </Layout>
           </AdminProtectedRoute>
         }

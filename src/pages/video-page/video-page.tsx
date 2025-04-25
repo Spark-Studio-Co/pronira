@@ -16,28 +16,18 @@ export const VideoPage = () => {
           <h1 className="text-[24px] lg:text-[40px] 2xl:text-[44px] lg:max-w-[710px] lg:text-left text-center font-bold">
             Видео инструкция
           </h1>
-          <div
-            style={{
-              position: "relative",
-              width: "100%",
-              height: 0,
-              paddingBottom: "56.25%",
-            }}
-          >
+          <div className="flex w-full h-full items-center justify-center">
             <iframe
-              src="https://streamable.com/e/zllsf4?autoplay=1"
-              allow="fullscreen; autoplay"
+              width="720"
+              height="405"
+              className="mt-8"
+              src="https://rutube.ru/play/embed/1dd543a192c8b9cd7bc7816858a14a9f/"
+              frameBorder="0"
+              allow="clipboard-write; autoplay"
+              webkitAllowFullScreen
+              mozallowfullscreen
               allowFullScreen
-              style={{
-                border: "none",
-                width: "100%",
-                height: "100%",
-                position: "absolute",
-                left: 0,
-                top: 0,
-                overflow: "hidden",
-              }}
-            />
+            ></iframe>
           </div>
           <Button
             onClick={() => navigation("/")}

@@ -113,11 +113,6 @@ export default function Login() {
             </Button>
           </form>
         </CardContent>
-        <CardFooter className="flex justify-center">
-          <p className="text-sm text-muted-foreground">
-            Тестовый вход: admin / password
-          </p>
-        </CardFooter>
       </Card>
     </div>
   );

@@ -19,7 +19,7 @@ import { useMobile } from "@/shared/hooks/use-is-mobile";
 const navItems = [
   {
     title: "Тарифы",
-    href: "/admin/tariffs",
+    href: "/admin/subscriptions",
     icon: DollarSign,
   },
   {
@@ -41,11 +41,6 @@ const navItems = [
     title: "Статистика",
     href: "/admin/statistic",
     icon: ChartLineIcon,
-  },
-  {
-    title: "Настройки",
-    href: "/admin/settings",
-    icon: Settings,
   },
 ];
 
