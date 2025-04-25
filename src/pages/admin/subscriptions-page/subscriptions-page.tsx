@@ -46,19 +46,25 @@ import {
   Trash2,
   Users,
 } from "lucide-react";
-
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import {
+  useCreateTariff,
   useGetTariffs,
   useGetTariffsWithUserCount,
-  useUpdateTariffPrice,
+  useUpdateTariff,
 } from "@/entities/tariffs/hooks/use-tariffs";
 
 export default function SubscriptionsPage() {
   const [searchTerm, setSearchTerm] = useState("");
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
   const [selectedPlan, setSelectedPlan] = useState<any>(null);
+  const [editedTitle, setEditedTitle] = useState("");
   const [editedPrice, setEditedPrice] = useState<number>(0);
+
+  // New tariff state
+  const [newTariffTitle, setNewTariffTitle] = useState("");
+  const [newTariffPrice, setNewTariffPrice] = useState<number>(0);
 
   const {
     data: tariffs,
@@ -72,7 +78,10 @@ export default function SubscriptionsPage() {
   } = useGetTariffsWithUserCount();
 
   // Update tariff mutation
-  const updateTariffMutation = useUpdateTariffPrice();
+  const updateTariffMutation = useUpdateTariff();
+
+  // Create tariff mutation
+  const createTariffMutation = useCreateTariff();
 
   // Filter tariffs based on search term
   const filteredTariffs =
@@ -80,24 +89,59 @@ export default function SubscriptionsPage() {
       tariff.title.toLowerCase().includes(searchTerm.toLowerCase())
     ) || [];
 
-  const handleEditPrice = (plan: any) => {
+  const handleEditTariff = (plan: any) => {
     setSelectedPlan(plan);
+    setEditedTitle(plan.title);
     setEditedPrice(plan.price);
     setIsEditDialogOpen(true);
   };
 
-  const handleSavePrice = async () => {
+  const handleSaveTariff = async () => {
     if (!selectedPlan) return;
 
     try {
-      await updateTariffMutation.mutateAsync({
-        id: selectedPlan.id,
-        price: editedPrice,
-      });
+      const updateData: { title?: string; price?: number } = {};
+
+      // Only include fields that have changed
+      if (editedTitle !== selectedPlan.title) {
+        updateData.title = editedTitle;
+      }
+
+      if (editedPrice !== selectedPlan.price) {
+        updateData.price = editedPrice;
+      }
+
+      // Only make the API call if there are changes
+      if (Object.keys(updateData).length > 0) {
+        await updateTariffMutation.mutateAsync({
+          id: selectedPlan.id,
+          data: updateData,
+        });
+      }
 
       setIsEditDialogOpen(false);
     } catch (error) {
-      console.error("error with change price", error);
+      console.error("Error updating tariff:", error);
+    }
+  };
+
+  const handleCreateTariff = async () => {
+    if (!newTariffTitle || newTariffPrice <= 0) {
+      return;
+    }
+
+    try {
+      await createTariffMutation.mutateAsync({
+        title: newTariffTitle,
+        price: newTariffPrice,
+      });
+
+      // Reset form and close dialog
+      setNewTariffTitle("");
+      setNewTariffPrice(0);
+      setIsCreateDialogOpen(false);
+    } catch (error) {
+      console.error("Error creating tariff:", error);
     }
   };
 
@@ -128,7 +172,7 @@ export default function SubscriptionsPage() {
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <h2 className="text-3xl font-bold tracking-tight">Подписки</h2>
-        <Button disabled>
+        <Button onClick={() => setIsCreateDialogOpen(true)}>
           <Plus className="mr-2 h-4 w-4" />
           Добавить план
         </Button>
@@ -157,10 +201,10 @@ export default function SubscriptionsPage() {
               <Button
                 variant="outline"
                 className="w-full"
-                onClick={() => handleEditPrice(plan)}
+                onClick={() => handleEditTariff(plan)}
               >
                 <Edit className="mr-2 h-4 w-4" />
-                Изменить цену
+                Редактировать
               </Button>
             </CardFooter>
           </Card>
@@ -209,9 +253,11 @@ export default function SubscriptionsPage() {
                       <DropdownMenuContent align="end">
                         <DropdownMenuLabel>Действия</DropdownMenuLabel>
                         <DropdownMenuSeparator />
-                        <DropdownMenuItem onClick={() => handleEditPrice(plan)}>
+                        <DropdownMenuItem
+                          onClick={() => handleEditTariff(plan)}
+                        >
                           <Edit className="mr-2 h-4 w-4" />
-                          Изменить цену
+                          Редактировать
                         </DropdownMenuItem>
                         <DropdownMenuSeparator />
                         <DropdownMenuItem className="text-destructive" disabled>
@@ -233,30 +279,37 @@ export default function SubscriptionsPage() {
           </TableBody>
         </Table>
       </div>
+
+      {/* Edit Tariff Dialog */}
       {selectedPlan && (
         <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
           <DialogContent className="sm:max-w-[425px]">
             <DialogHeader>
-              <DialogTitle>Изменить цену</DialogTitle>
+              <DialogTitle>Редактировать тариф</DialogTitle>
               <DialogDescription>
-                Обновить цену для {selectedPlan.title}.
+                Обновить информацию о тарифе.
               </DialogDescription>
             </DialogHeader>
             <div className="grid gap-4 py-4">
               <div className="grid grid-cols-4 items-center gap-4">
-                <Label className="text-right">Текущая цена:</Label>
-                <div className="col-span-3 font-medium">
-                  ₽{selectedPlan.price}
-                </div>
+                <Label htmlFor="edit-title" className="text-right">
+                  Название:
+                </Label>
+                <Input
+                  id="edit-title"
+                  value={editedTitle}
+                  onChange={(e) => setEditedTitle(e.target.value)}
+                  className="col-span-3"
+                />
               </div>
               <div className="grid grid-cols-4 items-center gap-4">
-                <Label htmlFor="price" className="text-right">
-                  Новая цена:
+                <Label htmlFor="edit-price" className="text-right">
+                  Цена:
                 </Label>
                 <div className="col-span-3 flex items-center">
                   <span className="mr-1">₽</span>
                   <Input
-                    id="price"
+                    id="edit-price"
                     type="number"
                     value={editedPrice}
                     onChange={(e) => setEditedPrice(Number(e.target.value))}
@@ -274,8 +327,13 @@ export default function SubscriptionsPage() {
                 Отмена
               </Button>
               <Button
-                onClick={handleSavePrice}
-                disabled={updateTariffMutation.isPending}
+                onClick={handleSaveTariff}
+                disabled={
+                  updateTariffMutation.isPending ||
+                  (editedTitle === selectedPlan.title &&
+                    editedPrice === selectedPlan.price) ||
+                  !editedTitle.trim()
+                }
               >
                 {updateTariffMutation.isPending && (
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -286,6 +344,71 @@ export default function SubscriptionsPage() {
           </DialogContent>
         </Dialog>
       )}
+
+      {/* Create Tariff Dialog */}
+      <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle>Добавить новый тариф</DialogTitle>
+            <DialogDescription>
+              Создайте новый тарифный план для пользователей.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="grid gap-4 py-4">
+            <div className="grid grid-cols-4 items-center gap-4">
+              <Label htmlFor="new-title" className="text-right">
+                Название:
+              </Label>
+              <Input
+                id="new-title"
+                value={newTariffTitle}
+                onChange={(e) => setNewTariffTitle(e.target.value)}
+                className="col-span-3"
+                placeholder="Например: Базовый"
+              />
+            </div>
+            <div className="grid grid-cols-4 items-center gap-4">
+              <Label htmlFor="new-price" className="text-right">
+                Цена:
+              </Label>
+              <div className="col-span-3 flex items-center">
+                <span className="mr-1">₽</span>
+                <Input
+                  id="new-price"
+                  type="number"
+                  value={newTariffPrice}
+                  onChange={(e) => setNewTariffPrice(Number(e.target.value))}
+                  className="flex-1"
+                  placeholder="0"
+                  min="1"
+                />
+              </div>
+            </div>
+          </div>
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => setIsCreateDialogOpen(false)}
+              disabled={createTariffMutation.isPending}
+            >
+              Отмена
+            </Button>
+            <Button
+              onClick={handleCreateTariff}
+              disabled={
+                createTariffMutation.isPending ||
+                !newTariffTitle ||
+                newTariffPrice <= 0
+              }
+            >
+              {createTariffMutation.isPending && (
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              )}
+              Создать тариф
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

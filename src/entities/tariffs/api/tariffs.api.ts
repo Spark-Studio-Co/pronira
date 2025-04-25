@@ -10,6 +10,11 @@ export interface TariffWithUserCount extends Tariff {
   usersCount: number;
 }
 
+export interface UpdateTariffDto {
+  title?: string;
+  price?: number;
+}
+
 export const tariffsApi = {
   // Get all tariffs (only title and price)
   getAllTariffs: async (): Promise<Tariff[]> => {
@@ -25,6 +30,19 @@ export const tariffsApi = {
   // Update tariff price
   updateTariffPrice: async (id: number, price: number): Promise<Tariff> => {
     const response = await apiClient.patch(`/tariffs/${id}`, { price });
+    return response.data;
+  },
+
+  updateTariff: async (id: number, data: UpdateTariffDto): Promise<Tariff> => {
+    const response = await apiClient.patch(`/tariffs/${id}`, data);
+    return response.data;
+  },
+
+  createTariff: async (data: {
+    title: string;
+    price: number;
+  }): Promise<Tariff> => {
+    const response = await apiClient.post("/tariffs", data);
     return response.data;
   },
 };

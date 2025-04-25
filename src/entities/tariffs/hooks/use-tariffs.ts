@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { tariffsApi } from "../api/tariffs.api";
+import { tariffsApi, UpdateTariffDto } from "../api/tariffs.api";
 
 // Query keys
 export const tariffKeys = {
@@ -33,6 +33,34 @@ export const useUpdateTariffPrice = () => {
   return useMutation({
     mutationFn: ({ id, price }: { id: number; price: number }) =>
       tariffsApi.updateTariffPrice(id, price),
+    onSuccess: () => {
+      // Invalidate and refetch tariffs lists
+      queryClient.invalidateQueries({ queryKey: tariffKeys.lists() });
+      queryClient.invalidateQueries({ queryKey: tariffKeys.withUsers() });
+    },
+  });
+};
+
+export const useUpdateTariff = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({ id, data }: { id: number; data: UpdateTariffDto }) =>
+      tariffsApi.updateTariff(id, data),
+    onSuccess: () => {
+      // Invalidate and refetch tariffs lists
+      queryClient.invalidateQueries({ queryKey: tariffKeys.lists() });
+      queryClient.invalidateQueries({ queryKey: tariffKeys.withUsers() });
+    },
+  });
+};
+
+export const useCreateTariff = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (data: { title: string; price: number }) =>
+      tariffsApi.createTariff(data),
     onSuccess: () => {
       // Invalidate and refetch tariffs lists
       queryClient.invalidateQueries({ queryKey: tariffKeys.lists() });

@@ -19,7 +19,9 @@ interface PaymentsChartProps {
   }>;
 }
 
-export function PaymentsChart({ data = [] }: PaymentsChartProps) {
+export function PaymentsChart({ data }: PaymentsChartProps) {
+  if (!Array.isArray(data)) return null;
+
   const formattedData = data.map((item) => ({
     name: new Date(item.date).toLocaleDateString("ru-RU", {
       day: "numeric",

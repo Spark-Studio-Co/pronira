@@ -19,7 +19,9 @@ interface UsersChartProps {
   }>;
 }
 
-export function UsersChart({ data = [] }: UsersChartProps) {
+export function UsersChart({ data }: UsersChartProps) {
+  if (!Array.isArray(data)) return null;
+
   const formattedData = data.map((item) => ({
     name: new Date(item.date).toLocaleDateString("ru-RU", {
       day: "numeric",
