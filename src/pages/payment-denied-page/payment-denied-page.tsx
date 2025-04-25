@@ -25,6 +25,13 @@ export const DeniedPyamentPage = () => {
         <Button
           variant="secondary"
           className="w-full mt-8"
+          onClick={() =>
+            window.open(
+              "https://t.me/svejy_veter92",
+              "_blank",
+              "noopener,noreferrer"
+            )
+          }
           text="Связаться с создателем"
         />
         <Button

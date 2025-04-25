@@ -35,6 +35,7 @@ import AdminProtectedRoute from "./lib/route-guards/admin-protected.route";
 import SubscriptionPolicy from "./pages/subscription-policy/subscription-policy";
 import { TariffsPage } from "./pages/tariffs-page/tariffs-page";
 import StatisticsPage from "./pages/admin/statistic-page/statistic-page";
+import ResetPasswordPage from "./pages/reset-password/reset-password";
 
 function NavRoutes() {
   const location = useLocation();
@@ -51,6 +52,7 @@ function NavRoutes() {
             path="/settings/personal-data"
             element={<PersonalDataPage />}
           />
+          <Route path="/reset-password" element={<ResetPasswordPage />} />
           <Route path="/privacy-policy" element={<PrivacyPolicyPage />} />
           <Route path="/subscription-policy" element={<SubscriptionPolicy />} />
           <Route path="/readme" element={<ReadmePage />} />
@@ -66,6 +68,7 @@ function NavRoutes() {
       ) : (
         <>
           <Route path="/tariffs" element={<TariffsPage />} />
+          <Route path="/reset-password" element={<ResetPasswordPage />} />
           <Route path="/" element={<IntroPage />} />
           <Route path="/payment/t-bank" element={<TBankPaymentPage />} />
           <Route path="/login" element={<LoginPage />} />

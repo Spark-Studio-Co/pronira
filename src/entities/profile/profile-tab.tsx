@@ -6,26 +6,28 @@ import { useInstructionPopupStore } from "./store/use-instruction-popup-store";
 import { useGetUser } from "../auth/hooks/queries/use-get-user.query";
 import { useAuthStore } from "../auth/store/use-auth-store";
 import { useSendParserData } from "../parser/hooks/mutation/send-parser-data.mutation";
-import { useDeleteParser } from "../parser/hooks/mutation/use-delete-parser.mutation"; // ⬅️ добавили
+import { useStopByChatId } from "../parser/hooks/mutation/use-stop-parser.mutation";
 import { ProfileTabSkeleton } from "./profile-skeleton";
-import { usePromoCodeStore } from "../promocode/store/use-promocode-store";
 import { useParserPopupStore } from "../parser/store/use-parser-popup.store";
 import { useNavigate } from "react-router-dom";
+import { useSubscriptionPopupStore } from "../tariffs/store/use-subscription-popup-store";
+import { SubscriptionAlert } from "../tariffs/ui/subscription-popup";
 
 export const ProfileTab = () => {
   const { open } = useInstructionPopupStore();
   const { chatId } = useAuthStore();
   const { mutate: activateParser } = useSendParserData();
-  const { mutate: deleteParser } = useDeleteParser(); // ⬅️ используем delete
   const { data: userData, isLoading } = useGetUser(chatId);
-  const { open: openPromo } = usePromoCodeStore();
   const { open: openParserPopup } = useParserPopupStore();
+  const { mutate: stopParserByChatId } = useStopByChatId();
+  const { open: openSubscriptionAlert } = useSubscriptionPopupStore();
 
   const [isParserActive, setIsParserActive] = useState(() => {
     return localStorage.getItem("isParserActive") === "true";
   });
 
   const navigate = useNavigate();
+
   useEffect(() => {
     localStorage.setItem("isParserActive", String(isParserActive));
   }, [isParserActive]);
@@ -37,6 +39,11 @@ export const ProfileTab = () => {
     }
 
     if (!isParserActive) {
+      if (!userData?.subscriptionActive) {
+        openSubscriptionAlert();
+        return;
+      }
+
       activateParser({
         url_flats: userData?.flatsLink,
         url_grounds: userData?.groundsLink,
@@ -49,8 +56,7 @@ export const ProfileTab = () => {
 
       openParserPopup();
     } else {
-      // 🛑 Остановка парсера
-      deleteParser();
+      stopParserByChatId(chatId);
     }
 
     setIsParserActive((prev) => !prev);
@@ -74,27 +80,39 @@ export const ProfileTab = () => {
           <span className="text-main text-[16px] mt-1 mb-1 font-bold">
             Баланс: {userData?.balance} руб.
           </span>
-          <span className="text-dark text-[16px] ">
-            Подписка: <span className="text-secondary">18.02.2025</span>
+          <span className="text-dark text-[16px]">
+            Подписка:{" "}
+            {userData?.subscriptionActive ? (
+              <span className="text-secondary">
+                {new Date(userData.subscriptionExpiresAt!).toLocaleDateString(
+                  "ru-RU"
+                )}
+              </span>
+            ) : (
+              <span className="text-red-500 font-semibold">неактивна</span>
+            )}
           </span>
         </div>
       </div>
+
       <Button
         text={isParserActive ? "Остановить парсер" : "Запустить парсер"}
         onClick={handleParserToggle}
         className={`mt-[19px] ${isParserActive ? "bg-red-500" : ""}`}
         variant="primary"
       />
-      <Button
-        text="Создать промокод"
-        className="mt-[19px]"
-        variant="primary"
-        onClick={() => openPromo()}
-      />
+
       <Button
         text="Связаться с создателем"
         className="mt-[19px]"
         variant="primary"
+        onClick={() =>
+          window.open(
+            "https://t.me/svejy_veter92",
+            "_blank",
+            "noopener,noreferrer"
+          )
+        }
       />
       <Button text="Вывести средства" className="mt-[19px]" variant="primary" />
       <Button
@@ -103,6 +121,7 @@ export const ProfileTab = () => {
         variant="secondary"
         onClick={() => navigate("/reset-password")}
       />
+      <SubscriptionAlert />
     </div>
   );
 };

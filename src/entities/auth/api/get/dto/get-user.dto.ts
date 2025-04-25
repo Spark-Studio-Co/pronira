@@ -5,6 +5,8 @@ export interface IGetUserDto {
   city: string;
   email: string;
   flatsLink: string;
+  subscriptionActive: boolean;
+  subscriptionExpiresAt: string;
   groundsLink: string;
   housesLink: string;
   rentLink: string;

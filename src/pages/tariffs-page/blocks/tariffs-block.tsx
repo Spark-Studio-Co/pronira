@@ -34,14 +34,14 @@ export default function TariffBlock() {
   };
 
   return (
-    <div className="mx-auto px-4 py-12 pb-16 w-[80vw]">
+    <div className="mx-auto px-4 py-12 pb-32 w-[80vw]">
       <div className="w-full flex justify-center mb-3">
         <h1 className="text-3xl text-center w-full sm:w-[80vw] md:w-[60vw] lg:w-[40vw] font-bold">
           Выбери для себя комфортный платеж в зависимости от своих целей
         </h1>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 w-full">
+      <div className="grid mt-8 grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 w-full">
         {tariffs.map((tariff, index) => (
           <div key={index} className="flex flex-col justify-between h-full">
             <TariffsCard

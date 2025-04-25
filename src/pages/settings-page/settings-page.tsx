@@ -52,7 +52,7 @@ export const SettingsPage = () => {
         <Button
           text="Отправить платеж за поисковой артефакт"
           className="w-full"
-          onClick={() => navigate("/payment")}
+          onClick={() => navigate("/tariffs")}
         />
         <Button
           text="Изменить персональные данные"
@@ -66,9 +66,13 @@ export const SettingsPage = () => {
         />
         <Button
           text="Связаться с создателем"
-          onClick={() => (
-            (window.location.href = "https://wa.me/+79785054554"), "_blank"
-          )}
+          onClick={() =>
+            window.open(
+              "https://t.me/svejy_veter92",
+              "_blank",
+              "noopener,noreferrer"
+            )
+          }
           className="w-full bg-green-500"
         />
         <Button

@@ -47,7 +47,7 @@ export const BottomTab = () => {
 
       <div
         className="flex flex-col items-center cursor-pointer"
-        onClick={() => handleNavigation("/payment", "payment")}
+        onClick={() => handleNavigation("/tariffs", "payment")}
       >
         <Wallet color={getColor("payment")} size={32} />
         <span

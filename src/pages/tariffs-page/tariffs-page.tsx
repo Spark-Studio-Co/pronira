@@ -1,9 +1,10 @@
+import { Layout } from "@/shared/ui/layout";
 import TariffBlock from "./blocks/tariffs-block";
 
 export const TariffsPage = () => {
   return (
-    <div>
+    <Layout isWelcome={false} isCenter>
       <TariffBlock />
-    </div>
+    </Layout>
   );
 };

@@ -14,22 +14,47 @@ import {
 } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { CheckCircle, Eye, EyeOff, Lock } from "lucide-react";
+import { useSendCode } from "@/entities/auth/hooks/mutation/use-send-reset-code.mutation";
+import { useResetPassword } from "@/entities/auth/api/post/reset-password.api";
 
 export default function ResetPasswordPage() {
   const navigate = useNavigate();
-  const [step, setStep] = useState<"code" | "password" | "success">("code");
+
+  const [step, setStep] = useState<"chatId" | "code" | "password" | "success">(
+    "chatId"
+  );
+
+  const [chatId, setChatId] = useState("");
   const [code, setCode] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
-  const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState("");
 
-  const toggleShowPassword = () => {
-    setShowPassword(!showPassword);
+  const { mutate: sendResetCode, isPending } = useSendCode();
+  const { mutate: resetPassword, isPending: isResetting } = useResetPassword();
+
+  const toggleShowPassword = () => setShowPassword(!showPassword);
+
+  const handleChatIdSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+
+    if (!chatId.trim()) {
+      setError("Введите Telegram chat ID");
+      return;
+    }
+
+    setError("");
+    sendResetCode(
+      { userId: chatId },
+      {
+        onSuccess: () => setStep("code"),
+        onError: () => setError("Ошибка при отправке кода. Проверьте chat ID."),
+      }
+    );
   };
 
-  const handleCodeSubmit = async (e: React.FormEvent) => {
+  const handleCodeSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
     if (!code.trim()) {
@@ -41,7 +66,7 @@ export default function ResetPasswordPage() {
     setStep("password");
   };
 
-  const handlePasswordSubmit = async (e: React.FormEvent) => {
+  const handlePasswordSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
     if (password.length < 8) {
@@ -55,28 +80,66 @@ export default function ResetPasswordPage() {
     }
 
     setError("");
-    setIsSubmitting(true);
-
-    try {
-      await new Promise((resolve) => setTimeout(resolve, 1500));
-      setStep("success");
-    } catch {
-      setError(
-        "Произошла ошибка при сбросе пароля. Пожалуйста, попробуйте снова."
-      );
-    } finally {
-      setIsSubmitting(false);
-    }
+    resetPassword(
+      {
+        userId: chatId,
+        resetCode: code,
+        newPassword: password,
+      },
+      {
+        onSuccess: () => setStep("success"),
+        onError: () => setError("Ошибка сброса пароля. Проверьте код."),
+      }
+    );
   };
 
   return (
     <div className="flex min-h-screen flex-col items-center justify-center bg-gray-50 p-4">
       <div className="w-full max-w-md">
+        {step === "chatId" && (
+          <Card>
+            <CardHeader className="space-y-1">
+              <CardTitle className="text-2xl font-bold">Telegram ID</CardTitle>
+              <CardDescription>
+                Введите ваш Telegram chat ID. Мы отправим код подтверждения в
+                бота.
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              {error && (
+                <Alert variant="destructive" className="mb-4">
+                  <AlertDescription>{error}</AlertDescription>
+                </Alert>
+              )}
+              <form onSubmit={handleChatIdSubmit} className="space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="chat-id">Ваш Telegram ID</Label>
+                  <Input
+                    id="chat-id"
+                    value={chatId}
+                    onChange={(e) => setChatId(e.target.value)}
+                    required
+                  />
+                </div>
+                <Button
+                  type="submit"
+                  className="w-full bg-main hover:bg-main"
+                  disabled={isPending}
+                >
+                  {isPending ? "Отправка..." : "Получить код"}
+                </Button>
+              </form>
+            </CardContent>
+          </Card>
+        )}
+
         {step === "code" && (
           <Card>
             <CardHeader className="space-y-1">
               <CardTitle className="text-2xl font-bold">Введите код</CardTitle>
-              <CardDescription>Код был отправлен на вашу почту</CardDescription>
+              <CardDescription>
+                Код был отправлен ботом в Telegram
+              </CardDescription>
             </CardHeader>
             <CardContent>
               {error && (
@@ -145,6 +208,7 @@ export default function ResetPasswordPage() {
                     </Button>
                   </div>
                 </div>
+
                 <div className="space-y-2">
                   <Label htmlFor="confirm-password">Подтвердите пароль</Label>
                   <div className="relative">
@@ -159,12 +223,13 @@ export default function ResetPasswordPage() {
                     />
                   </div>
                 </div>
+
                 <Button
                   type="submit"
                   className="w-full bg-main hover:bg-main"
-                  disabled={isSubmitting}
+                  disabled={isResetting}
                 >
-                  {isSubmitting ? "Сохранение..." : "Сохранить новый пароль"}
+                  {isResetting ? "Сброс..." : "Сохранить новый пароль"}
                 </Button>
               </form>
             </CardContent>
