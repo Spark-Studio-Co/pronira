@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Table,
   TableBody,
@@ -29,9 +29,11 @@ import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Search, MoreHorizontal } from "lucide-react";
 import { useGetUsers } from "@/entities/users/hooks/queries/use-get-users.query";
+import { useUpdateUser } from "@/entities/auth/hooks/mutation/use-update-user.mutation";
 
 type User = {
   id: string;
+  chatId: string;
   name: string;
   email: string;
   city?: string;
@@ -60,6 +62,37 @@ export default function UsersPage() {
     error: any;
   };
 
+  const { mutate, isPending: isLoading } = useUpdateUser();
+
+  const [form, setForm] = useState({
+    chatId: selectedUser?.id || "",
+    name: selectedUser?.name || "",
+    email: selectedUser?.email || "",
+    city: selectedUser?.city || "",
+    phoneNumber: selectedUser?.phoneNumber || "",
+    role: selectedUser?.role || "user",
+    balance: selectedUser?.balance || 0,
+  });
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setForm((prev) => ({
+      ...prev,
+      [name]: name === "balance" ? Number(value) : value,
+    }));
+  };
+
+  const handleSave = () => {
+    mutate(form, {
+      onSuccess: () => {
+        setIsDialogOpen(false);
+      },
+      onError: () => {
+        console.error("Ошибка при обновлении");
+      },
+    });
+  };
+
   const filteredUsers = users.filter((user) =>
     [user.name, user.email, user.phoneNumber, user.city].some((field) =>
       field?.toLowerCase().includes(searchTerm.toLowerCase())
@@ -67,14 +100,31 @@ export default function UsersPage() {
   );
 
   const handleEditUser = (user: User) => {
+    console.log("user:", user);
+
     setSelectedUser(user);
     setIsDialogOpen(true);
   };
 
   const handleDataUser = (user: User) => {
+    console.log("user:", user);
     setSelectedUser(user);
     setIsDataOpen(true);
   };
+
+  useEffect(() => {
+    if (selectedUser) {
+      setForm({
+        chatId: selectedUser.id || "",
+        name: selectedUser.name || "",
+        email: selectedUser.email || "",
+        city: selectedUser.city || "",
+        phoneNumber: selectedUser.phoneNumber || "",
+        role: selectedUser.role || "user",
+        balance: selectedUser.balance || 0,
+      });
+    }
+  }, [selectedUser]);
 
   return (
     <div className="space-y-6">
@@ -176,51 +226,31 @@ export default function UsersPage() {
               </DialogDescription>
             </DialogHeader>
             <div className="grid gap-4 py-4">
-              <div className="grid grid-cols-4 items-center gap-4">
-                <Label htmlFor="name">Имя</Label>
-                <Input
-                  defaultValue={selectedUser.name}
-                  className="col-span-3"
-                />
-              </div>
-              <div className="grid grid-cols-4 items-center gap-4">
-                <Label>Email</Label>
-                <Input
-                  defaultValue={selectedUser.email}
-                  className="col-span-3"
-                />
-              </div>
-              <div className="grid grid-cols-4 items-center gap-4">
-                <Label>Город</Label>
-                <Input
-                  defaultValue={selectedUser.city}
-                  className="col-span-3"
-                />
-              </div>
-              <div className="grid grid-cols-4 items-center gap-4">
-                <Label>Телефон</Label>
-                <Input
-                  defaultValue={selectedUser.phoneNumber}
-                  className="col-span-3"
-                />
-              </div>
-              <div className="grid grid-cols-4 items-center gap-4">
-                <Label>Роль</Label>
-                <Input
-                  defaultValue={selectedUser.role}
-                  className="col-span-3"
-                />
-              </div>
-              <div className="grid grid-cols-4 items-center gap-4">
-                <Label>Баланс</Label>
-                <Input
-                  defaultValue={selectedUser.balance?.toString()}
-                  className="col-span-3"
-                />
-              </div>
+              {[
+                { label: "Имя", name: "name" },
+                { label: "Email", name: "email" },
+                { label: "Город", name: "city" },
+                { label: "Телефон", name: "phoneNumber" },
+                { label: "Роль", name: "role" },
+                { label: "Баланс", name: "balance", type: "number" },
+              ].map(({ label, name, type = "text" }) => (
+                <div key={name} className="grid grid-cols-4 items-center gap-4">
+                  <Label htmlFor={name}>{label}</Label>
+                  <Input
+                    name={name}
+                    type={type}
+                    //@ts-ignore
+                    value={form[name]}
+                    onChange={handleChange}
+                    className="col-span-3"
+                  />
+                </div>
+              ))}
             </div>
             <DialogFooter>
-              <Button type="submit">Сохранить</Button>
+              <Button onClick={handleSave} disabled={isLoading}>
+                {isLoading ? "Сохраняем..." : "Сохранить"}
+              </Button>
             </DialogFooter>
           </DialogContent>
         </Dialog>

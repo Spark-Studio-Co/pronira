@@ -27,7 +27,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { FormLabel } from "@/components/ui/form";
+import { Label } from "@/components/ui/label";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -37,113 +37,121 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import {
-  CreditCard,
+  AlertCircle,
   Edit,
+  Loader2,
   MoreHorizontal,
   Plus,
   Search,
   Trash2,
+  Users,
 } from "lucide-react";
 
-// Mock data
-const mockSubscriptions = [
-  {
-    id: 1,
-    name: "Базовая подписка",
-    price: "1500 руб",
-    billingCycle: "Ежемесячно",
-    features: ["Feature 1", "Feature 2"],
-    userCount: 450,
-  },
-  {
-    id: 2,
-    name: "Подписка Про",
-    price: "3500 руб",
-    billingCycle: "Ежемесячно",
-    features: ["Feature 1", "Feature 2", "Feature 3"],
-    userCount: 280,
-  },
-
-  {
-    id: 4,
-    name: "Годовая подписка Про",
-    price: "35000 руб",
-    billingCycle: "Ежегодно",
-    features: ["Feature 1", "Feature 2"],
-    userCount: 85,
-  },
-];
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import {
+  useGetTariffs,
+  useGetTariffsWithUserCount,
+  useUpdateTariffPrice,
+} from "@/entities/tariffs/hooks/use-tariffs";
 
 export default function SubscriptionsPage() {
   const [searchTerm, setSearchTerm] = useState("");
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
-  const [selectedPlan, setSelectedPlan] = useState(null);
-  const [editedPrice, setEditedPrice] = useState("");
+  const [selectedPlan, setSelectedPlan] = useState<any>(null);
+  const [editedPrice, setEditedPrice] = useState<number>(0);
 
-  const filteredSubscriptions = mockSubscriptions.filter((sub) =>
-    sub.name.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const {
+    data: tariffs,
+    isLoading: isLoadingTariffs,
+    error: tariffsError,
+  } = useGetTariffs();
+  const {
+    data: tariffsWithUsers,
+    isLoading: isLoadingTariffsWithUsers,
+    error: tariffsWithUsersError,
+  } = useGetTariffsWithUserCount();
+
+  // Update tariff mutation
+  const updateTariffMutation = useUpdateTariffPrice();
+
+  // Filter tariffs based on search term
+  const filteredTariffs =
+    tariffsWithUsers?.filter((tariff) =>
+      tariff.title.toLowerCase().includes(searchTerm.toLowerCase())
+    ) || [];
 
   const handleEditPrice = (plan: any) => {
     setSelectedPlan(plan);
-    setEditedPrice(plan.price.replace("$", ""));
+    setEditedPrice(plan.price);
     setIsEditDialogOpen(true);
   };
 
-  const handleSavePrice = () => {
-    console.log(`Updating price for ${selectedPlan.name} to $${editedPrice}`);
-    setIsEditDialogOpen(false);
+  const handleSavePrice = async () => {
+    if (!selectedPlan) return;
+
+    try {
+      await updateTariffMutation.mutateAsync({
+        id: selectedPlan.id,
+        price: editedPrice,
+      });
+
+      setIsEditDialogOpen(false);
+    } catch (error) {
+      console.error("error with change price", error);
+    }
   };
+
+  // Loading state
+  if (isLoadingTariffs || isLoadingTariffsWithUsers) {
+    return (
+      <div className="flex items-center justify-center h-[50vh]">
+        <Loader2 className="h-8 w-8 animate-spin text-primary mr-2" />
+        <span>Загрузка тарифов...</span>
+      </div>
+    );
+  }
+
+  // Error state
+  if (tariffsError || tariffsWithUsersError) {
+    return (
+      <Alert variant="destructive" className="my-4">
+        <AlertCircle className="h-4 w-4" />
+        <AlertTitle>Ошибка</AlertTitle>
+        <AlertDescription>
+          Не удалось загрузить данные о тарифах. Пожалуйста, попробуйте позже.
+        </AlertDescription>
+      </Alert>
+    );
+  }
 
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <h2 className="text-3xl font-bold tracking-tight">Подписки</h2>
-        <Button>
+        <Button disabled>
           <Plus className="mr-2 h-4 w-4" />
           Добавить план
         </Button>
       </div>
 
       <div className="grid gap-6 md:grid-cols-3">
-        {mockSubscriptions.slice(0, 3).map((plan) => (
+        {tariffsWithUsers?.slice(0, 3).map((plan) => (
           <Card key={plan.id}>
             <CardHeader>
-              <CardTitle>{plan.name}</CardTitle>
-              <CardDescription>{plan.billingCycle} billing</CardDescription>
+              <CardTitle>{plan.title}</CardTitle>
+              <CardDescription>Ежемесячно</CardDescription>
             </CardHeader>
             <CardContent>
               <div className="text-3xl font-bold mb-4">
-                {plan.price}
+                ₽{plan.price}
                 <span className="text-sm font-normal text-muted-foreground">
-                  /
-                  {plan.billingCycle.toLowerCase() === "ежемесячно"
-                    ? "месяц"
-                    : "год"}
+                  /месяц
                 </span>
               </div>
-              <ul className="space-y-2 mb-4">
-                {plan.features.map((feature, i) => (
-                  <li key={i} className="flex items-center">
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      className="mr-2 h-4 w-4 text-primary"
-                    >
-                      <path d="M20 6 9 17l-5-5" />
-                    </svg>
-                    {feature}
-                  </li>
-                ))}
-              </ul>
-              <p className="text-sm text-muted-foreground">
-                {plan.userCount} Активные пользователи
-              </p>
+              <div className="flex items-center text-sm text-muted-foreground mb-4">
+                <Users className="mr-2 h-4 w-4" />
+                <span>{plan.usersCount} активных пользователей</span>
+              </div>
             </CardContent>
             <CardFooter>
               <Button
@@ -175,21 +183,21 @@ export default function SubscriptionsPage() {
         <Table>
           <TableHeader>
             <TableRow>
+              <TableHead>ID</TableHead>
               <TableHead>Название</TableHead>
               <TableHead>Цена</TableHead>
-              <TableHead>Цикл оплаты</TableHead>
               <TableHead>Активные пользователи</TableHead>
               <TableHead className="w-[80px]"></TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
-            {filteredSubscriptions.length > 0 ? (
-              filteredSubscriptions.map((plan) => (
+            {filteredTariffs.length > 0 ? (
+              filteredTariffs.map((plan) => (
                 <TableRow key={plan.id}>
-                  <TableCell className="font-medium">{plan.name}</TableCell>
-                  <TableCell>{plan.price}</TableCell>
-                  <TableCell>{plan.billingCycle}</TableCell>
-                  <TableCell>{plan.userCount}</TableCell>
+                  <TableCell>{plan.id}</TableCell>
+                  <TableCell className="font-medium">{plan.title}</TableCell>
+                  <TableCell>₽{plan.price}</TableCell>
+                  <TableCell>{plan.usersCount}</TableCell>
                   <TableCell>
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
@@ -206,7 +214,7 @@ export default function SubscriptionsPage() {
                           Изменить цену
                         </DropdownMenuItem>
                         <DropdownMenuSeparator />
-                        <DropdownMenuItem className="text-destructive">
+                        <DropdownMenuItem className="text-destructive" disabled>
                           <Trash2 className="mr-2 h-4 w-4" />
                           Удалить план
                         </DropdownMenuItem>
@@ -218,7 +226,7 @@ export default function SubscriptionsPage() {
             ) : (
               <TableRow>
                 <TableCell colSpan={5} className="h-24 text-center">
-                  Тариффы не найдены.
+                  Тарифы не найдены.
                 </TableCell>
               </TableRow>
             )}
@@ -231,26 +239,27 @@ export default function SubscriptionsPage() {
             <DialogHeader>
               <DialogTitle>Изменить цену</DialogTitle>
               <DialogDescription>
-                Обновить цену для {selectedPlan.name}.
+                Обновить цену для {selectedPlan.title}.
               </DialogDescription>
             </DialogHeader>
             <div className="grid gap-4 py-4">
               <div className="grid grid-cols-4 items-center gap-4">
-                <FormLabel className="text-right">Текущая цена:</FormLabel>
+                <Label className="text-right">Текущая цена:</Label>
                 <div className="col-span-3 font-medium">
-                  {selectedPlan.price}
+                  ₽{selectedPlan.price}
                 </div>
               </div>
               <div className="grid grid-cols-4 items-center gap-4">
-                <FormLabel htmlFor="price" className="text-right">
+                <Label htmlFor="price" className="text-right">
                   Новая цена:
-                </FormLabel>
+                </Label>
                 <div className="col-span-3 flex items-center">
                   <span className="mr-1">₽</span>
                   <Input
                     id="price"
+                    type="number"
                     value={editedPrice}
-                    onChange={(e) => setEditedPrice(e.target.value)}
+                    onChange={(e) => setEditedPrice(Number(e.target.value))}
                     className="flex-1"
                   />
                 </div>
@@ -260,10 +269,19 @@ export default function SubscriptionsPage() {
               <Button
                 variant="outline"
                 onClick={() => setIsEditDialogOpen(false)}
+                disabled={updateTariffMutation.isPending}
               >
                 Отмена
               </Button>
-              <Button onClick={handleSavePrice}>Save Changes</Button>
+              <Button
+                onClick={handleSavePrice}
+                disabled={updateTariffMutation.isPending}
+              >
+                {updateTariffMutation.isPending && (
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                )}
+                Сохранить
+              </Button>
             </DialogFooter>
           </DialogContent>
         </Dialog>

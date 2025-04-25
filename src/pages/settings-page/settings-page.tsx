@@ -44,11 +44,11 @@ export const SettingsPage = () => {
           className="w-full"
           onClick={() => navigate("/personal/links")}
         />
-        <Button
+        {/* <Button
           text="Получить промокод для друга"
           className="w-full"
           onClick={handleCodePopupOpen}
-        />
+        /> */}
         <Button
           text="Отправить платеж за поисковой артефакт"
           className="w-full"

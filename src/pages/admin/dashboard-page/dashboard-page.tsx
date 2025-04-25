@@ -7,11 +7,13 @@ import { ru } from "date-fns/locale";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useGetUsers } from "@/entities/users/hooks/queries/use-get-users.query";
 import { useGetPromocodes } from "@/entities/promocode/hooks/queries/use-get-promocodes.query";
+import { useDashboardStats } from "@/entities/statistics/hooks/useStatistics";
 
 export default function DashboardPage() {
   const { data: users, isLoading: isLoadingUsers } = useGetUsers();
   const { data: promocodes, isLoading: isLoadingPromocodes } =
     useGetPromocodes();
+  const { data: stats, isLoading: isLoadingStats } = useDashboardStats("30d");
 
   const activePromocodes =
     promocodes?.filter((promo) => promo.usageCount < promo.maxUsage) || [];
@@ -40,24 +42,58 @@ export default function DashboardPage() {
   return (
     <div className="space-y-6">
       <h2 className="text-3xl font-bold tracking-tight">Статистика</h2>
+
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
         <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+          <CardHeader className="flex flex-row items-center justify-between pb-2">
             <CardTitle className="text-sm font-medium">
-              Количество пользователей
+              Всего пользователей
             </CardTitle>
             <Users className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            {isLoadingUsers ? (
+            {isLoadingStats ? (
               <Skeleton className="h-8 w-24" />
             ) : (
-              <div className="text-2xl font-bold">{users?.length || 0}</div>
+              <div className="text-2xl font-bold">{stats?.totalUsers}</div>
             )}
           </CardContent>
         </Card>
+
         <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+          <CardHeader className="flex flex-row items-center justify-between pb-2">
+            <CardTitle className="text-sm font-medium">
+              Новых пользователей
+            </CardTitle>
+            <Users className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            {isLoadingStats ? (
+              <Skeleton className="h-8 w-24" />
+            ) : (
+              <div className="text-2xl font-bold">{stats?.newUsers}</div>
+            )}
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between pb-2">
+            <CardTitle className="text-sm font-medium">Конверсия</CardTitle>
+            <CreditCard className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            {isLoadingStats ? (
+              <Skeleton className="h-8 w-24" />
+            ) : (
+              <div className="text-2xl font-bold">{stats?.conversionRate}%</div>
+            )}
+          </CardContent>
+        </Card>
+      </div>
+
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between pb-2">
             <CardTitle className="text-sm font-medium">
               Активные промокоды
             </CardTitle>
@@ -73,8 +109,9 @@ export default function DashboardPage() {
             )}
           </CardContent>
         </Card>
+
         <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+          <CardHeader className="flex flex-row items-center justify-between pb-2">
             <CardTitle className="text-sm font-medium">
               Заработано по подпискам
             </CardTitle>
@@ -87,6 +124,7 @@ export default function DashboardPage() {
           </CardContent>
         </Card>
       </div>
+
       <div className="grid gap-4 md:grid-cols-2">
         <Card className="col-span-1">
           <CardHeader>
@@ -126,10 +164,7 @@ export default function DashboardPage() {
                       {user.subscriptionExpiresAt
                         ? formatDistanceToNow(
                             new Date(user.subscriptionExpiresAt),
-                            {
-                              addSuffix: true,
-                              locale: ru,
-                            }
+                            { addSuffix: true, locale: ru }
                           )
                         : "Нет подписки"}
                     </div>
@@ -143,6 +178,7 @@ export default function DashboardPage() {
             )}
           </CardContent>
         </Card>
+
         <Card className="col-span-1">
           <CardHeader>
             <CardTitle>Недавние промокоды</CardTitle>

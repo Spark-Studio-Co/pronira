@@ -1,3 +1,5 @@
+"use client";
+
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -28,79 +30,56 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { PlusCircle } from "lucide-react";
-
-const tariffs = [
-  {
-    id: "1",
-    name: "Базовый",
-    price: 990,
-    trialPeriod: 7,
-    features: [
-      "Основные функции",
-      "Ограниченное количество запросов",
-      "Базовая поддержка",
-    ],
-    isActive: true,
-  },
-  {
-    id: "2",
-    name: "Стандарт",
-    price: 1990,
-    trialPeriod: 14,
-    features: [
-      "Все функции базового тарифа",
-      "Расширенное количество запросов",
-      "Приоритетная поддержка",
-    ],
-    isActive: true,
-  },
-  {
-    id: "3",
-    name: "Премиум",
-    price: 3990,
-    trialPeriod: 30,
-    features: [
-      "Все функции стандартного тарифа",
-      "Неограниченное количество запросов",
-      "Премиум поддержка 24/7",
-      "Дополнительные интеграции",
-    ],
-    isActive: true,
-  },
-  {
-    id: "4",
-    name: "Корпоративный",
-    price: 9990,
-    trialPeriod: 30,
-    features: [
-      "Все функции премиум тарифа",
-      "Выделенный менеджер",
-      "Индивидуальные настройки",
-      "API доступ",
-    ],
-    isActive: false,
-  },
-];
+import { PlusCircle, Loader2 } from "lucide-react";
+import {
+  useGetTariffs,
+  useGetTariffsWithUserCount,
+  useUpdateTariffPrice,
+} from "@/entities/tariffs/hooks/use-tariffs";
 
 export default function TariffsPageAdmin() {
-  const [tariffsList, setTariffsList] = useState(tariffs);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isNewTariffDialogOpen, setIsNewTariffDialogOpen] = useState(false);
-  const [selectedTariff, setSelectedTariff] = useState(null);
+  const [selectedTariff, setSelectedTariff] = useState<any>(null);
+  const [newPrice, setNewPrice] = useState<number>(0);
+  const [isActive, setIsActive] = useState<boolean>(true);
 
-  const handleEditTariff = (tariff) => {
+  // Fetch tariffs data
+  const { data: tariffs, isLoading: isLoadingTariffs } = useGetTariffs();
+  const { data: tariffsWithUsers, isLoading: isLoadingTariffsWithUsers } =
+    useGetTariffsWithUserCount();
+
+  // Update tariff mutation
+  const updateTariffMutation = useUpdateTariffPrice();
+
+  const handleEditTariff = (tariff: any) => {
     setSelectedTariff(tariff);
+    setNewPrice(tariff.price);
+    setIsActive(true); // Assuming all fetched tariffs are active
     setIsDialogOpen(true);
   };
 
-  const handleToggleActive = (id) => {
-    setTariffsList(
-      tariffsList.map((tariff) =>
-        tariff.id === id ? { ...tariff, isActive: !tariff.isActive } : tariff
-      )
-    );
+  const handleUpdateTariff = async () => {
+    if (!selectedTariff) return;
+
+    try {
+      await updateTariffMutation.mutateAsync({
+        id: selectedTariff.id,
+        price: newPrice,
+      });
+
+      setIsDialogOpen(false);
+    } catch (error) {}
   };
+
+  if (isLoadingTariffs || isLoadingTariffsWithUsers) {
+    return (
+      <div className="flex items-center justify-center h-screen">
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+        <span className="ml-2">Загрузка тарифов...</span>
+      </div>
+    );
+  }
 
   return (
     <div className="flex-1 space-y-4 p-4 pt-6 md:p-8">
@@ -117,51 +96,23 @@ export default function TariffsPageAdmin() {
       <Tabs defaultValue="tariffs" className="space-y-4">
         <TabsList>
           <TabsTrigger value="tariffs">Тарифы</TabsTrigger>
-          <TabsTrigger value="trial">Пробный период</TabsTrigger>
+          <TabsTrigger value="tariffs-with-users">
+            Тарифы с пользователями
+          </TabsTrigger>
         </TabsList>
+
         <TabsContent value="tariffs" className="space-y-4">
-          <div className="grid gap-4 grid-cols-2 md:grid-cols-2 lg:grid-cols-3">
-            {tariffsList.map((tariff) => (
-              <Card
-                key={tariff.id}
-                className={!tariff.isActive ? "opacity-60" : ""}
-              >
+          <div className="grid gap-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
+            {tariffs?.map((tariff) => (
+              <Card key={tariff.id}>
                 <CardHeader>
                   <div className="flex justify-between items-center">
-                    <CardTitle>{tariff.name}</CardTitle>
-                    {tariff.isActive ? (
-                      <Badge className="bg-green-500">Активен</Badge>
-                    ) : (
-                      <Badge variant="outline">Неактивен</Badge>
-                    )}
+                    <CardTitle>{tariff.title}</CardTitle>
+                    <Badge className="bg-green-500">Активен</Badge>
                   </div>
                   <CardDescription>₽{tariff.price} / месяц</CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <div className="space-y-2">
-                    <p className="text-sm">
-                      Пробный период: {tariff.trialPeriod} дней
-                    </p>
-                    <ul className="text-sm space-y-1 mt-4">
-                      {tariff.features.map((feature, index) => (
-                        <li key={index} className="flex items-center">
-                          <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            stroke="currentColor"
-                            strokeWidth="2"
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            className="mr-2 h-4 w-4 text-green-500"
-                          >
-                            <polyline points="20 6 9 17 4 12"></polyline>
-                          </svg>
-                          {feature}
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
                   <div className="flex justify-between mt-6">
                     <Button
                       variant="outline"
@@ -170,58 +121,49 @@ export default function TariffsPageAdmin() {
                     >
                       Редактировать
                     </Button>
-                    <div className="flex items-center space-x-2">
-                      <Switch
-                        id={`active-${tariff.id}`}
-                        checked={tariff.isActive}
-                        onCheckedChange={() => handleToggleActive(tariff.id)}
-                      />
-                      <Label htmlFor={`active-${tariff.id}`}>
-                        {tariff.isActive ? "Активен" : "Неактивен"}
-                      </Label>
-                    </div>
                   </div>
                 </CardContent>
               </Card>
             ))}
           </div>
         </TabsContent>
-        <TabsContent value="trial" className="space-y-4">
+
+        <TabsContent value="tariffs-with-users" className="space-y-4">
           <Card>
             <CardHeader>
-              <CardTitle>Настройки пробного периода</CardTitle>
+              <CardTitle>Тарифы с количеством пользователей</CardTitle>
               <CardDescription>
-                Настройте длительность пробного периода для каждого тарифа
+                Статистика по количеству пользователей на каждом тарифе
               </CardDescription>
             </CardHeader>
             <CardContent>
               <Table>
                 <TableHeader>
                   <TableRow>
+                    <TableHead>ID</TableHead>
                     <TableHead>Тариф</TableHead>
-                    <TableHead>Текущий пробный период (дни)</TableHead>
-                    <TableHead>Новый пробный период (дни)</TableHead>
+                    <TableHead>Стоимость (₽)</TableHead>
+                    <TableHead>Количество пользователей</TableHead>
                     <TableHead className="text-right">Действия</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {tariffsList.map((tariff) => (
+                  {tariffsWithUsers?.map((tariff) => (
                     <TableRow key={tariff.id}>
+                      <TableCell>{tariff.id}</TableCell>
                       <TableCell className="font-medium">
-                        {tariff.name}
+                        {tariff.title}
                       </TableCell>
-                      <TableCell>{tariff.trialPeriod}</TableCell>
-                      <TableCell>
-                        <Input
-                          type="number"
-                          defaultValue={tariff.trialPeriod}
-                          className="w-20"
-                          min="0"
-                          max="90"
-                        />
-                      </TableCell>
+                      <TableCell>{tariff.price}</TableCell>
+                      <TableCell>{tariff.usersCount}</TableCell>
                       <TableCell className="text-right">
-                        <Button size="sm">Сохранить</Button>
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => handleEditTariff(tariff)}
+                        >
+                          Редактировать
+                        </Button>
                       </TableCell>
                     </TableRow>
                   ))}
@@ -239,18 +181,19 @@ export default function TariffsPageAdmin() {
             <DialogHeader>
               <DialogTitle>Редактировать тариф</DialogTitle>
               <DialogDescription>
-                Изменение настроек тарифа {selectedTariff.name}
+                Изменение настроек тарифа {selectedTariff.title}
               </DialogDescription>
             </DialogHeader>
             <div className="grid gap-4 py-4">
               <div className="grid grid-cols-4 items-center gap-4">
-                <Label htmlFor="tariff-name" className="text-right">
+                <Label htmlFor="tariff-title" className="text-right">
                   Название
                 </Label>
                 <Input
-                  id="tariff-name"
-                  defaultValue={selectedTariff.name}
+                  id="tariff-title"
+                  defaultValue={selectedTariff.title}
                   className="col-span-3"
+                  disabled
                 />
               </div>
               <div className="grid grid-cols-4 items-center gap-4">
@@ -260,18 +203,8 @@ export default function TariffsPageAdmin() {
                 <Input
                   id="tariff-price"
                   type="number"
-                  defaultValue={selectedTariff.price}
-                  className="col-span-3"
-                />
-              </div>
-              <div className="grid grid-cols-4 items-center gap-4">
-                <Label htmlFor="tariff-trial" className="text-right">
-                  Пробный период (дни)
-                </Label>
-                <Input
-                  id="tariff-trial"
-                  type="number"
-                  defaultValue={selectedTariff.trialPeriod}
+                  value={newPrice}
+                  onChange={(e) => setNewPrice(Number(e.target.value))}
                   className="col-span-3"
                 />
               </div>
@@ -280,22 +213,33 @@ export default function TariffsPageAdmin() {
                 <div className="flex items-center space-x-2 col-span-3">
                   <Switch
                     id="tariff-active"
-                    checked={selectedTariff.isActive}
+                    checked={isActive}
+                    onCheckedChange={setIsActive}
+                    disabled
                   />
                   <Label htmlFor="tariff-active">
-                    {selectedTariff.isActive ? "Активен" : "Неактивен"}
+                    {isActive ? "Активен" : "Неактивен"}
                   </Label>
                 </div>
               </div>
             </div>
             <DialogFooter>
-              <Button type="submit">Сохранить изменения</Button>
+              <Button
+                type="submit"
+                onClick={handleUpdateTariff}
+                disabled={updateTariffMutation.isPending}
+              >
+                {updateTariffMutation.isPending && (
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                )}
+                Сохранить изменения
+              </Button>
             </DialogFooter>
           </DialogContent>
         </Dialog>
       )}
 
-      {/* New Tariff Dialog */}
+      {/* New Tariff Dialog - This would need a new API endpoint to create tariffs */}
       <Dialog
         open={isNewTariffDialogOpen}
         onOpenChange={setIsNewTariffDialogOpen}
@@ -303,51 +247,15 @@ export default function TariffsPageAdmin() {
         <DialogContent className="sm:max-w-[500px]">
           <DialogHeader>
             <DialogTitle>Добавить новый тариф</DialogTitle>
-            <DialogDescription>Создайте новый тарифный план</DialogDescription>
+            <DialogDescription>
+              Эта функция недоступна, так как API не предоставляет эндпоинт для
+              создания тарифов
+            </DialogDescription>
           </DialogHeader>
-          <div className="grid gap-4 py-4">
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="new-tariff-name" className="text-right">
-                Название
-              </Label>
-              <Input
-                id="new-tariff-name"
-                placeholder="Название тарифа"
-                className="col-span-3"
-              />
-            </div>
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="new-tariff-price" className="text-right">
-                Стоимость (₽)
-              </Label>
-              <Input
-                id="new-tariff-price"
-                type="number"
-                placeholder="0"
-                className="col-span-3"
-              />
-            </div>
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="new-tariff-trial" className="text-right">
-                Пробный период (дни)
-              </Label>
-              <Input
-                id="new-tariff-trial"
-                type="number"
-                placeholder="14"
-                className="col-span-3"
-              />
-            </div>
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label className="text-right">Статус</Label>
-              <div className="flex items-center space-x-2 col-span-3">
-                <Switch id="new-tariff-active" defaultChecked={true} />
-                <Label htmlFor="new-tariff-active">Активен</Label>
-              </div>
-            </div>
-          </div>
           <DialogFooter>
-            <Button type="submit">Создать тариф</Button>
+            <Button onClick={() => setIsNewTariffDialogOpen(false)}>
+              Закрыть
+            </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

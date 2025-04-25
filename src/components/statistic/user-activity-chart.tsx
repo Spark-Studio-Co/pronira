@@ -9,19 +9,29 @@ import {
   Tooltip,
 } from "recharts";
 
-const data = [
-  { name: "Активные", value: 845, color: "#10b981" },
-  { name: "Неактивные", value: 245, color: "#6b7280" },
-  { name: "Пробный период", value: 144, color: "#3b82f6" },
-];
+interface UserActivityChartProps {
+  data?: {
+    active: number;
+    inactive: number;
+    trial: number;
+  };
+}
 
-export function UserActivityChart() {
+export function UserActivityChart({ data }: UserActivityChartProps) {
+  const pieData = data
+    ? [
+        { name: "Активные", value: data.active, color: "#10b981" },
+        { name: "Неактивные", value: data.inactive, color: "#6b7280" },
+        { name: "Пробный период", value: data.trial, color: "#3b82f6" },
+      ]
+    : [];
+
   return (
     <div className="h-[300px] w-full">
       <ResponsiveContainer width="100%" height="100%">
         <PieChart>
           <Pie
-            data={data}
+            data={pieData}
             cx="50%"
             cy="50%"
             innerRadius={60}
@@ -29,7 +39,7 @@ export function UserActivityChart() {
             paddingAngle={5}
             dataKey="value"
           >
-            {data.map((entry, index) => (
+            {pieData.map((entry, index) => (
               <Cell key={`cell-${index}`} fill={entry.color} />
             ))}
           </Pie>

@@ -9,15 +9,17 @@ import {
   Tooltip,
 } from "recharts";
 
-const data = [
-  { name: "Базовый", value: 324, color: "#6b7280" },
-  { name: "Стандарт", value: 456, color: "#3b82f6" },
-  { name: "Премиум", value: 245, color: "#10b981" },
-  { name: "Корпоративный", value: 65, color: "#8b5cf6" },
-  { name: "Пробный период", value: 144, color: "#f59e0b" },
-];
+interface TariffDataItem {
+  name: string;
+  value: number;
+  color: string;
+}
 
-export function TariffsDistribution() {
+interface TariffsDistributionProps {
+  data?: TariffDataItem[];
+}
+
+export function TariffsDistribution({ data = [] }: TariffsDistributionProps) {
   return (
     <div className="h-[300px] w-full">
       <ResponsiveContainer width="100%" height="100%">

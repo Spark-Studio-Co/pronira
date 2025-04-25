@@ -15,26 +15,42 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { useState } from "react";
+import {
+  useDashboardStats,
+  useUserTrends,
+  useUserActivityBreakdown,
+  usePaymentStats,
+  useTariffStats,
+} from "@/entities/statistics/hooks/useStatistics";
 import { UsersChart } from "@/components/statistic/users-chart";
 import { PaymentsChart } from "@/components/statistic/payments-chart";
 import { TariffsDistribution } from "@/components/statistic/tariffs-distribution";
 import { UserActivityChart } from "@/components/statistic/user-activity-chart";
 
 export default function StatisticsPage() {
+  const [period, setPeriod] = useState("30d");
+
+  const { data: dashboardStats } = useDashboardStats(period);
+  const { data: trends } = useUserTrends(period);
+  const { data: activity } = useUserActivityBreakdown();
+  const { data: payments } = usePaymentStats(period);
+  const { data: tariffs } = useTariffStats();
+
   return (
     <div className="flex-1 space-y-4 p-4 pt-6 md:p-8">
       <div className="flex items-center justify-between">
         <h2 className="text-3xl font-bold tracking-tight">Статистика</h2>
         <div className="flex items-center gap-2">
-          <Select defaultValue="30days">
+          <Select defaultValue={period} onValueChange={setPeriod}>
             <SelectTrigger className="w-[13vw]">
               <SelectValue placeholder="Выберите период" />
             </SelectTrigger>
-            <SelectContent className="">
-              <SelectItem value="7days">Последние 7 дней</SelectItem>
-              <SelectItem value="30days">Последние 30 дней</SelectItem>
-              <SelectItem value="90days">Последние 90 дней</SelectItem>
-              <SelectItem value="year">Последний год</SelectItem>
+            <SelectContent>
+              <SelectItem value="7d">Последние 7 дней</SelectItem>
+              <SelectItem value="30d">Последние 30 дней</SelectItem>
+              <SelectItem value="90d">Последние 90 дней</SelectItem>
+              <SelectItem value="1y">Последний год</SelectItem>
               <SelectItem value="all">Все время</SelectItem>
             </SelectContent>
           </Select>
@@ -57,10 +73,9 @@ export default function StatisticsPage() {
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">1,234</div>
-                <p className="text-xs text-muted-foreground">
-                  +12% с прошлого месяца
-                </p>
+                <div className="text-2xl font-bold">
+                  {dashboardStats?.totalUsers ?? 0}
+                </div>
               </CardContent>
             </Card>
             <Card>
@@ -70,10 +85,9 @@ export default function StatisticsPage() {
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">845</div>
-                <p className="text-xs text-muted-foreground">
-                  +5.2% с прошлого месяца
-                </p>
+                <div className="text-2xl font-bold">
+                  {dashboardStats?.activeUsers ?? 0}
+                </div>
               </CardContent>
             </Card>
             <Card>
@@ -83,10 +97,9 @@ export default function StatisticsPage() {
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">145</div>
-                <p className="text-xs text-muted-foreground">
-                  +18.1% с прошлого месяца
-                </p>
+                <div className="text-2xl font-bold">
+                  {dashboardStats?.newUsers ?? 0}
+                </div>
               </CardContent>
             </Card>
             <Card>
@@ -96,10 +109,9 @@ export default function StatisticsPage() {
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">68.4%</div>
-                <p className="text-xs text-muted-foreground">
-                  +4.3% с прошлого месяца
-                </p>
+                <div className="text-2xl font-bold">
+                  {dashboardStats?.conversionRate ?? 0}%
+                </div>
               </CardContent>
             </Card>
           </div>
@@ -113,7 +125,7 @@ export default function StatisticsPage() {
                 </CardDescription>
               </CardHeader>
               <CardContent className="pl-2">
-                <UsersChart />
+                <UsersChart data={trends as any} />
               </CardContent>
             </Card>
             <Card className="col-span-3">
@@ -124,7 +136,7 @@ export default function StatisticsPage() {
                 </CardDescription>
               </CardHeader>
               <CardContent className="pl-2">
-                <UserActivityChart />
+                <UserActivityChart data={activity} />
               </CardContent>
             </Card>
           </div>
@@ -133,53 +145,49 @@ export default function StatisticsPage() {
         <TabsContent value="payments" className="space-y-4">
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
             <Card>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardHeader>
                 <CardTitle className="text-sm font-medium">
                   Общий доход
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">₽423,500</div>
-                <p className="text-xs text-muted-foreground">
-                  +18.1% с прошлого месяца
-                </p>
+                <div className="text-2xl font-bold">
+                  ₽{payments?.totalRevenue?.toLocaleString() ?? 0}
+                </div>
               </CardContent>
             </Card>
             <Card>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardHeader>
                 <CardTitle className="text-sm font-medium">
                   Средний чек
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">₽2,450</div>
-                <p className="text-xs text-muted-foreground">
-                  +3.2% с прошлого месяца
-                </p>
+                <div className="text-2xl font-bold">
+                  ₽{payments?.averageCheck?.toLocaleString() ?? 0}
+                </div>
               </CardContent>
             </Card>
             <Card>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardHeader>
                 <CardTitle className="text-sm font-medium">
                   Количество платежей
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">173</div>
-                <p className="text-xs text-muted-foreground">
-                  +12.5% с прошлого месяца
-                </p>
+                <div className="text-2xl font-bold">
+                  {payments?.paymentsCount ?? 0}
+                </div>
               </CardContent>
             </Card>
             <Card>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardHeader>
                 <CardTitle className="text-sm font-medium">Возвраты</CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">₽12,500</div>
-                <p className="text-xs text-muted-foreground">
-                  -2.3% с прошлого месяца
-                </p>
+                <div className="text-2xl font-bold">
+                  ₽{payments?.refundsTotal?.toLocaleString() ?? 0}
+                </div>
               </CardContent>
             </Card>
           </div>
@@ -193,7 +201,7 @@ export default function StatisticsPage() {
                 </CardDescription>
               </CardHeader>
               <CardContent className="pl-2">
-                <PaymentsChart />
+                <PaymentsChart data={payments?.daily} />
               </CardContent>
             </Card>
           </div>
@@ -201,58 +209,21 @@ export default function StatisticsPage() {
 
         <TabsContent value="tariffs" className="space-y-4">
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">
-                  Базовый тариф
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">324</div>
-                <p className="text-xs text-muted-foreground">
-                  26.3% от всех пользователей
-                </p>
-              </CardContent>
-            </Card>
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">
-                  Стандарт тариф
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">456</div>
-                <p className="text-xs text-muted-foreground">
-                  36.9% от всех пользователей
-                </p>
-              </CardContent>
-            </Card>
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">
-                  Премиум тариф
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">245</div>
-                <p className="text-xs text-muted-foreground">
-                  19.9% от всех пользователей
-                </p>
-              </CardContent>
-            </Card>
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">
-                  Корпоративный тариф
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">65</div>
-                <p className="text-xs text-muted-foreground">
-                  5.3% от всех пользователей
-                </p>
-              </CardContent>
-            </Card>
+            {tariffs?.map((tariff: any) => (
+              <Card key={tariff.title}>
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                  <CardTitle className="text-sm font-medium">
+                    {tariff.title}
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold">{tariff.count}</div>
+                  <p className="text-xs text-muted-foreground">
+                    {tariff.percentage}% от всех пользователей
+                  </p>
+                </CardContent>
+              </Card>
+            ))}
           </div>
 
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
@@ -264,7 +235,7 @@ export default function StatisticsPage() {
                 </CardDescription>
               </CardHeader>
               <CardContent className="pl-2">
-                <TariffsDistribution />
+                <TariffsDistribution data={tariffs} />
               </CardContent>
             </Card>
           </div>

@@ -86,7 +86,7 @@ export default function Sidebar() {
                 !isOpen && !isMobile && "hidden"
               )}
             >
-              Админка | Проныра
+              Админ | Проныра
             </h2>
             {!isOpen && !isMobile && (
               <div className="flex justify-center">
