@@ -1,9 +1,23 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
-import { CreditCard, Mail, Phone, User, FileText, Coins } from "lucide-react";
+import type React from "react";
+import { useEffect, useState } from "react";
+import {
+  AlertCircle,
+  Check,
+  CreditCard,
+  Mail,
+  Phone,
+  User,
+  FileText,
+  Coins,
+  Tag,
+  Loader,
+} from "lucide-react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useTariffStore } from "@/entities/tariffs/store/use-tariff-store"; // 👈 Zustand store
+import { useGetPromocodes } from "@/entities/promocode/hooks/queries/use-get-promocodes.query";
+import { useApplyPromocode } from "@/entities/promocode/hooks/mutations/use-apply-promocode.mutation";
 
 declare global {
   interface Window {
@@ -21,12 +35,34 @@ export default function TBankPaymentPage() {
     selectedTariff?.price?.toString() || query.get("amount") || "100";
   const defaultDescription =
     selectedTariff?.title || query.get("description") || "Оплата подписки";
+  const queryPromocode = query.get("promocode") || "";
 
   const [isScriptLoaded, setIsScriptLoaded] = useState(false);
+  const [amount, setAmount] = useState(defaultAmount);
+  const [originalAmount, setOriginalAmount] = useState(defaultAmount);
+
+  // Promocode state
+  const [promocode, setPromocode] = useState(queryPromocode);
+  const [appliedPromocode, setAppliedPromocode] = useState<any | null>(null);
+  const [promocodeError, setPromocodeError] = useState("");
+
+  // Fetch promocodes from backend
+  const { data: promocodes, isLoading: isLoadingPromocodes } =
+    useGetPromocodes();
+
+  // Apply promocode mutation
+  const applyPromocodeMutation = useApplyPromocode();
+
+  useEffect(() => {
+    // Check if there's a promocode in the URL and apply it
+    if (queryPromocode && promocodes) {
+      handleApplyPromocode(queryPromocode);
+    }
+  }, [queryPromocode, promocodes]);
 
   useEffect(() => {
     // Redirect if no tariff is selected
-    if (!selectedTariff) {
+    if (!selectedTariff && !query.get("amount")) {
       navigate("/tariffs"); // or "/" if that's your default
     }
 
@@ -42,7 +78,40 @@ export default function TBankPaymentPage() {
         document.body.removeChild(script);
       }
     };
-  }, [selectedTariff, navigate]);
+  }, [selectedTariff, navigate, query]);
+
+  // Update the handleApplyPromocode function to show the discount amount
+  const handleApplyPromocode = async (code: string = promocode) => {
+    if (!code.trim()) {
+      setPromocodeError("Введите промокод");
+      return;
+    }
+
+    setPromocodeError("");
+
+    try {
+      const result = await applyPromocodeMutation.mutateAsync({
+        code: code.trim(),
+        amount: Number(originalAmount),
+      });
+
+      setAppliedPromocode(result.promocode);
+      setAmount(result.discountedAmount.toFixed(2));
+    } catch (error: any) {
+      setPromocodeError(
+        error.response?.data?.message || "Недействительный промокод"
+      );
+      setAppliedPromocode(null);
+      setAmount(originalAmount); // Reset to original amount
+    }
+  };
+
+  const handleRemovePromocode = () => {
+    setAppliedPromocode(null);
+    setPromocode("");
+    setPromocodeError("");
+    setAmount(originalAmount); // Reset to original amount
+  };
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -90,10 +159,6 @@ export default function TBankPaymentPage() {
     }
   };
 
-  useEffect(() => {
-    console.log(selectedTariff);
-  }, []);
-
   return (
     <div className="min-h-screen flex items-center justify-center p-4 bg-gradient-to-b from-[#e1eaf8] to-white dark:from-[#1e1e1e] dark:to-[#2a2a2a]">
       <div className="w-full max-w-md p-6 bg-white dark:bg-[#222] rounded-lg shadow-lg border border-[#6798de]/20">
@@ -104,8 +169,25 @@ export default function TBankPaymentPage() {
           </p>
           {selectedTariff && (
             <p className="text-sm text-gray-700 dark:text-gray-300 mt-2">
-              Вы выбрали тариф: <strong>{selectedTariff.title}</strong> —{" "}
-              <strong>{selectedTariff.price} ₽</strong>
+              Вы выбрали тариф: <strong>{selectedTariff.title}</strong>
+              {appliedPromocode ? (
+                <>
+                  <span className="block mt-1">
+                    <span className="line-through">
+                      {selectedTariff.price} ₽
+                    </span>{" "}
+                    <strong className="text-green-600">{amount} ₽</strong>{" "}
+                    <span className="text-xs text-green-600">
+                      (-{appliedPromocode.discount}%)
+                    </span>
+                  </span>
+                </>
+              ) : (
+                <span>
+                  {" "}
+                  — <strong>{selectedTariff.price} ₽</strong>
+                </span>
+              )}
             </p>
           )}
         </div>
@@ -126,13 +208,86 @@ export default function TBankPaymentPage() {
             </label>
             <input
               id="amount"
-              disabled
               name="amount"
               type="text"
-              defaultValue={defaultAmount}
+              value={amount}
+              readOnly
               required
-              className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 bg-white dark:bg-[#333] dark:text-white transition-colors"
+              className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 bg-gray-100 dark:bg-[#333] dark:text-white transition-colors"
             />
+          </div>
+
+          {/* Promocode section */}
+          <div className="space-y-2">
+            <label
+              htmlFor="promocode"
+              className="text-sm font-medium flex items-center gap-2 text-gray-700 dark:text-gray-300"
+            >
+              <Tag className="h-4 w-4 text-[#6798de]" />
+              Промокод
+            </label>
+            <div className="flex gap-2">
+              <input
+                id="promocode"
+                type="text"
+                value={promocode}
+                onChange={(e) => setPromocode(e.target.value)}
+                disabled={!!appliedPromocode || isLoadingPromocodes}
+                placeholder={
+                  isLoadingPromocodes
+                    ? "Загрузка промокодов..."
+                    : "Введите промокод"
+                }
+                className={`flex-1 px-3 py-2 border rounded-md ${
+                  promocodeError ? "border-red-500" : "border-gray-300"
+                } ${
+                  appliedPromocode
+                    ? "bg-gray-100 dark:bg-[#444]"
+                    : "bg-white dark:bg-[#333]"
+                } ${isLoadingPromocodes ? "opacity-70" : ""} dark:text-white`}
+              />
+              {appliedPromocode ? (
+                <button
+                  type="button"
+                  onClick={handleRemovePromocode}
+                  className="px-3 py-2 bg-gray-200 dark:bg-[#444] text-gray-700 dark:text-gray-300 rounded-md hover:bg-gray-300 dark:hover:bg-[#555] transition-colors"
+                >
+                  Отменить
+                </button>
+              ) : (
+                <button
+                  type="button"
+                  onClick={() => handleApplyPromocode()}
+                  disabled={
+                    applyPromocodeMutation.isPending ||
+                    !promocode.trim() ||
+                    isLoadingPromocodes
+                  }
+                  className="px-3 py-2 bg-[#6798de] text-white rounded-md hover:bg-[#5687cd] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {applyPromocodeMutation.isPending ? (
+                    <Loader className="h-4 w-4 animate-spin" />
+                  ) : (
+                    "Применить"
+                  )}
+                </button>
+              )}
+            </div>
+
+            {promocodeError && (
+              <div className="flex items-center text-red-500 text-sm mt-1">
+                <AlertCircle className="h-4 w-4 mr-1" />
+                {promocodeError}
+              </div>
+            )}
+
+            {/* Update the applied promocode display to show the correct discount percentage */}
+            {appliedPromocode && (
+              <div className="flex items-center text-green-600 text-sm mt-1">
+                <Check className="h-4 w-4 mr-1" />
+                Промокод применен: скидка {appliedPromocode.discount}%
+              </div>
+            )}
           </div>
 
           <div className="space-y-2">
@@ -208,7 +363,7 @@ export default function TBankPaymentPage() {
             className="w-full flex items-center justify-center px-4 py-3 bg-[#FBC520] hover:bg-[#FAB619] text-[#3C2C0B] font-bold text-lg rounded-md transition-all"
           >
             <CreditCard className="mr-2 h-5 w-5" />
-            Оплатить
+            Оплатить {amount} ₽
           </button>
 
           {!isScriptLoaded && (

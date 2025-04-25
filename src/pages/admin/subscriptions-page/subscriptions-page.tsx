@@ -62,28 +62,21 @@ export default function SubscriptionsPage() {
   const [editedTitle, setEditedTitle] = useState("");
   const [editedPrice, setEditedPrice] = useState<number>(0);
 
-  // New tariff state
   const [newTariffTitle, setNewTariffTitle] = useState("");
   const [newTariffPrice, setNewTariffPrice] = useState<number>(0);
 
-  const {
-    data: tariffs,
-    isLoading: isLoadingTariffs,
-    error: tariffsError,
-  } = useGetTariffs();
+  const { isLoading: isLoadingTariffs, error: tariffsError } = useGetTariffs();
+
   const {
     data: tariffsWithUsers,
     isLoading: isLoadingTariffsWithUsers,
     error: tariffsWithUsersError,
   } = useGetTariffsWithUserCount();
 
-  // Update tariff mutation
   const updateTariffMutation = useUpdateTariff();
 
-  // Create tariff mutation
   const createTariffMutation = useCreateTariff();
 
-  // Filter tariffs based on search term
   const filteredTariffs =
     tariffsWithUsers?.filter((tariff) =>
       tariff.title.toLowerCase().includes(searchTerm.toLowerCase())
