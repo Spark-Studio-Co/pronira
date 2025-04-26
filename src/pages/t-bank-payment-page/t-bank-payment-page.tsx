@@ -18,6 +18,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { useTariffStore } from "@/entities/tariffs/store/use-tariff-store"; // 👈 Zustand store
 import { useGetPromocodes } from "@/entities/promocode/hooks/queries/use-get-promocodes.query";
 import { useApplyPromocode } from "@/entities/promocode/hooks/mutations/use-apply-promocode.mutation";
+import { useAuthStore } from "@/entities/auth/store/use-auth-store";
 
 declare global {
   interface Window {
@@ -30,6 +31,7 @@ export default function TBankPaymentPage() {
   const navigate = useNavigate();
   const query = new URLSearchParams(location.search);
   const { selectedTariff } = useTariffStore(); // 👈 Get selected tariff
+  const { chatId } = useAuthStore();
 
   const defaultAmount =
     selectedTariff?.price?.toString() || query.get("amount") || "100";
@@ -61,7 +63,6 @@ export default function TBankPaymentPage() {
   }, [queryPromocode, promocodes]);
 
   useEffect(() => {
-    // Redirect if no tariff is selected
     if (!selectedTariff && !query.get("amount")) {
       navigate("/tariffs"); // or "/" if that's your default
     }
@@ -152,6 +153,27 @@ export default function TBankPaymentPage() {
       });
     }
 
+    // 👇 Recurrent payment: add required fields
+    const recurrentField = document.createElement("input");
+    recurrentField.type = "hidden";
+    recurrentField.name = "Recurrent";
+    recurrentField.value = "Y";
+    form.appendChild(recurrentField);
+
+    const customerKeyField = document.createElement("input");
+    customerKeyField.type = "hidden";
+    customerKeyField.name = "CustomerKey"; // ✅ правильно
+    customerKeyField.value = chatId as any;
+    form.appendChild(customerKeyField);
+
+    // Optional: redirectDueDate if you want auto-redirection after some date
+    // const redirectDueDateField = document.createElement("input");
+    // redirectDueDateField.type = "hidden";
+    // redirectDueDateField.name = "redirectDueDate";
+    // redirectDueDateField.value = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(); // 30 days later
+    // form.appendChild(redirectDueDateField);
+
+    // 👇 Call Tinkoff PayForm
     if (typeof window.pay === "function") {
       window.pay(form);
     } else {
@@ -227,6 +249,7 @@ export default function TBankPaymentPage() {
               Промокод
             </label>
             <div className="flex gap-2">
+              <input type="hidden" name="Recurrent" value="Y" />
               <input
                 id="promocode"
                 type="text"
