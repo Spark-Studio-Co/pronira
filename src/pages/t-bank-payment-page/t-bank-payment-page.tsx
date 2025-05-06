@@ -20,11 +20,37 @@ import { useGetPromocodes } from "@/entities/promocode/hooks/queries/use-get-pro
 import { useApplyPromocode } from "@/entities/promocode/hooks/mutations/use-apply-promocode.mutation";
 import { useAuthStore } from "@/entities/auth/store/use-auth-store";
 
-declare global {
-  interface Window {
-    pay: any;
-  }
-}
+const generateToken = (params: Record<string, any>, password: string) => {
+  const paramsForToken = { ...params };
+  delete paramsForToken.Receipt;
+  delete paramsForToken.DATA;
+
+  const sortedKeys = Object.keys(paramsForToken).sort();
+
+  // Concatenate values
+  let concatenatedValues = "";
+  sortedKeys.forEach((key) => {
+    if (paramsForToken[key] !== null && paramsForToken[key] !== undefined) {
+      concatenatedValues += paramsForToken[key];
+    }
+  });
+
+  // Append password
+  concatenatedValues += password;
+
+  // Generate SHA-256 hash
+  return sha256(concatenatedValues);
+};
+
+const sha256 = async (message: string) => {
+  const msgBuffer = new TextEncoder().encode(message);
+  const hashBuffer = await crypto.subtle.digest("SHA-256", msgBuffer);
+  const hashArray = Array.from(new Uint8Array(hashBuffer));
+  const hashHex = hashArray
+    .map((b) => b.toString(16).padStart(2, "0"))
+    .join("");
+  return hashHex;
+};
 
 export default function TBankPaymentPage() {
   const location = useLocation();
@@ -39,24 +65,20 @@ export default function TBankPaymentPage() {
     selectedTariff?.title || query.get("description") || "Оплата подписки";
   const queryPromocode = query.get("promocode") || "";
 
-  const [isScriptLoaded, setIsScriptLoaded] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const [amount, setAmount] = useState(defaultAmount);
   const [originalAmount, setOriginalAmount] = useState(defaultAmount);
 
-  // Promocode state
   const [promocode, setPromocode] = useState(queryPromocode);
   const [appliedPromocode, setAppliedPromocode] = useState<any | null>(null);
   const [promocodeError, setPromocodeError] = useState("");
 
-  // Fetch promocodes from backend
   const { data: promocodes, isLoading: isLoadingPromocodes } =
     useGetPromocodes();
 
-  // Apply promocode mutation
   const applyPromocodeMutation = useApplyPromocode();
 
   useEffect(() => {
-    // Check if there's a promocode in the URL and apply it
     if (queryPromocode && promocodes) {
       handleApplyPromocode(queryPromocode);
     }
@@ -66,22 +88,8 @@ export default function TBankPaymentPage() {
     if (!selectedTariff && !query.get("amount")) {
       navigate("/tariffs"); // or "/" if that's your default
     }
-
-    // Load Tinkoff script
-    const script = document.createElement("script");
-    script.src = "https://securepay.tinkoff.ru/html/payForm/js/tinkoff_v2.js";
-    script.async = true;
-    script.onload = () => setIsScriptLoaded(true);
-    document.body.appendChild(script);
-
-    return () => {
-      if (document.body.contains(script)) {
-        document.body.removeChild(script);
-      }
-    };
   }, [selectedTariff, navigate, query]);
 
-  // Update the handleApplyPromocode function to show the discount amount
   const handleApplyPromocode = async (code: string = promocode) => {
     if (!code.trim()) {
       setPromocodeError("Введите промокод");
@@ -114,30 +122,36 @@ export default function TBankPaymentPage() {
     setAmount(originalAmount); // Reset to original amount
   };
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    setIsLoading(true);
 
-    const form = e.currentTarget;
-    const formElements = form.elements as HTMLFormControlsCollection;
+    try {
+      const form = e.currentTarget;
+      const formElements = form.elements as HTMLFormControlsCollection;
 
-    const description = (
-      formElements.namedItem("description") as HTMLInputElement
-    ).value;
-    const amount = (formElements.namedItem("amount") as HTMLInputElement).value;
-    const email = (formElements.namedItem("email") as HTMLInputElement).value;
-    const phone = (formElements.namedItem("phone") as HTMLInputElement).value;
-    const receiptInput = formElements.namedItem("receipt") as HTMLInputElement;
+      const description = (
+        formElements.namedItem("description") as HTMLInputElement
+      ).value;
+      const amount = (formElements.namedItem("amount") as HTMLInputElement)
+        .value;
+      const email = (formElements.namedItem("email") as HTMLInputElement).value;
+      const phone = (formElements.namedItem("phone") as HTMLInputElement).value;
+      const name =
+        (formElements.namedItem("name") as HTMLInputElement)?.value || "";
 
-    if (!email && !phone) {
-      alert("Поле E-mail или Phone не должно быть пустым");
-      return;
-    }
+      if (!email && !phone) {
+        alert("Поле E-mail или Phone не должно быть пустым");
+        setIsLoading(false);
+        return;
+      }
 
-    if (receiptInput) {
-      receiptInput.value = JSON.stringify({
+      const receiptData = {
         EmailCompany: "mail@mail.com",
         Taxation: "patent",
         FfdVersion: "1.2",
+        Email: email || undefined, // Include email if provided
+        Phone: phone || undefined, // Include phone if provided
         Items: [
           {
             Name: description || "Оплата",
@@ -150,34 +164,82 @@ export default function TBankPaymentPage() {
             MeasurementUnit: "pc",
           },
         ],
+      };
+
+      const dataObject = {
+        Phone: phone || undefined,
+        Email: email || undefined,
+        Name: name || undefined,
+      };
+
+      const paymentDataWithoutToken = {
+        TerminalKey: "1744092581993DEMO",
+        Amount: Math.round(Number.parseFloat(amount) * 100), // Amount in kopecks
+        OrderId: `order_${chatId}_${Date.now()}`, // 👈 вставляем userId в OrderId
+        Description: description,
+        CustomerKey: chatId,
+        Recurrent: "Y",
+        DATA: dataObject,
+        Receipt: receiptData,
+        NotificationURL: window.location.origin + "/payment-callback",
+        SuccessURL: window.location.origin + "/payment-success",
+        FailURL: window.location.origin + "/payment-failed",
+      };
+
+      const token = await generateToken(
+        paymentDataWithoutToken,
+        "7TVsG42L!*#9r&XX"
+      );
+
+      const initPaymentData = {
+        ...paymentDataWithoutToken,
+        Token: token,
+      };
+
+      console.log("Sending direct payment init request:", initPaymentData);
+
+      // Send initialization request to Tinkoff API
+      const response = await fetch("https://securepay.tinkoff.ru/v2/Init", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(initPaymentData),
       });
-    }
 
-    // 👇 Recurrent payment: add required fields
-    const recurrentField = document.createElement("input");
-    recurrentField.type = "hidden";
-    recurrentField.name = "Recurrent";
-    recurrentField.value = "Y";
-    form.appendChild(recurrentField);
+      const responseData = await response.json();
+      console.log("Payment initialization response:", responseData);
 
-    const customerKeyField = document.createElement("input");
-    customerKeyField.type = "hidden";
-    customerKeyField.name = "CustomerKey"; // ✅ правильно
-    customerKeyField.value = chatId as any;
-    form.appendChild(customerKeyField);
+      if (responseData.Success) {
+        // Redirect to the payment URL
+        await fetch(
+          "https://xn----7sbhlqzghjcdke5k.xn--p1ai/api/tinkoff/link-order",
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              orderId: paymentDataWithoutToken.OrderId,
+              userId: chatId,
+            }),
+          }
+        );
 
-    // Optional: redirectDueDate if you want auto-redirection after some date
-    // const redirectDueDateField = document.createElement("input");
-    // redirectDueDateField.type = "hidden";
-    // redirectDueDateField.name = "redirectDueDate";
-    // redirectDueDateField.value = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(); // 30 days later
-    // form.appendChild(redirectDueDateField);
-
-    // 👇 Call Tinkoff PayForm
-    if (typeof window.pay === "function") {
-      window.pay(form);
-    } else {
-      alert("Скрипт оплаты Tinkoff не загружен");
+        window.location.href = responseData.PaymentURL;
+      } else {
+        // Handle error
+        throw new Error(
+          responseData.Message || "Payment initialization failed"
+        );
+      }
+    } catch (error) {
+      console.error("Payment error:", error);
+      alert(
+        "Ошибка при инициализации платежа. Пожалуйста, попробуйте еще раз."
+      );
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -186,40 +248,31 @@ export default function TBankPaymentPage() {
       <div className="w-full max-w-md p-6 bg-white dark:bg-[#222] rounded-lg shadow-lg border border-[#6798de]/20">
         <div className="mb-6 text-center">
           <h1 className="text-2xl font-bold text-[#6798de] mb-2">Оплата</h1>
-          <p className="text-gray-500 dark:text-gray-400">
+          <div className="text-gray-500 dark:text-gray-400">
             Безопасная оплата через Тинькофф Банк
-          </p>
+          </div>
           {selectedTariff && (
-            <p className="text-sm text-gray-700 dark:text-gray-300 mt-2">
+            <div className="text-sm text-gray-700 dark:text-gray-300 mt-2">
               Вы выбрали тариф: <strong>{selectedTariff.title}</strong>
               {appliedPromocode ? (
-                <>
-                  <span className="block mt-1">
-                    <span className="line-through">
-                      {selectedTariff.price} ₽
-                    </span>{" "}
-                    <strong className="text-green-600">{amount} ₽</strong>{" "}
-                    <span className="text-xs text-green-600">
-                      (-{appliedPromocode.discount}%)
-                    </span>
+                <span className="block mt-1">
+                  <span className="line-through">{selectedTariff.price} ₽</span>{" "}
+                  <strong className="text-green-600">{amount} ₽</strong>{" "}
+                  <span className="text-xs text-green-600">
+                    (-{appliedPromocode.discount}%)
                   </span>
-                </>
+                </span>
               ) : (
                 <span>
                   {" "}
                   — <strong>{selectedTariff.price} ₽</strong>
                 </span>
               )}
-            </p>
+            </div>
           )}
         </div>
 
         <form id="payform-tbank" onSubmit={handleSubmit} className="space-y-4">
-          <input type="hidden" name="terminalkey" value="1744092581993DEMO" />
-          <input type="hidden" name="frame" value="false" />
-          <input type="hidden" name="language" value="ru" />
-          <input type="hidden" name="receipt" value="" />
-
           <div className="space-y-2">
             <label
               htmlFor="amount"
@@ -249,7 +302,6 @@ export default function TBankPaymentPage() {
               Промокод
             </label>
             <div className="flex gap-2">
-              <input type="hidden" name="Recurrent" value="Y" />
               <input
                 id="promocode"
                 type="text"
@@ -380,25 +432,27 @@ export default function TBankPaymentPage() {
               className="w-full px-3 py-2 border rounded-md bg-white dark:bg-[#333] dark:text-white"
             />
           </div>
-
           <button
             type="submit"
-            className="w-full flex items-center justify-center px-4 py-3 bg-[#FBC520] hover:bg-[#FAB619] text-[#3C2C0B] font-bold text-lg rounded-md transition-all"
+            disabled={isLoading}
+            className="w-full flex items-center justify-center px-4 py-3 bg-[#FBC520] hover:bg-[#FAB619] text-[#3C2C0B] font-bold text-lg rounded-md transition-all disabled:opacity-70 disabled:cursor-not-allowed"
           >
-            <CreditCard className="mr-2 h-5 w-5" />
-            Оплатить {amount} ₽
+            {isLoading ? (
+              <>
+                <Loader className="mr-2 h-5 w-5 animate-spin" />
+                Инициализация платежа...
+              </>
+            ) : (
+              <>
+                <CreditCard className="mr-2 h-5 w-5" />
+                Оплатить {amount} ₽
+              </>
+            )}
           </button>
-
-          {!isScriptLoaded && (
-            <p className="text-sm text-amber-600 dark:text-amber-400 text-center mt-2">
-              Загрузка платежной системы...
-            </p>
-          )}
-
-          <p className="text-xs text-gray-500 dark:text-gray-400 text-center mt-4">
+          <div className="text-xs text-gray-500 dark:text-gray-400 text-center mt-4">
             Нажимая кнопку «Оплатить», вы соглашаетесь с условиями оплаты и
             политикой конфиденциальности
-          </p>
+          </div>
         </form>
       </div>
     </div>
