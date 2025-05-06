@@ -12,6 +12,7 @@ import { useParserPopupStore } from "../parser/store/use-parser-popup.store";
 import { useNavigate } from "react-router-dom";
 import { useSubscriptionPopupStore } from "../tariffs/store/use-subscription-popup-store";
 import { SubscriptionAlert } from "../tariffs/ui/subscription-popup";
+import { useCheckSubscription } from "../users/hooks/queries/use-check-subscription";
 
 export const ProfileTab = () => {
   const { open } = useInstructionPopupStore();
@@ -21,6 +22,9 @@ export const ProfileTab = () => {
   const { open: openParserPopup } = useParserPopupStore();
   const { mutate: stopParserByChatId } = useStopByChatId();
   const { open: openSubscriptionAlert } = useSubscriptionPopupStore();
+
+  const { data: subscriptionCheck, isLoading: isSubscriptionLoading } =
+    useCheckSubscription(chatId as any);
 
   const [isParserActive, setIsParserActive] = useState(() => {
     return localStorage.getItem("isParserActive") === "true";
@@ -39,7 +43,7 @@ export const ProfileTab = () => {
     }
 
     if (!isParserActive) {
-      if (!userData?.subscriptionActive) {
+      if (!subscriptionCheck?.active) {
         openSubscriptionAlert();
         return;
       }
@@ -62,7 +66,7 @@ export const ProfileTab = () => {
     setIsParserActive((prev) => !prev);
   };
 
-  if (isLoading) {
+  if (isLoading || isSubscriptionLoading) {
     return <ProfileTabSkeleton />;
   }
 
@@ -82,9 +86,9 @@ export const ProfileTab = () => {
           </span>
           <span className="text-dark text-[16px]">
             Подписка:{" "}
-            {userData?.subscriptionActive ? (
+            {subscriptionCheck?.active ? (
               <span className="text-secondary">
-                {new Date(userData.subscriptionExpiresAt!).toLocaleDateString(
+                {new Date(subscriptionCheck.expiresAt).toLocaleDateString(
                   "ru-RU"
                 )}
               </span>

@@ -111,7 +111,7 @@ export default function TBankPaymentPage() {
         error.response?.data?.message || "Недействительный промокод"
       );
       setAppliedPromocode(null);
-      setAmount(originalAmount); // Reset to original amount
+      setAmount(originalAmount);
     }
   };
 
@@ -167,6 +167,7 @@ export default function TBankPaymentPage() {
       };
 
       const dataObject = {
+        chatID: chatId || undefined,
         Phone: phone || undefined,
         Email: email || undefined,
         Name: name || undefined,
@@ -181,7 +182,6 @@ export default function TBankPaymentPage() {
         Recurrent: "Y",
         DATA: dataObject,
         Receipt: receiptData,
-        NotificationURL: window.location.origin + "/payment-callback",
         SuccessURL: window.location.origin + "/payment-success",
         FailURL: window.location.origin + "/payment-failed",
       };
