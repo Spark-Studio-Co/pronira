@@ -36,7 +36,7 @@ export const TariffsCard: React.FC<TariffsCardProps> = ({
   }`;
 
   return (
-    <div className="flex flex-col h-full justify-between min-h-[300px] w-full lg:w-[25vw]">
+    <div className="flex flex-col justify-between w-full lg:w-[25vw]">
       <span className={titleClass}>{title}</span>
       <div className={borderClass}>
         <div className="space-y-2">

@@ -109,7 +109,7 @@ export default function TariffBlock() {
 
       <div className="grid mt-8 grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 w-full">
         {tariffs.map((tariff, index) => (
-          <div key={index} className="flex flex-col justify-between h-full">
+          <div key={index} className="flex flex-col justify-between">
             <TariffsCard
               title={tariff.title}
               items={tariff.items}
@@ -121,7 +121,7 @@ export default function TariffBlock() {
                 onClick={() => handleBuyClick(tariff)}
                 className={`w-full py-3 px-6 rounded-sm ${
                   tariff.isActive
-                    ? "text-dark bg-gray-300"
+                    ? "text-dark bg-gray-300 pointer-events-none"
                     : "bg-main text-white"
                 }`}
               >
