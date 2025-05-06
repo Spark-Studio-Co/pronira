@@ -13,11 +13,9 @@ export const SubscriptionAlert = () => {
           <Dialog.Title className="text-lg font-semibold text-main mb-4">
             Подписка неактивна
           </Dialog.Title>
-
           <p className="text-dark text-[16px] mb-6">
             Чтобы запустить парсер, необходимо активировать подписку.
           </p>
-
           <div className="flex justify-end">
             <Button
               text="Перейти к тарифам"

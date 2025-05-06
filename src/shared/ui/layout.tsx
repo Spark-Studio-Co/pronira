@@ -51,7 +51,6 @@ export const Layout: React.FC<ILayout> = ({
         )}
         {children}
       </div>
-
       {!isWelcome && <BottomTab />}
     </div>
   );

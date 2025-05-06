@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Avatar } from "@/shared/ui/avatar";
 import { Button } from "@/shared/ui/button";
 import { InfoIcon } from "lucide-react";
@@ -32,9 +32,37 @@ export const ProfileTab = () => {
 
   const navigate = useNavigate();
 
+  // Автозапуск парсера — только один раз
+  const hasStartedParser = useRef(false);
+
   useEffect(() => {
     localStorage.setItem("isParserActive", String(isParserActive));
   }, [isParserActive]);
+
+  // ✅ Логика автозапуска парсера
+  useEffect(() => {
+    if (
+      chatId &&
+      subscriptionCheck?.active &&
+      isParserActive &&
+      userData &&
+      !hasStartedParser.current
+    ) {
+      hasStartedParser.current = true;
+
+      activateParser({
+        url_flats: userData.flatsLink,
+        url_grounds: userData.groundsLink,
+        url_houses: userData.housesLink,
+        url_rents: userData.rentLink,
+        chat_id: Number(chatId),
+        min_price: "0",
+        max_price: "10000000000",
+      });
+
+      openParserPopup();
+    }
+  }, [chatId, subscriptionCheck?.active, isParserActive, userData]);
 
   const handleParserToggle = async () => {
     if (!chatId) {
