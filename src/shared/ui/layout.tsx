@@ -1,6 +1,6 @@
 import { useAuthStore } from "@/entities/auth/store/use-auth-store";
 import { BottomTab } from "@/features/bottom-tab/ui/bottom-tab";
-import React, { useEffect } from "react";
+import React from "react";
 import { useNavigate } from "react-router-dom";
 
 interface ILayout {
@@ -21,11 +21,11 @@ export const Layout: React.FC<ILayout> = ({
   const { chatId } = useAuthStore();
   const navigate = useNavigate();
 
-  useEffect(() => {
-    if (!chatId) {
-      navigate("/login", { replace: true });
-    }
-  }, [chatId, navigate]);
+  // useEffect(() => {
+  //   if (!chatId) {
+  //     navigate("/login", { replace: true });
+  //   }
+  // }, [chatId, navigate]);
 
   return (
     <div className="w-full min-h-full">

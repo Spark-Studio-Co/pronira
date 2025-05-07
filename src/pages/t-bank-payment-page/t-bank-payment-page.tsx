@@ -226,6 +226,20 @@ export default function TBankPaymentPage() {
           }
         );
 
+        await fetch(
+          "https://xn----7sbhlqzghjcdke5k.xn--p1ai/api/tariffs/assign",
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              userId: chatId,
+              tariffId: selectedTariff?.price,
+            }),
+          }
+        );
+
         window.location.href = responseData.PaymentURL;
       } else {
         // Handle error
