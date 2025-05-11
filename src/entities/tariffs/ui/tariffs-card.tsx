@@ -23,9 +23,9 @@ export const TariffsCard: React.FC<TariffsCardProps> = ({
     isActive ? "bg-gray-200 text-dark" : "bg-main text-white"
   }`;
 
-  const itemClass = `w-full block text-center py-2 px-4 rounded-sm ${
-    isActive ? "bg-gray-100 text-dark" : "bg-main text-white"
-  }`;
+  // const itemClass = `w-full block text-center py-2 px-4 rounded-sm ${
+  //   isActive ? "bg-gray-100 text-dark" : "bg-main text-white"
+  // }`;
 
   const noteClass = `w-full text-center py-2 px-4 rounded-sm mt-10 ${
     isActive ? "bg-gray-100 text-dark" : "bg-main text-white"
@@ -36,20 +36,31 @@ export const TariffsCard: React.FC<TariffsCardProps> = ({
   }`;
 
   return (
-    <div className="flex flex-col justify-between w-full lg:w-[25vw]">
+    <div className="flex flex-col justify-between w-full lg:w-[20vw]">
       <span className={titleClass}>{title}</span>
       <div className={borderClass}>
         <div className="space-y-2">
           {items.map((item, index) => (
-            <div key={index} className={`flex items-center gap-2 ${itemClass}`}>
-              {item.icon && (
-                <img
-                  src={item.icon}
-                  alt={item.iconAlt || "icon"}
-                  className="w-8 h-8 rounded-full"
-                />
-              )}
-              <span className="w-full text-left">{item.text}</span>
+            <div key={index} className={`flex gap-2 items-center w-full`}>
+              {/* Левая колонка с иконкой */}
+              <div className="w-10 h-10 flex-shrink-0 flex items-center justify-center">
+                {item.icon && (
+                  <img
+                    src={item.icon}
+                    alt={item.iconAlt || "icon"}
+                    className="w-8 h-8 object-contain rounded-full"
+                  />
+                )}
+              </div>
+
+              {/* Правая колонка с текстом и стилями */}
+              <div
+                className={`flex-1 py-2 px-3 rounded-sm ${
+                  isActive ? "bg-gray-100 text-dark" : "bg-main text-white"
+                }`}
+              >
+                <span className="text-center block">{item.text}</span>
+              </div>
             </div>
           ))}
 

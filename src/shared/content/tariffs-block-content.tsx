@@ -37,7 +37,7 @@ export const tariffs = [
           когда произойдет понижение цены на объект, ты об этом узнаешь
         </p>
 
-        <p className="font-bold text-[12px]">
+        <p className="font-bold text-[10px]">
           2. Поиск новых по ключевым словам
         </p>
 
@@ -47,7 +47,7 @@ export const tariffs = [
         </p>
 
         <p className="text-[8px] text-red-600 font-semibold">
-          ВНИМАНИЕ!{" "}
+          ВНИМАНИЕ!
           <p className="text-black font-normal">
             Поиск по ключевым — это более тонкие настройки. <br />
             Будь готов к тому, что количество сильно уменьшится
@@ -58,7 +58,7 @@ export const tariffs = [
     isActive: true,
   },
   {
-    title: "Для БОЛЬШИХ продаж",
+    title: "Для БОльших продаж",
     price: "",
     buttonText: "Купить",
     items: [
@@ -72,10 +72,11 @@ export const tariffs = [
     highlightedNote: (
       <div className="text-center text-dark">
         <p className="font-bold text-[20px]">
-          Бизнес класс <br /> Всё, как у Профи +
+          Бизнес класс ;)
+          <br /> Всё, как у Профи +
         </p>
 
-        <p className="font-bold text-[14px] mt-4">Активная Кнопка</p>
+        <p className="font-bold text-[16px] mt-4">Активная Кнопка</p>
         <button className="border-2 border-dark text-dark px-4 py-1 rounded text-sm">
           Поиск под запрос
         </button>

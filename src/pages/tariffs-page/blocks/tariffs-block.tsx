@@ -119,7 +119,7 @@ export default function TariffBlock() {
             <div className="mt-4">
               <button
                 onClick={() => handleBuyClick(tariff)}
-                className={`w-full py-3 px-6 rounded-sm ${
+                className={`w-[20vw] py-3 px-6 rounded-sm ${
                   tariff.isActive
                     ? "text-dark bg-gray-300 pointer-events-none"
                     : "bg-main text-white"
