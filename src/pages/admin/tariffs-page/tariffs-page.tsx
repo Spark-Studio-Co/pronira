@@ -34,7 +34,8 @@ import { PlusCircle, Loader2 } from "lucide-react";
 import {
   useGetTariffs,
   useGetTariffsWithUserCount,
-  useUpdateTariffPrice,
+  useUpdateTariff,
+  useCreateTariff,
 } from "@/entities/tariffs/hooks/use-tariffs";
 
 export default function TariffsPageAdmin() {
@@ -42,7 +43,16 @@ export default function TariffsPageAdmin() {
   const [isNewTariffDialogOpen, setIsNewTariffDialogOpen] = useState(false);
   const [selectedTariff, setSelectedTariff] = useState<any>(null);
   const [newPrice, setNewPrice] = useState<number>(0);
+  const [subscriptionTime, setSubscriptionTime] = useState<number>(30);
   const [isActive, setIsActive] = useState<boolean>(true);
+
+  // New tariff form state
+  const [newTariff, setNewTariff] = useState({
+    title: "",
+    price: 0,
+    subscriptionTime: 30, // Default to 30 days
+  });
+  const [formErrors, setFormErrors] = useState<Record<string, string>>({});
 
   // Fetch tariffs data
   const { data: tariffs, isLoading: isLoadingTariffs } = useGetTariffs();
@@ -50,11 +60,15 @@ export default function TariffsPageAdmin() {
     useGetTariffsWithUserCount();
 
   // Update tariff mutation
-  const updateTariffMutation = useUpdateTariffPrice();
+  const updateTariffMutation = useUpdateTariff();
+
+  // Create tariff mutation
+  const createTariffMutation = useCreateTariff();
 
   const handleEditTariff = (tariff: any) => {
     setSelectedTariff(tariff);
     setNewPrice(tariff.price);
+    setSubscriptionTime(tariff.subscriptionTime || 30);
     setIsActive(true); // Assuming all fetched tariffs are active
     setIsDialogOpen(true);
   };
@@ -65,11 +79,64 @@ export default function TariffsPageAdmin() {
     try {
       await updateTariffMutation.mutateAsync({
         id: selectedTariff.id,
-        price: newPrice,
+        data: {
+          price: newPrice,
+          subscriptionTime: subscriptionTime,
+        },
       });
 
       setIsDialogOpen(false);
     } catch (error) {}
+  };
+
+  const handleCreateTariff = async () => {
+    // Validate form
+    const errors: Record<string, string> = {};
+
+    if (!newTariff.title) {
+      errors.title = "Название тарифа обязательно";
+    }
+
+    if (!newTariff.price || newTariff.price < 1) {
+      errors.price = "Стоимость должна быть больше 0";
+    }
+
+    if (!newTariff.subscriptionTime || newTariff.subscriptionTime < 1) {
+      errors.subscriptionTime = "Срок подписки должен быть больше 0 дней";
+    }
+
+    if (Object.keys(errors).length > 0) {
+      setFormErrors(errors);
+      return;
+    }
+
+    try {
+      await createTariffMutation.mutateAsync(newTariff);
+      setIsNewTariffDialogOpen(false);
+      // Reset form
+      setNewTariff({
+        title: "",
+        price: 0,
+        subscriptionTime: 30,
+      });
+      setFormErrors({});
+    } catch (error) {
+      console.error("Failed to create tariff:", error);
+    }
+  };
+
+  const handleNewTariffChange = (field: string, value: string | number) => {
+    setNewTariff({
+      ...newTariff,
+      [field]: value,
+    });
+
+    // Clear error for this field if it exists
+    if (formErrors[field]) {
+      const updatedErrors = { ...formErrors };
+      delete updatedErrors[field];
+      setFormErrors(updatedErrors);
+    }
   };
 
   if (isLoadingTariffs || isLoadingTariffsWithUsers) {
@@ -110,7 +177,9 @@ export default function TariffsPageAdmin() {
                     <CardTitle>{tariff.title}</CardTitle>
                     <Badge className="bg-green-500">Активен</Badge>
                   </div>
-                  <CardDescription>₽{tariff.price} / месяц</CardDescription>
+                  <CardDescription>
+                    ₽{tariff.price} за {tariff.subscriptionTime || 30} дней
+                  </CardDescription>
                 </CardHeader>
                 <CardContent>
                   <div className="flex justify-between mt-6">
@@ -143,6 +212,7 @@ export default function TariffsPageAdmin() {
                     <TableHead>ID</TableHead>
                     <TableHead>Тариф</TableHead>
                     <TableHead>Стоимость (₽)</TableHead>
+                    <TableHead>Срок подписки (дни)</TableHead>
                     <TableHead>Количество пользователей</TableHead>
                     <TableHead className="text-right">Действия</TableHead>
                   </TableRow>
@@ -155,6 +225,9 @@ export default function TariffsPageAdmin() {
                         {tariff.title}
                       </TableCell>
                       <TableCell>{tariff.price}</TableCell>
+                      <TableCell>
+                        {tariff.subscriptionTime || 30} дней
+                      </TableCell>
                       <TableCell>{tariff.usersCount}</TableCell>
                       <TableCell className="text-right">
                         <Button
@@ -209,6 +282,22 @@ export default function TariffsPageAdmin() {
                 />
               </div>
               <div className="grid grid-cols-4 items-center gap-4">
+                <Label
+                  htmlFor="tariff-subscription-time"
+                  className="text-right"
+                >
+                  Срок подписки (дни)
+                </Label>
+                <Input
+                  id="tariff-subscription-time"
+                  type="number"
+                  min="1"
+                  value={subscriptionTime}
+                  onChange={(e) => setSubscriptionTime(Number(e.target.value))}
+                  className="col-span-3"
+                />
+              </div>
+              <div className="grid grid-cols-4 items-center gap-4">
                 <Label className="text-right">Статус</Label>
                 <div className="flex items-center space-x-2 col-span-3">
                   <Switch
@@ -239,7 +328,7 @@ export default function TariffsPageAdmin() {
         </Dialog>
       )}
 
-      {/* New Tariff Dialog - This would need a new API endpoint to create tariffs */}
+      {/* New Tariff Dialog */}
       <Dialog
         open={isNewTariffDialogOpen}
         onOpenChange={setIsNewTariffDialogOpen}
@@ -248,13 +337,89 @@ export default function TariffsPageAdmin() {
           <DialogHeader>
             <DialogTitle>Добавить новый тариф</DialogTitle>
             <DialogDescription>
-              Эта функция недоступна, так как API не предоставляет эндпоинт для
-              создания тарифов
+              Заполните форму для создания нового тарифа
             </DialogDescription>
           </DialogHeader>
+          <div className="grid gap-4 py-4">
+            <div className="grid grid-cols-4 items-center gap-4">
+              <Label htmlFor="new-tariff-title" className="text-right">
+                Название
+              </Label>
+              <div className="col-span-3">
+                <Input
+                  id="new-tariff-title"
+                  value={newTariff.title}
+                  onChange={(e) =>
+                    handleNewTariffChange("title", e.target.value)
+                  }
+                  className={formErrors.title ? "border-red-500" : ""}
+                />
+                {formErrors.title && (
+                  <p className="text-red-500 text-sm mt-1">
+                    {formErrors.title}
+                  </p>
+                )}
+              </div>
+            </div>
+            <div className="grid grid-cols-4 items-center gap-4">
+              <Label htmlFor="new-tariff-price" className="text-right">
+                Стоимость (₽)
+              </Label>
+              <div className="col-span-3">
+                <Input
+                  id="new-tariff-price"
+                  type="number"
+                  min="1"
+                  value={newTariff.price}
+                  onChange={(e) =>
+                    handleNewTariffChange("price", Number(e.target.value))
+                  }
+                  className={formErrors.price ? "border-red-500" : ""}
+                />
+                {formErrors.price && (
+                  <p className="text-red-500 text-sm mt-1">
+                    {formErrors.price}
+                  </p>
+                )}
+              </div>
+            </div>
+            <div className="grid grid-cols-4 items-center gap-4">
+              <Label htmlFor="new-tariff-time" className="text-right">
+                Срок подписки (дни)
+              </Label>
+              <div className="col-span-3">
+                <Input
+                  id="new-tariff-time"
+                  type="number"
+                  min="1"
+                  value={newTariff.subscriptionTime}
+                  onChange={(e) =>
+                    handleNewTariffChange(
+                      "subscriptionTime",
+                      Number(e.target.value)
+                    )
+                  }
+                  className={
+                    formErrors.subscriptionTime ? "border-red-500" : ""
+                  }
+                />
+                {formErrors.subscriptionTime && (
+                  <p className="text-red-500 text-sm mt-1">
+                    {formErrors.subscriptionTime}
+                  </p>
+                )}
+              </div>
+            </div>
+          </div>
           <DialogFooter>
-            <Button onClick={() => setIsNewTariffDialogOpen(false)}>
-              Закрыть
+            <Button
+              onClick={handleCreateTariff}
+              disabled={createTariffMutation.isPending}
+            >
+              {createTariffMutation.isPending && (
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              )}
+              Создать тариф
             </Button>
           </DialogFooter>
         </DialogContent>

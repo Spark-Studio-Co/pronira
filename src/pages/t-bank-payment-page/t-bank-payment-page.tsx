@@ -174,7 +174,7 @@ export default function TBankPaymentPage() {
       };
 
       const paymentDataWithoutToken = {
-        TerminalKey: "1744092581993DEMO",
+        TerminalKey: "1744092582040",
         Amount: Math.round(Number.parseFloat(amount) * 100), // Amount in kopecks
         OrderId: `order_${chatId}_${Date.now()}`, // 👈 вставляем userId в OrderId
         Description: description,
@@ -188,7 +188,7 @@ export default function TBankPaymentPage() {
 
       const token = await generateToken(
         paymentDataWithoutToken,
-        "7TVsG42L!*#9r&XX"
+        "SHkprk$WgmOY9&mq"
       );
 
       const initPaymentData = {

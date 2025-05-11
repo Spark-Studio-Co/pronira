@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Table,
   TableBody,
@@ -61,9 +61,13 @@ export default function SubscriptionsPage() {
   const [selectedPlan, setSelectedPlan] = useState<any>(null);
   const [editedTitle, setEditedTitle] = useState("");
   const [editedPrice, setEditedPrice] = useState<number>(0);
+  const [editedSubscriptionTime, setEditedSubscriptionTime] =
+    useState<number>(30);
 
   const [newTariffTitle, setNewTariffTitle] = useState("");
   const [newTariffPrice, setNewTariffPrice] = useState<number>(0);
+  const [newTariffSubscriptionTime, setNewTariffSubscriptionTime] =
+    useState<number>(30);
 
   const { isLoading: isLoadingTariffs, error: tariffsError } = useGetTariffs();
 
@@ -82,10 +86,15 @@ export default function SubscriptionsPage() {
       tariff.title.toLowerCase().includes(searchTerm.toLowerCase())
     ) || [];
 
+  useEffect(() => {
+    console.log(filteredTariffs);
+  }, []);
+
   const handleEditTariff = (plan: any) => {
     setSelectedPlan(plan);
     setEditedTitle(plan.title);
     setEditedPrice(plan.price);
+    setEditedSubscriptionTime(plan.subscriptionTime || 30);
     setIsEditDialogOpen(true);
   };
 
@@ -93,7 +102,11 @@ export default function SubscriptionsPage() {
     if (!selectedPlan) return;
 
     try {
-      const updateData: { title?: string; price?: number } = {};
+      const updateData: {
+        title?: string;
+        price?: number;
+        subscriptionTime?: number;
+      } = {};
 
       // Only include fields that have changed
       if (editedTitle !== selectedPlan.title) {
@@ -102,6 +115,10 @@ export default function SubscriptionsPage() {
 
       if (editedPrice !== selectedPlan.price) {
         updateData.price = editedPrice;
+      }
+
+      if (editedSubscriptionTime !== selectedPlan.subscriptionTime) {
+        updateData.subscriptionTime = editedSubscriptionTime;
       }
 
       // Only make the API call if there are changes
@@ -119,7 +136,11 @@ export default function SubscriptionsPage() {
   };
 
   const handleCreateTariff = async () => {
-    if (!newTariffTitle || newTariffPrice <= 0) {
+    if (
+      !newTariffTitle ||
+      newTariffPrice <= 0 ||
+      newTariffSubscriptionTime <= 0
+    ) {
       return;
     }
 
@@ -127,11 +148,13 @@ export default function SubscriptionsPage() {
       await createTariffMutation.mutateAsync({
         title: newTariffTitle,
         price: newTariffPrice,
+        subscriptionTime: newTariffSubscriptionTime,
       });
 
       // Reset form and close dialog
       setNewTariffTitle("");
       setNewTariffPrice(0);
+      setNewTariffSubscriptionTime(30);
       setIsCreateDialogOpen(false);
     } catch (error) {
       console.error("Error creating tariff:", error);
@@ -176,13 +199,15 @@ export default function SubscriptionsPage() {
           <Card key={plan.id}>
             <CardHeader>
               <CardTitle>{plan.title}</CardTitle>
-              <CardDescription>Ежемесячно</CardDescription>
+              <CardDescription>
+                Подписка на {plan.subscriptionTime || 30} дней
+              </CardDescription>
             </CardHeader>
             <CardContent>
               <div className="text-3xl font-bold mb-4">
                 ₽{plan.price}
                 <span className="text-sm font-normal text-muted-foreground">
-                  /месяц
+                  за {plan.subscriptionTime || 30} дней
                 </span>
               </div>
               <div className="flex items-center text-sm text-muted-foreground mb-4">
@@ -223,6 +248,7 @@ export default function SubscriptionsPage() {
               <TableHead>ID</TableHead>
               <TableHead>Название</TableHead>
               <TableHead>Цена</TableHead>
+              <TableHead>Срок подписки</TableHead>
               <TableHead>Активные пользователи</TableHead>
               <TableHead className="w-[80px]"></TableHead>
             </TableRow>
@@ -234,6 +260,7 @@ export default function SubscriptionsPage() {
                   <TableCell>{plan.id}</TableCell>
                   <TableCell className="font-medium">{plan.title}</TableCell>
                   <TableCell>₽{plan.price}</TableCell>
+                  <TableCell>{plan.subscriptionTime} дней</TableCell>
                   <TableCell>{plan.usersCount}</TableCell>
                   <TableCell>
                     <DropdownMenu>
@@ -310,6 +337,21 @@ export default function SubscriptionsPage() {
                   />
                 </div>
               </div>
+              <div className="grid grid-cols-4 items-center gap-4">
+                <Label htmlFor="edit-subscription-time" className="text-right">
+                  Срок подписки (дни):
+                </Label>
+                <Input
+                  id="edit-subscription-time"
+                  type="number"
+                  min="1"
+                  value={editedSubscriptionTime}
+                  onChange={(e) =>
+                    setEditedSubscriptionTime(Number(e.target.value))
+                  }
+                  className="col-span-3"
+                />
+              </div>
             </div>
             <DialogFooter>
               <Button
@@ -324,7 +366,8 @@ export default function SubscriptionsPage() {
                 disabled={
                   updateTariffMutation.isPending ||
                   (editedTitle === selectedPlan.title &&
-                    editedPrice === selectedPlan.price) ||
+                    editedPrice === selectedPlan.price &&
+                    editedSubscriptionTime === selectedPlan.subscriptionTime) ||
                   !editedTitle.trim()
                 }
               >
@@ -377,6 +420,22 @@ export default function SubscriptionsPage() {
                 />
               </div>
             </div>
+            <div className="grid grid-cols-4 items-center gap-4">
+              <Label htmlFor="new-subscription-time" className="text-right">
+                Срок подписки (дни):
+              </Label>
+              <Input
+                id="new-subscription-time"
+                type="number"
+                min="1"
+                value={newTariffSubscriptionTime}
+                onChange={(e) =>
+                  setNewTariffSubscriptionTime(Number(e.target.value))
+                }
+                className="col-span-3"
+                placeholder="30"
+              />
+            </div>
           </div>
           <DialogFooter>
             <Button
@@ -391,7 +450,8 @@ export default function SubscriptionsPage() {
               disabled={
                 createTariffMutation.isPending ||
                 !newTariffTitle ||
-                newTariffPrice <= 0
+                newTariffPrice <= 0 ||
+                newTariffSubscriptionTime <= 0
               }
             >
               {createTariffMutation.isPending && (
