@@ -6,6 +6,7 @@ interface UpdateLinksPayload {
   links: {
     type: string;
     url: string;
+    category: string;
   }[];
 }
 

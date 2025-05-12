@@ -36,9 +36,10 @@ export const PersonalLinksPage = () => {
     // Transform the links object into the format expected by the API
     const linksArray = Object.entries(links)
       .filter(([_, url]) => url.trim() !== "")
-      .map(([type, url]) => ({
-        type,
+      .map(([category, url]) => ({
+        category, // 👈 переименовано с type
         url,
+        tgToken: "", // если требуется, добавь актуальный токен
       }));
 
     const payload = {
@@ -46,7 +47,7 @@ export const PersonalLinksPage = () => {
       links: linksArray,
     };
 
-    updateLinks(payload, {
+    updateLinks(payload as any, {
       onSuccess: () => navigate("/personal"),
       onError: (error) => {
         console.error("Ошибка при отправке данных:", error);
