@@ -1,9 +1,11 @@
+"use client";
+
 import { Button } from "@/shared/ui/button";
 import { Layout } from "@/shared/ui/layout";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { useAuthStore } from "@/entities/auth/store/use-auth-store";
-import { useUpdateUser } from "@/entities/auth/hooks/mutation/use-update-user.mutation";
+import { useUpdateLinks } from "@/entities/parser/hooks/mutation/use-update-links.mutation";
 
 export const PersonalLinksPage = () => {
   const navigate = useNavigate();
@@ -11,7 +13,7 @@ export const PersonalLinksPage = () => {
   const [activeInputs, setActiveInputs] = useState<string[]>([]);
   const { chatId } = useAuthStore();
 
-  const { mutate: updateUser, isPending } = useUpdateUser();
+  const { mutate: updateLinks, isPending } = useUpdateLinks();
 
   const categories = ["Квартиры", "Дома", "Участки", "Аренда"];
 
@@ -31,15 +33,20 @@ export const PersonalLinksPage = () => {
       return;
     }
 
+    // Transform the links object into the format expected by the API
+    const linksArray = Object.entries(links)
+      .filter(([_, url]) => url.trim() !== "")
+      .map(([type, url]) => ({
+        type,
+        url,
+      }));
+
     const payload = {
-      chatId,
-      flatsLink: links["Квартиры"] || "",
-      housesLink: links["Дома"] || "",
-      groundsLink: links["Участки"] || "",
-      rentLink: links["Аренда"] || "",
+      userId: chatId,
+      links: linksArray,
     };
 
-    updateUser(payload, {
+    updateLinks(payload, {
       onSuccess: () => navigate("/personal"),
       onError: (error) => {
         console.error("Ошибка при отправке данных:", error);
