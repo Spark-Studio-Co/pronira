@@ -31,7 +31,7 @@ export const tariffs = [
     highlightedNote: (
       <div className="text-left">
         <p className="font-bold text-[14px]">Доступны ВСЕ категории +</p>
-        <span className="font-bold text-[12px]">1. Продавец понизил цену</span>
+        <span className="font-bold text-[10px]">1. Продавец понизил цену</span>
         <br />
         <p className="text-[8px]">
           когда произойдет понижение цены на объект, ты об этом узнаешь
@@ -76,12 +76,12 @@ export const tariffs = [
           <br /> Всё, как у Профи +
         </p>
 
-        <p className="font-bold text-[16px] mt-4">Активная Кнопка</p>
+        <p className="font-bold text-[16px] mt-6">Активная Кнопка</p>
         <button className="border-2 border-dark text-dark px-4 py-1 rounded text-sm">
           Поиск под запрос
         </button>
 
-        <p className="text-[10px] text-dark/90 mt-4">
+        <p className="text-[10px] text-dark/90 mt-8">
           Проныра пришлет всё по ключевым словам <br />
           за последние несколько месяцев
         </p>

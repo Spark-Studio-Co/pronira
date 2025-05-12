@@ -100,14 +100,14 @@ export default function TariffBlock() {
   }
 
   return (
-    <div className="mx-auto px-4 py-12 pb-32 w-[80vw]">
+    <div className="mx-auto max-w-[80vw] px-4 py-12">
       <div className="w-full flex justify-center mb-3">
         <h1 className="text-3xl text-center w-full sm:w-[80vw] md:w-[60vw] lg:w-[40vw] font-bold">
           Выбери для себя комфортный платеж в зависимости от своих целей
         </h1>
       </div>
 
-      <div className="grid mt-8 grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 w-full">
+      <div className="grid mt-8 grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 w-full py-12">
         {tariffs.map((tariff, index) => (
           <div key={index} className="flex flex-col justify-between">
             <TariffsCard
@@ -119,7 +119,7 @@ export default function TariffBlock() {
             <div className="mt-4">
               <button
                 onClick={() => handleBuyClick(tariff)}
-                className={`w-[20vw] py-3 px-6 rounded-sm ${
+                className={`w-full lg:w-[20vw] py-3 px-6 rounded-sm ${
                   tariff.isActive
                     ? "text-dark bg-gray-300 pointer-events-none"
                     : "bg-main text-white"
