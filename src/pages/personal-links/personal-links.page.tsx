@@ -33,13 +33,19 @@ export const PersonalLinksPage = () => {
       return;
     }
 
-    // Transform the links object into the format expected by the API
+    const categoryTokenMap: Record<string, string> = {
+      Квартиры: "7067505501:AAF-YnHRAgqm2mhQ8QnPl9alKWUu2QO91YM",
+      Участки: "8062579317:AAGKp7zzbuxO-CdF2D33Eu6qWiFgjFSAV_w",
+      Дома: "7502003155:AAH2EokCUAAEgsXGufDF64tgYBDuzxHQIYM",
+      Аренда: "7670256176:AAGBKB1cmFf6i22ahOlZ4wCzc3312h9m8To",
+    };
+
     const linksArray = Object.entries(links)
       .filter(([_, url]) => url.trim() !== "")
       .map(([category, url]) => ({
-        category, // 👈 переименовано с type
+        category,
         url,
-        tgToken: "", // если требуется, добавь актуальный токен
+        tgToken: categoryTokenMap[category] || "",
       }));
 
     const payload = {
