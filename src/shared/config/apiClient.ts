@@ -1,4 +1,3 @@
-// src/shared/api/query-client.ts
 import axios from "axios";
 
 // Main API for user/admin operations
@@ -21,8 +20,8 @@ export const parserApiClient = axios.create({
   withCredentials: true,
 });
 
-// Auth token handling for `apiClient`
-apiClient.interceptors.request.use((config) => {
+// --- Request interceptors: Add token to headers ---
+const addAuthHeader = (config: any) => {
   const token = localStorage.getItem("admin_token");
 
   if (token && config.headers) {
@@ -30,15 +29,20 @@ apiClient.interceptors.request.use((config) => {
   }
 
   return config;
-});
+};
 
-// (Optional) Add interceptor for parserApiClient if auth is required
-parserApiClient.interceptors.request.use((config) => {
-  const token = localStorage.getItem("admin_token");
+apiClient.interceptors.request.use(addAuthHeader);
+parserApiClient.interceptors.request.use(addAuthHeader);
 
-  if (token && config.headers) {
-    config.headers.Authorization = `Bearer ${token}`;
+// --- Response interceptor: Handle 401 Unauthorized ---
+apiClient.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (error.response && error.response.status === 401) {
+      localStorage.removeItem("admin_token");
+      localStorage.removeItem("auth-storage");
+    }
+
+    return Promise.reject(error);
   }
-
-  return config;
-});
+);
