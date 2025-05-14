@@ -8,7 +8,6 @@ import {
   Tag,
   Menu,
   X,
-  Settings,
   ChartLineIcon,
   DollarSign,
   HouseIcon,

@@ -3,7 +3,6 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
 import {
   Table,
   TableBody,
@@ -13,7 +12,6 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { Switch } from "@/components/ui/switch";
 import {
   Dialog,
   DialogContent,
@@ -59,21 +57,12 @@ export default function FreePlanPage() {
 
   // Edit form state
   const [editForm, setEditForm] = useState({
-    title: "",
-    objectsLimit: 0,
-    linksLimit: 0,
-    description: "",
-    durationDays: 30,
-    isActive: false,
+    duration: 30,
   });
 
   // New plan form state
   const [newPlan, setNewPlan] = useState({
-    title: "",
-    objectsLimit: 5,
-    linksLimit: 3,
-    description: "",
-    durationDays: 30,
+    duration: 30,
   });
 
   const [formErrors, setFormErrors] = useState<Record<string, string>>({});
@@ -91,12 +80,7 @@ export default function FreePlanPage() {
   const handleEditPlan = (plan: any) => {
     setSelectedPlan(plan);
     setEditForm({
-      title: plan.title,
-      objectsLimit: plan.objectsLimit,
-      linksLimit: plan.linksLimit || 0,
-      description: plan.description || "",
-      durationDays: plan.durationDays || 30,
-      isActive: plan.isActive,
+      duration: plan.duration || 30,
     });
     setIsDialogOpen(true);
   };
@@ -120,20 +104,8 @@ export default function FreePlanPage() {
     // Validate form
     const errors: Record<string, string> = {};
 
-    if (!newPlan.title) {
-      errors.title = "Название плана обязательно";
-    }
-
-    if (newPlan.objectsLimit < 0) {
-      errors.objectsLimit = "Лимит объектов должен быть положительным числом";
-    }
-
-    if (newPlan.linksLimit < 0) {
-      errors.linksLimit = "Лимит ссылок должен быть положительным числом";
-    }
-
-    if (newPlan.durationDays < 1) {
-      errors.durationDays = "Длительность должна быть не менее 1 дня";
+    if (newPlan.duration < 1) {
+      errors.duration = "Длительность должна быть не менее 1 дня";
     }
 
     if (Object.keys(errors).length > 0) {
@@ -142,15 +114,13 @@ export default function FreePlanPage() {
     }
 
     try {
-      await createPlanMutation.mutateAsync(newPlan);
+      await createPlanMutation.mutateAsync({
+        duration: newPlan.duration,
+      });
       setIsNewPlanDialogOpen(false);
       // Reset form
       setNewPlan({
-        title: "",
-        objectsLimit: 5,
-        linksLimit: 3,
-        description: "",
-        durationDays: 30,
+        duration: 30,
       });
       setFormErrors({});
     } catch (error) {
@@ -169,17 +139,14 @@ export default function FreePlanPage() {
     }
   };
 
-  const handleFormChange = (
-    field: string,
-    value: string | number | boolean
-  ) => {
+  const handleFormChange = (field: string, value: number) => {
     setEditForm({
       ...editForm,
       [field]: value,
     });
   };
 
-  const handleNewPlanChange = (field: string, value: string | number) => {
+  const handleNewPlanChange = (field: string, value: number) => {
     setNewPlan({
       ...newPlan,
       [field]: value,
@@ -192,15 +159,6 @@ export default function FreePlanPage() {
       setFormErrors(updatedErrors);
     }
   };
-
-  if (isLoadingFreePlans || isLoadingCurrentPlan) {
-    return (
-      <div className="flex items-center justify-center h-screen">
-        <Loader2 className="h-8 w-8 animate-spin text-primary" />
-        <span className="ml-2">Загрузка бесплатных планов...</span>
-      </div>
-    );
-  }
 
   return (
     <div className="flex-1 space-y-4 p-4 pt-6 md:p-8">
@@ -231,29 +189,15 @@ export default function FreePlanPage() {
             </div>
           </CardHeader>
           <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <h3 className="font-medium">Название</h3>
-                <p>{currentFreePlan.title}</p>
-              </div>
-              <div>
-                <h3 className="font-medium">Лимит объектов</h3>
-                <p>{currentFreePlan.objectsLimit}</p>
-              </div>
-              <div>
-                <h3 className="font-medium">Лимит ссылок</h3>
-                <p>{currentFreePlan.linksLimit}</p>
+                <h3 className="font-medium">ID</h3>
+                <p>{currentFreePlan.id}</p>
               </div>
               <div>
                 <h3 className="font-medium">Длительность</h3>
-                <p>{currentFreePlan.durationDays} дней</p>
+                <p>{currentFreePlan.duration} дней</p>
               </div>
-              {currentFreePlan.description && (
-                <div className="md:col-span-2">
-                  <h3 className="font-medium">Описание</h3>
-                  <p>{currentFreePlan.description}</p>
-                </div>
-              )}
             </div>
             <div className="mt-4">
               <Button
@@ -279,9 +223,6 @@ export default function FreePlanPage() {
             <TableHeader>
               <TableRow>
                 <TableHead>ID</TableHead>
-                <TableHead>Название</TableHead>
-                <TableHead>Лимит объектов</TableHead>
-                <TableHead>Лимит ссылок</TableHead>
                 <TableHead>Длительность</TableHead>
                 <TableHead>Статус</TableHead>
                 <TableHead className="text-right">Действия</TableHead>
@@ -291,10 +232,7 @@ export default function FreePlanPage() {
               {freePlans?.map((plan) => (
                 <TableRow key={plan.id}>
                   <TableCell>{plan.id}</TableCell>
-                  <TableCell className="font-medium">{plan.title}</TableCell>
-                  <TableCell>{plan.objectsLimit}</TableCell>
-                  <TableCell>{plan.linksLimit}</TableCell>
-                  <TableCell>{plan.durationDays} дней</TableCell>
+                  <TableCell>{plan.duration} дней</TableCell>
                   <TableCell>
                     {plan.isActive ? (
                       <Badge className="bg-green-500">Активен</Badge>
@@ -364,51 +302,10 @@ export default function FreePlanPage() {
             <DialogHeader>
               <DialogTitle>Редактировать бесплатный план</DialogTitle>
               <DialogDescription>
-                Изменение настроек бесплатного плана {selectedPlan.title}
+                Изменение длительности бесплатного плана
               </DialogDescription>
             </DialogHeader>
             <div className="grid gap-4 py-4">
-              <div className="grid grid-cols-4 items-center gap-4">
-                <Label htmlFor="plan-title" className="text-right">
-                  Название
-                </Label>
-                <Input
-                  id="plan-title"
-                  value={editForm.title}
-                  onChange={(e) => handleFormChange("title", e.target.value)}
-                  className="col-span-3"
-                />
-              </div>
-              <div className="grid grid-cols-4 items-center gap-4">
-                <Label htmlFor="plan-objects-limit" className="text-right">
-                  Лимит объектов
-                </Label>
-                <Input
-                  id="plan-objects-limit"
-                  type="number"
-                  min="0"
-                  value={editForm.objectsLimit}
-                  onChange={(e) =>
-                    handleFormChange("objectsLimit", Number(e.target.value))
-                  }
-                  className="col-span-3"
-                />
-              </div>
-              <div className="grid grid-cols-4 items-center gap-4">
-                <Label htmlFor="plan-links-limit" className="text-right">
-                  Лимит ссылок
-                </Label>
-                <Input
-                  id="plan-links-limit"
-                  type="number"
-                  min="0"
-                  value={editForm.linksLimit}
-                  onChange={(e) =>
-                    handleFormChange("linksLimit", Number(e.target.value))
-                  }
-                  className="col-span-3"
-                />
-              </div>
               <div className="grid grid-cols-4 items-center gap-4">
                 <Label htmlFor="plan-duration" className="text-right">
                   Длительность (дни)
@@ -417,41 +314,12 @@ export default function FreePlanPage() {
                   id="plan-duration"
                   type="number"
                   min="1"
-                  value={editForm.durationDays}
+                  value={editForm.duration}
                   onChange={(e) =>
-                    handleFormChange("durationDays", Number(e.target.value))
+                    handleFormChange("duration", Number(e.target.value))
                   }
                   className="col-span-3"
                 />
-              </div>
-              <div className="grid grid-cols-4 items-start gap-4">
-                <Label htmlFor="plan-description" className="text-right pt-2">
-                  Описание
-                </Label>
-                <Textarea
-                  id="plan-description"
-                  value={editForm.description}
-                  onChange={(e) =>
-                    handleFormChange("description", e.target.value)
-                  }
-                  className="col-span-3"
-                  rows={3}
-                />
-              </div>
-              <div className="grid grid-cols-4 items-center gap-4">
-                <Label className="text-right">Статус</Label>
-                <div className="flex items-center space-x-2 col-span-3">
-                  <Switch
-                    id="plan-active"
-                    checked={editForm.isActive}
-                    onCheckedChange={(checked) =>
-                      handleFormChange("isActive", checked)
-                    }
-                  />
-                  <Label htmlFor="plan-active">
-                    {editForm.isActive ? "Активен" : "Неактивен"}
-                  </Label>
-                </div>
               </div>
             </div>
             <DialogFooter>
@@ -476,72 +344,10 @@ export default function FreePlanPage() {
           <DialogHeader>
             <DialogTitle>Добавить новый бесплатный план</DialogTitle>
             <DialogDescription>
-              Заполните форму для создания нового бесплатного плана
+              Укажите длительность нового бесплатного плана
             </DialogDescription>
           </DialogHeader>
           <div className="grid gap-4 py-4">
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="new-plan-title" className="text-right">
-                Название
-              </Label>
-              <div className="col-span-3">
-                <Input
-                  id="new-plan-title"
-                  value={newPlan.title}
-                  onChange={(e) => handleNewPlanChange("title", e.target.value)}
-                  className={formErrors.title ? "border-red-500" : ""}
-                />
-                {formErrors.title && (
-                  <p className="text-red-500 text-sm mt-1">
-                    {formErrors.title}
-                  </p>
-                )}
-              </div>
-            </div>
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="new-plan-objects-limit" className="text-right">
-                Лимит объектов
-              </Label>
-              <div className="col-span-3">
-                <Input
-                  id="new-plan-objects-limit"
-                  type="number"
-                  min="0"
-                  value={newPlan.objectsLimit}
-                  onChange={(e) =>
-                    handleNewPlanChange("objectsLimit", Number(e.target.value))
-                  }
-                  className={formErrors.objectsLimit ? "border-red-500" : ""}
-                />
-                {formErrors.objectsLimit && (
-                  <p className="text-red-500 text-sm mt-1">
-                    {formErrors.objectsLimit}
-                  </p>
-                )}
-              </div>
-            </div>
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="new-plan-links-limit" className="text-right">
-                Лимит ссылок
-              </Label>
-              <div className="col-span-3">
-                <Input
-                  id="new-plan-links-limit"
-                  type="number"
-                  min="0"
-                  value={newPlan.linksLimit}
-                  onChange={(e) =>
-                    handleNewPlanChange("linksLimit", Number(e.target.value))
-                  }
-                  className={formErrors.linksLimit ? "border-red-500" : ""}
-                />
-                {formErrors.linksLimit && (
-                  <p className="text-red-500 text-sm mt-1">
-                    {formErrors.linksLimit}
-                  </p>
-                )}
-              </div>
-            </div>
             <div className="grid grid-cols-4 items-center gap-4">
               <Label htmlFor="new-plan-duration" className="text-right">
                 Длительность (дни)
@@ -551,32 +357,18 @@ export default function FreePlanPage() {
                   id="new-plan-duration"
                   type="number"
                   min="1"
-                  value={newPlan.durationDays}
+                  value={newPlan.duration}
                   onChange={(e) =>
-                    handleNewPlanChange("durationDays", Number(e.target.value))
+                    handleNewPlanChange("duration", Number(e.target.value))
                   }
-                  className={formErrors.durationDays ? "border-red-500" : ""}
+                  className={formErrors.duration ? "border-red-500" : ""}
                 />
-                {formErrors.durationDays && (
+                {formErrors.duration && (
                   <p className="text-red-500 text-sm mt-1">
-                    {formErrors.durationDays}
+                    {formErrors.duration}
                   </p>
                 )}
               </div>
-            </div>
-            <div className="grid grid-cols-4 items-start gap-4">
-              <Label htmlFor="new-plan-description" className="text-right pt-2">
-                Описание
-              </Label>
-              <Textarea
-                id="new-plan-description"
-                value={newPlan.description}
-                onChange={(e) =>
-                  handleNewPlanChange("description", e.target.value)
-                }
-                className="col-span-3"
-                rows={3}
-              />
             </div>
           </div>
           <DialogFooter>

@@ -14,6 +14,11 @@ interface FreePlan {
   updatedAt: string;
 }
 
+// Type for creating a free plan - now only requires duration
+interface CreateFreePlanInput {
+  duration: number;
+}
+
 // Fetch all free plans
 export const useGetFreePlans = () => {
   return useQuery<FreePlan[]>({
@@ -48,17 +53,12 @@ export const useGetFreePlan = (id: number) => {
   });
 };
 
-// Create a new free plan
+// Create a new free plan - now only requires duration
 export const useCreateFreePlan = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async (
-      freePlanData: Omit<
-        FreePlan,
-        "id" | "createdAt" | "updatedAt" | "isActive"
-      >
-    ) => {
+    mutationFn: async (freePlanData: CreateFreePlanInput) => {
       const { data } = await apiClient.post("/free-plan", freePlanData);
       return data;
     },
