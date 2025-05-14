@@ -19,6 +19,11 @@ import { useMobile } from "@/shared/hooks/use-is-mobile";
 
 const navItems = [
   {
+    title: "Пробный период",
+    href: "/admin/free-plan",
+    icon: DollarSign,
+  },
+  {
     title: "Тарифы",
     href: "/admin/subscriptions",
     icon: DollarSign,

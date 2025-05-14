@@ -36,6 +36,7 @@ import SubscriptionPolicy from "./pages/subscription-policy/subscription-policy"
 import { TariffsPage } from "./pages/tariffs-page/tariffs-page";
 import StatisticsPage from "./pages/admin/statistic-page/statistic-page";
 import ResetPasswordPage from "./pages/reset-password/reset-password";
+import FreePlanPage from "./pages/admin/free-plan-page/free-plan-page";
 
 function NavRoutes() {
   const location = useLocation();
@@ -100,6 +101,16 @@ function NavRoutes() {
           <AdminProtectedRoute>
             <Layout>
               <PromocodesPage />
+            </Layout>
+          </AdminProtectedRoute>
+        }
+      />
+      <Route
+        path="/admin/free-plan"
+        element={
+          <AdminProtectedRoute>
+            <Layout>
+              <FreePlanPage />
             </Layout>
           </AdminProtectedRoute>
         }
