@@ -1,3 +1,5 @@
+"use client";
+
 import { useEffect, useRef, useState } from "react";
 import { Avatar } from "@/shared/ui/avatar";
 import { Button } from "@/shared/ui/button";
@@ -13,11 +15,13 @@ import { useNavigate } from "react-router-dom";
 import { useSubscriptionPopupStore } from "../tariffs/store/use-subscription-popup-store";
 import { SubscriptionAlert } from "../tariffs/ui/subscription-popup";
 import { useCheckSubscription } from "../users/hooks/queries/use-check-subscription";
+import { useStartParsersByChatId } from "../parser/hooks/mutation/use-start-parser-by-chat-id.mutation";
 
 export const ProfileTab = () => {
   const { open } = useInstructionPopupStore();
   const { chatId } = useAuthStore();
   const { mutate: activateParser } = useSendParserData();
+  const { mutate: startParsersByChatId } = useStartParsersByChatId();
   const { data: userData, isLoading } = useGetUser(chatId);
   const { open: openParserPopup } = useParserPopupStore();
   const { mutate: stopParserByChatId } = useStopByChatId();
@@ -30,6 +34,14 @@ export const ProfileTab = () => {
     return localStorage.getItem("isParserActive") === "true";
   });
 
+  // Timer state
+  const [timeRemaining, setTimeRemaining] = useState({
+    days: 0,
+    hours: 0,
+    minutes: 0,
+    seconds: 0,
+  });
+
   const navigate = useNavigate();
 
   // Автозапуск парсера — только один раз
@@ -39,7 +51,7 @@ export const ProfileTab = () => {
     localStorage.setItem("isParserActive", String(isParserActive));
   }, [isParserActive]);
 
-  // ✅ Логика автозапуска парсера
+  // ✅ Логика автозапуска парсера - обновлена для использования нового API
   useEffect(() => {
     if (
       chatId &&
@@ -50,19 +62,49 @@ export const ProfileTab = () => {
     ) {
       hasStartedParser.current = true;
 
-      activateParser({
-        url_flats: userData.flatsLink,
-        url_grounds: userData.groundsLink,
-        url_houses: userData.housesLink,
-        url_rents: userData.rentLink,
-        chat_id: Number(chatId),
-        min_price: "0",
-        max_price: "10000000000",
-      });
-
+      // Используем новый метод API для запуска парсера по chatId
+      startParsersByChatId(chatId);
       openParserPopup();
     }
-  }, [chatId, subscriptionCheck?.active, isParserActive, userData]);
+  }, [
+    chatId,
+    subscriptionCheck?.active,
+    isParserActive,
+    userData,
+    startParsersByChatId,
+    openParserPopup,
+  ]);
+
+  // Timer logic
+  useEffect(() => {
+    if (subscriptionCheck?.active && subscriptionCheck?.expiresAt) {
+      const calculateTimeLeft = () => {
+        const expiryTime = new Date(subscriptionCheck.expiresAt).getTime();
+        const now = new Date().getTime();
+        const difference = expiryTime - now;
+
+        if (difference > 0) {
+          const days = Math.floor(difference / (1000 * 60 * 60 * 24));
+          const hours = Math.floor(
+            (difference % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)
+          );
+          const minutes = Math.floor(
+            (difference % (1000 * 60 * 60)) / (1000 * 60)
+          );
+          const seconds = Math.floor((difference % (1000 * 60)) / 1000);
+
+          setTimeRemaining({ days, hours, minutes, seconds });
+        } else {
+          setTimeRemaining({ days: 0, hours: 0, minutes: 0, seconds: 0 });
+        }
+      };
+
+      calculateTimeLeft();
+      const timer = setInterval(calculateTimeLeft, 1000);
+
+      return () => clearInterval(timer);
+    }
+  }, [subscriptionCheck]);
 
   const handleParserToggle = async () => {
     if (!chatId) {
@@ -76,16 +118,8 @@ export const ProfileTab = () => {
         return;
       }
 
-      activateParser({
-        url_flats: userData?.flatsLink,
-        url_grounds: userData?.groundsLink,
-        url_houses: userData?.housesLink,
-        url_rents: userData?.rentLink,
-        chat_id: Number(chatId),
-        min_price: "0",
-        max_price: "10000000000",
-      });
-
+      // Используем новый метод API для запуска парсера по chatId
+      startParsersByChatId(chatId);
       openParserPopup();
     } else {
       stopParserByChatId(chatId);
@@ -124,16 +158,56 @@ export const ProfileTab = () => {
               <span className="text-red-500 font-semibold">неактивна</span>
             )}
           </span>
+
+          {/* Subscription timer */}
+          {subscriptionCheck?.active && (
+            <div className="w-full mt-2 p-2 bg-blue-50 rounded-md border border-blue-200">
+              <div className="flex justify-between items-center">
+                <p className="text-sm font-medium text-blue-700">
+                  Осталось времени:
+                </p>
+                {subscriptionCheck?.freePlan && (
+                  <span className="text-xs font-medium px-2 py-1 bg-green-100 text-green-800 rounded-full">
+                    Бесплатный тариф
+                  </span>
+                )}
+              </div>
+              <div className="flex justify-between mt-1 text-blue-800">
+                <div className="text-center">
+                  <span className="text-lg font-bold">
+                    {timeRemaining.days}
+                  </span>
+                  <p className="text-xs">дней</p>
+                </div>
+                <div className="text-center">
+                  <span className="text-lg font-bold">
+                    {timeRemaining.hours}
+                  </span>
+                  <p className="text-xs">часов</p>
+                </div>
+                <div className="text-center">
+                  <span className="text-lg font-bold">
+                    {timeRemaining.minutes}
+                  </span>
+                  <p className="text-xs">минут</p>
+                </div>
+                <div className="text-center">
+                  <span className="text-lg font-bold">
+                    {timeRemaining.seconds}
+                  </span>
+                  <p className="text-xs">секунд</p>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
       </div>
-
       <Button
         text={isParserActive ? "Остановить парсер" : "Запустить парсер"}
         onClick={handleParserToggle}
         className={`mt-[19px] ${isParserActive ? "bg-red-500" : ""}`}
         variant="primary"
       />
-
       <Button
         text="Связаться с создателем"
         className="mt-[19px]"
