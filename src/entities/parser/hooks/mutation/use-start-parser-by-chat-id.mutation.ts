@@ -8,7 +8,7 @@ interface StartByChatDto {
 export const useStartParsersByChatId = () => {
   return useMutation({
     mutationFn: async (chatId: string | number) => {
-      const { data } = await parserApiClient.post("/start-by-chat", {
+      const { data } = await parserApiClient.post("/parser/start-by-chat", {
         chatId: chatId,
       });
       return data;
