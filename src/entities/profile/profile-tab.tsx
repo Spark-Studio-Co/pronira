@@ -113,12 +113,20 @@ export const ProfileTab = () => {
     }
 
     if (!isParserActive) {
+      // если подписка неактивна
       if (!subscriptionCheck?.active) {
+        if (subscriptionCheck?.freePlan) {
+          // 👉 перенаправляем на /tariffs, если free план закончился
+          navigate("/tariffs");
+          return;
+        }
+
+        // если обычная подписка закончилась — показать попап
         openSubscriptionAlert();
         return;
       }
 
-      // Используем новый метод API для запуска парсера по chatId
+      // запускаем парсер
       startParsersByChatId(chatId);
       openParserPopup();
     } else {
