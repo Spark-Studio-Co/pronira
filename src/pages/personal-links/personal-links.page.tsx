@@ -33,6 +33,8 @@ export const PersonalLinksPage = () => {
       return;
     }
 
+    // test
+
     const categoryTokenMap: Record<string, string> = {
       Квартиры: "7678740477:AAGMQoWpVLIRsVUs9S2Lw7eosn8onxYOoic",
       Участки: "7364782502:AAED4nvuEYAzeI4W_rKHwUQfO7y92jQXilY",
