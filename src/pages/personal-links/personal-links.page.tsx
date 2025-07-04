@@ -34,10 +34,10 @@ export const PersonalLinksPage = () => {
     }
 
     const categoryTokenMap: Record<string, string> = {
-      Квартиры: "7067505501:AAF-YnHRAgqm2mhQ8QnPl9alKWUu2QO91YM",
-      Участки: "8062579317:AAGKp7zzbuxO-CdF2D33Eu6qWiFgjFSAV_w",
-      Дома: "7502003155:AAH2EokCUAAEgsXGufDF64tgYBDuzxHQIYM",
-      Аренда: "7670256176:AAGBKB1cmFf6i22ahOlZ4wCzc3312h9m8To",
+      Квартиры: "7678740477:AAGMQoWpVLIRsVUs9S2Lw7eosn8onxYOoic",
+      Участки: "7364782502:AAED4nvuEYAzeI4W_rKHwUQfO7y92jQXilY",
+      Дома: "7775446952:AAE7NOZXxEic8GSzXZMsNwCd6QH2prRsU7Q",
+      Аренда: "7754457993:AAF2puDGSWt1mMKEWDG5lXTp19m6t1gAnWE",
     };
 
     const linksArray = Object.entries(links)
